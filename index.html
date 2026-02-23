@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSN — Tableau de bord</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // VUE GLOBALE — DONNÉES
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    const vueGlobaleData = {
+      axes: [
+        { id: 'A1', name: 'Plateformes numériques', fullName: 'Axe 1 : Plateformes numériques et gouvernance', type: 'axe', color: '#3B82F6' },
+        { id: 'A2', name: 'Modélisation et méthodes', fullName: 'Axe 2 : Modélisation et méthodes numériques', type: 'axe', color: '#8B5CF6' },
+        { id: 'A3', name: 'Interventions numériques', fullName: 'Axe 3 : Interventions numériques', type: 'axe', color: '#EC4899' },
+        { id: 'A4', name: 'Transformation numérique', fullName: 'Axe 4 : Transformation numérique', type: 'axe', color: '#F59E0B' },
+        { id: 'CA-FORM', name: 'Formation', fullName: "Champ d'action : Formation interdisciplinaire", type: 'champ', color: '#10B981' },
+        { id: 'CA-MOB', name: 'Mobilisation', fullName: "Champ d'action : Mobilisation des connaissances", type: 'champ', color: '#14B8A6' },
+        { id: 'CA-RENF', name: 'Renforcement', fullName: "Champ d'action : Renforcement des capacités", type: 'champ', color: '#06B6D4' },
+        { id: 'PD-ENG', name: 'Engagement citoyen', fullName: 'Principe directeur : Engagement citoyen', type: 'principe', color: '#6366F1' },
+        { id: 'PD-CONF', name: 'Numérique de confiance', fullName: 'Principe directeur : Numérique de confiance', type: 'principe', color: '#A855F7' },
+        { id: 'PD-DUR', name: 'Santé durable', fullName: 'Principe directeur : Santé durable', type: 'principe', color: '#22C55E' },
+        { id: 'PD-SCI', name: 'Science ouverte', fullName: 'Principe directeur : Science ouverte', type: 'principe', color: '#EAB308' },
+        { id: 'PD-EDIA', name: 'EDIA', fullName: 'Principe directeur : EDIA', type: 'principe', color: '#EF4444' },
+      ],
+      chantiers: [
+        { id: 'C1', name: 'Guides & Outils', verb: 'PRODUIRE', color: '#2563EB', icon: '📘' },
+        { id: 'C2', name: 'Répertoires', verb: 'RECENSER', color: '#7C3AED', icon: '🗺️' },
+        { id: 'C3', name: 'Concertation', verb: 'CONNECTER', color: '#DB2777', icon: '🤝' },
+        { id: 'C4', name: 'Formation', verb: 'FORMER', color: '#059669', icon: '🎓' },
+        { id: 'C5', name: 'Consultation', verb: 'ÉCOUTER', color: '#0891B2', icon: '👂' },
+        { id: 'C6', name: 'Influence', verb: 'CONVAINCRE', color: '#DC2626', icon: '📢' },
+        { id: 'C7', name: 'Événements', verb: 'ANIMER', color: '#D97706', icon: '🎪' },
+      ],
+      actions: [
+        { id: 'A1-OS1-a', axe: 'A1', chantier: 'C6', action: "Rédiger un manifeste en faveur de l'accès aux données" },
+        { id: 'A1-OS1-b', axe: 'A1', chantier: 'C1', action: "Produire un document annexe mettant de l'avant les bénéfices" },
+        { id: 'A1-OS1-c', axe: 'A1', chantier: 'C3', action: "Former un comité de patients et usagers sur l'acceptabilité" },
+        { id: 'A1-OS2-a', axe: 'A1', chantier: 'C3', action: 'Lancer une table de concertation entre les plateformes' },
+        { id: 'A1-OS2-b', axe: 'A1', chantier: 'C2', action: 'Cartographier les actifs informationnels et les expertises' },
+        { id: 'A1-OS2-c', axe: 'A1', chantier: 'C3', action: "S'arrimer aux initiatives et communautés de pratiques existantes" },
+        { id: 'A1-OS3-a', axe: 'A1', chantier: 'C6', action: 'Se joindre aux comités sur le DSN et aux instances de Santé Québec' },
+        { id: 'A1-OS3-b', axe: 'A1', chantier: 'C3', action: 'Table inter-axes de concertation en gouvernance informationnelle' },
+        { id: 'A1-OS3-c', axe: 'A1', chantier: 'C1', action: "Partage des cadres de gestion et des modèles d'entente" },
+        { id: 'A2-OS1-a', axe: 'A2', chantier: 'C2', action: "Effectuer une cartographie des différents champs d'expertise" },
+        { id: 'A2-OS1-b', axe: 'A2', chantier: 'C3', action: 'Lancer une communauté de pratique des méthodologistes' },
+        { id: 'A2-OS2-a', axe: 'A2', chantier: 'C1', action: "Établir un guide/template standard pour encadrer l'harmonisation" },
+        { id: 'A2-OS2-b', axe: 'A2', chantier: 'C1', action: 'Identifier les bonnes pratiques à formaliser pour la communauté' },
+        { id: 'A2-OS2-c', axe: 'A2', chantier: 'C1', action: "Assurer l'offre de ressources en français" },
+        { id: 'A2-OS3-a', axe: 'A2', chantier: 'C7', action: 'Organiser des journal clubs pour le partage des connaissances' },
+        { id: 'A2-OS3-b', axe: 'A2', chantier: 'C7', action: 'Organiser des activités avec des partenaires (ex. IVADO)' },
+        { id: 'A3-OS1-a', axe: 'A3', chantier: 'C2', action: 'Effectuer une cartographie des meilleures pratiques' },
+        { id: 'A3-OS1-b', axe: 'A3', chantier: 'C5', action: 'Identifier des problèmes communs rencontrés par les chercheurs' },
+        { id: 'A3-OS1-c', axe: 'A3', chantier: 'C2', action: 'Effectuer une cartographie des living labs dans les milieux' },
+        { id: 'A3-OS2-a', axe: 'A3', chantier: 'C3', action: 'Organiser une table de concertation chercheurs-milieux preneurs' },
+        { id: 'A3-OS2-b', axe: 'A3', chantier: 'C3', action: 'Identifier des ambassadeurs dans le RSN' },
+        { id: 'A3-OS3-a', axe: 'A3', chantier: 'C5', action: 'Lancer une consultation pour identifier les enjeux' },
+        { id: 'A3-OS3-b', axe: 'A3', chantier: 'C7', action: "Organiser des événements en partenariat avec l'industrie" },
+        { id: 'A4-OS1-a', axe: 'A4', chantier: 'C2', action: 'Cartographier les initiatives, formations et projets existants' },
+        { id: 'A4-OS1-b', axe: 'A4', chantier: 'C4', action: 'Former la communauté de recherche à la vulgarisation' },
+        { id: 'A4-OS1-c', axe: 'A4', chantier: 'C5', action: 'Organiser des ateliers de travail et de consultation' },
+        { id: 'A4-OS2-a', axe: 'A4', chantier: 'C3', action: "Mobiliser les experts de l'axe aux compétences diverses" },
+        { id: 'A4-OS2-b', axe: 'A4', chantier: 'C3', action: 'Mettre en place une table de concertation sur la gouvernance' },
+        { id: 'A4-OS2-c', axe: 'A4', chantier: 'C6', action: 'Éclairer la décision publique en lien avec le DSN' },
+        { id: 'A4-OS3-a', axe: 'A4', chantier: 'C3', action: 'Prendre contact avec des experts en vulgarisation juridique' },
+        { id: 'A4-OS3-b', axe: 'A4', chantier: 'C2', action: 'Réunir les formations et ressources sur les lois 5 et 25' },
+        { id: 'CA-FORM-OS1-a', axe: 'CA-FORM', chantier: 'C7', action: 'Soutien aux événements de formation' },
+        { id: 'CA-FORM-OS1-b', axe: 'CA-FORM', chantier: 'C2', action: 'Effectuer une analyse du paysage de la formation' },
+        { id: 'CA-FORM-OS1-c', axe: 'CA-FORM', chantier: 'C5', action: 'Effectuer une analyse des lacunes' },
+        { id: 'CA-FORM-OS2-a', axe: 'CA-FORM', chantier: 'C5', action: 'Consultation sur les besoins des étudiants' },
+        { id: 'CA-FORM-OS2-b', axe: 'CA-FORM', chantier: 'C7', action: 'Soutien aux manifestations étudiantes sur la santé numérique' },
+        { id: 'CA-FORM-OS3-a', axe: 'CA-FORM', chantier: 'C2', action: 'Inventaire des programmes de formation existants' },
+        { id: 'CA-FORM-OS3-b', axe: 'CA-FORM', chantier: 'C5', action: 'Consultation sur les besoins des chercheurs' },
+        { id: 'CA-MOB-OS1-a', axe: 'CA-MOB', chantier: 'C3', action: 'Établir des réunions interdisciplinaires régulières' },
+        { id: 'CA-MOB-OS1-b', axe: 'CA-MOB', chantier: 'C2', action: 'Identifier les expertises des différents membres' },
+        { id: 'CA-MOB-OS1-c', axe: 'CA-MOB', chantier: 'C2', action: 'Identifier les communautés existantes et identifier les gaps' },
+        { id: 'CA-MOB-OS1-d', axe: 'CA-MOB', chantier: 'C5', action: 'Préciser le public et objectif en matière de mobilisation' },
+        { id: 'CA-MOB-OS2-a', axe: 'CA-MOB', chantier: 'C1', action: 'Élaborer des résumés conviviaux des connaissances et articles' },
+        { id: 'CA-MOB-OS2-b', axe: 'CA-MOB', chantier: 'C5', action: "Identifier les besoins des groupes cibles en matière d'accès" },
+        { id: 'CA-MOB-OS2-c', axe: 'CA-MOB', chantier: 'C3', action: 'Collaborer activement avec les axes et le comité étudiant' },
+        { id: 'CA-MOB-OS2-d', axe: 'CA-MOB', chantier: 'C1', action: 'Porter attention au problème de disponibilité et de biais' },
+        { id: 'CA-MOB-OS3-a', axe: 'CA-MOB', chantier: 'C2', action: 'Accéder aux revues de littérature existantes et les compiler' },
+        { id: 'CA-MOB-OS3-b', axe: 'CA-MOB', chantier: 'C1', action: "Développer un bulletin d'informations régulier" },
+        { id: 'CA-MOB-OS3-c', axe: 'CA-MOB', chantier: 'C5', action: 'Identifier les besoins des groupes cibles' },
+        { id: 'CA-RENF-OS1-a', axe: 'CA-RENF', chantier: 'C3', action: 'Développer des communautés de pratique' },
+        { id: 'CA-RENF-OS1-b', axe: 'CA-RENF', chantier: 'C3', action: "Créer des réseaux d'apprentissages collaboratifs" },
+        { id: 'CA-RENF-OS2-a', axe: 'CA-RENF', chantier: 'C2', action: 'Assurer la réalisation des cartographies des assets critiques' },
+        { id: 'CA-RENF-OS3-a', axe: 'CA-RENF', chantier: 'C3', action: "Mettre en place un comité de suivi chargé d'évaluer les progrès" },
+        { id: 'CA-RENF-OS3-b', axe: 'CA-RENF', chantier: 'C1', action: 'Revoir les critères et cadres existants' },
+        { id: 'PD-ENG-OS1-a', axe: 'PD-ENG', chantier: 'C3', action: 'Travailler en partenariat avec des organisations et communautés' },
+        { id: 'PD-ENG-OS1-b', axe: 'PD-ENG', chantier: 'C5', action: 'Recenser et analyser les attentes de la patientèle' },
+        { id: 'PD-ENG-OS2-a', axe: 'PD-ENG', chantier: 'C6', action: "Favoriser l'intégration de la co-construction dans le DSN" },
+        { id: 'PD-ENG-OS2-b', axe: 'PD-ENG', chantier: 'C3', action: 'Former un comité patientèle et public au sein du RSN' },
+        { id: 'PD-ENG-OS3-a', axe: 'PD-ENG', chantier: 'C1', action: "Définir les modalités d'engagement et de partage" },
+        { id: 'PD-ENG-OS3-b', axe: 'PD-ENG', chantier: 'C7', action: 'Développer ou promouvoir des balados et webinaires' },
+        { id: 'PD-ENG-OS3-c', axe: 'PD-ENG', chantier: 'C7', action: "Soutenir l'organisation de conférences accessibles au public" },
+        { id: 'PD-ENG-OS3-d', axe: 'PD-ENG', chantier: 'C5', action: 'Considérer les spécificités du Québec' },
+        { id: 'PD-CONF-OS1-a', axe: 'PD-CONF', chantier: 'C3', action: 'Organiser des rencontres transversales avec les axes' },
+        { id: 'PD-CONF-OS1-b', axe: 'PD-CONF', chantier: 'C5', action: "Identifier les attentes spécifiques par axe ou champ d'action" },
+        { id: 'PD-CONF-OS1-c', axe: 'PD-CONF', chantier: 'C1', action: 'Produire une ébauche de la définition sous forme de fiche' },
+        { id: 'PD-CONF-OS2-a', axe: 'PD-CONF', chantier: 'C2', action: 'Cartographier les acteurs concernés (patients partenaires, CEPPP)' },
+        { id: 'PD-CONF-OS2-b', axe: 'PD-CONF', chantier: 'C5', action: 'Organiser des groupes de discussion citoyens pour coconstruire' },
+        { id: 'PD-CONF-OS2-c', axe: 'PD-CONF', chantier: 'C5', action: 'Mobiliser les comités de patients partenaires' },
+        { id: 'PD-CONF-OS3-a', axe: 'PD-CONF', chantier: 'C1', action: 'Développer une feuille de route de critères de confiance' },
+        { id: 'PD-CONF-OS3-b', axe: 'PD-CONF', chantier: 'C3', action: 'Déployer cette feuille de route dans des projets pilotes' },
+        { id: 'PD-CONF-OS3-c', axe: 'PD-CONF', chantier: 'C7', action: 'Faire connaître ces outils aux parties prenantes' },
+        { id: 'PD-DUR-OS1-a', axe: 'PD-DUR', chantier: 'C2', action: 'Effectuer une revue de la littérature nationale et internationale' },
+        { id: 'PD-DUR-OS1-b', axe: 'PD-DUR', chantier: 'C1', action: 'Proposer une définition commune de la santé durable' },
+        { id: 'PD-DUR-OS1-c', axe: 'PD-DUR', chantier: 'C3', action: 'Organiser une réflexion stratégique sur les données et la santé' },
+        { id: 'PD-DUR-OS2-a', axe: 'PD-DUR', chantier: 'C2', action: 'Identifier et cartographier les partenariats potentiels' },
+        { id: 'PD-DUR-OS2-b', axe: 'PD-DUR', chantier: 'C5', action: 'Solliciter les citoyens et citoyennes prioritaires' },
+        { id: 'PD-DUR-OS2-c', axe: 'PD-DUR', chantier: 'C2', action: 'Identifier des projets dans les autres axes du RSN' },
+        { id: 'PD-DUR-OS2-d', axe: 'PD-DUR', chantier: 'C2', action: 'Identifier les chercheurs-euses en santé durable' },
+        { id: 'PD-DUR-OS3-a', axe: 'PD-DUR', chantier: 'C6', action: "Élaborer un énoncé politique ou manifeste de l'axe santé durable" },
+        { id: 'PD-DUR-OS3-b', axe: 'PD-DUR', chantier: 'C7', action: "Organiser un atelier de réflexion autour de l'IA et durabilité" },
+        { id: 'PD-SCI-OS1-a', axe: 'PD-SCI', chantier: 'C5', action: 'Élaborer un sondage auprès des membres du Réseau' },
+        { id: 'PD-SCI-OS1-b', axe: 'PD-SCI', chantier: 'C2', action: 'Réaliser une veille des initiatives internationales' },
+        { id: 'PD-SCI-OS1-c', axe: 'PD-SCI', chantier: 'C2', action: 'Regarder les initiatives au Québec en particulier' },
+        { id: 'PD-SCI-OS2-a', axe: 'PD-SCI', chantier: 'C1', action: 'Créer un espace GitHub RSN avec un modèle de gouvernance' },
+        { id: 'PD-SCI-OS2-b', axe: 'PD-SCI', chantier: 'C1', action: 'Partager des packages R et Python avec la communauté' },
+        { id: 'PD-SCI-OS2-c', axe: 'PD-SCI', chantier: 'C4', action: 'Proposer des formations pratiques sur rmarkdown et quarto' },
+        { id: 'PD-SCI-OS3-a', axe: 'PD-SCI', chantier: 'C1', action: 'Développer des connaissances accessibles pour les chercheurs sur la science ouverte' },
+        { id: 'PD-SCI-OS3-b', axe: 'PD-SCI', chantier: 'C7', action: 'Organiser une Journée science ouverte annuelle' },
+        { id: 'PD-EDIA-OS1-a', axe: 'PD-EDIA', chantier: 'C1', action: "Élaborer un formulaire d'auto-identification pour le RSN" },
+        { id: 'PD-EDIA-OS1-b', axe: 'PD-EDIA', chantier: 'C1', action: "Établir une définition commune de l'EDIA pour le RSN" },
+        { id: 'PD-EDIA-OS1-c', axe: 'PD-EDIA', chantier: 'C1', action: "Mettre en évidence les bénéfices concrets de l'EDIA" },
+        { id: 'PD-EDIA-OS1-d', axe: 'PD-EDIA', chantier: 'C2', action: 'Recenser les outils et ressources disponibles EDIA' },
+        { id: 'PD-EDIA-OS2-a', axe: 'PD-EDIA', chantier: 'C7', action: "Sensibiliser à l'importance d'un recrutement équitable" },
+        { id: 'PD-EDIA-OS2-b', axe: 'PD-EDIA', chantier: 'C1', action: "Développer ou adapter un outil d'évaluation EDIA" },
+        { id: 'PD-EDIA-OS2-c', axe: 'PD-EDIA', chantier: 'C6', action: "Inclure des critères EDIA dans les procédures d'évaluation" },
+        { id: 'PD-EDIA-OS3-a', axe: 'PD-EDIA', chantier: 'C1', action: "Mettre en évidence les bénéfices de l'intégration de l'EDIA" },
+        { id: 'PD-EDIA-OS3-b', axe: 'PD-EDIA', chantier: 'C1', action: "Prévoir l'observation et l'évaluation à court terme de l'EDIA" },
+      ]
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ANALYSE CHANTIERS — CONFIG & DONNÉES
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    const STATUS = {
+      keep:    { label: "À garder",      bg: "bg-emerald-50",  border: "border-emerald-300", text: "text-emerald-800",  dot: "bg-emerald-500",  icon: "✅" },
+      rewrite: { label: "À réécrire",    bg: "bg-amber-50",    border: "border-amber-300",   text: "text-amber-800",   dot: "bg-amber-500",    icon: "✏️" },
+      gap:     { label: "Gap — À créer", bg: "bg-red-50",      border: "border-red-300",     text: "text-red-800",     dot: "bg-red-500",      icon: "🔴" },
+      move:    { label: "À déplacer",    bg: "bg-sky-50",      border: "border-sky-300",     text: "text-sky-800",     dot: "bg-sky-500",      icon: "🔀" },
+    };
+
+    const STATUS_DARK = {
+      keep:    { label: "À garder",      bg: "bg-emerald-950", border: "border-emerald-700", text: "text-emerald-300", dot: "bg-emerald-400", icon: "✅" },
+      rewrite: { label: "À réécrire",    bg: "bg-amber-950",   border: "border-amber-700",   text: "text-amber-300",  dot: "bg-amber-400",   icon: "✏️" },
+      gap:     { label: "Gap — À créer", bg: "bg-red-950",     border: "border-red-800",     text: "text-red-300",    dot: "bg-red-400",     icon: "🔴" },
+      move:    { label: "À déplacer",    bg: "bg-sky-950",     border: "border-sky-700",     text: "text-sky-300",    dot: "bg-sky-400",     icon: "🔀" },
+    };
+
+    const getS = (status, darkMode) => darkMode ? STATUS_DARK[status] : STATUS[status];
+
+    const CHANTIERS_META = [
+      { id: 1, name: "Guides & Outils",               verb: "PRODUIRE",   totalActions: 22, analyzed: true  },
+      { id: 2, name: "Répertoires & Cartographie",    verb: "RECENSER",   totalActions: 20, analyzed: false },
+      { id: 3, name: "Concertation & Maillage",       verb: "CONNECTER",  totalActions: 20, analyzed: false },
+      { id: 4, name: "Formation & Relève",            verb: "FORMER",     totalActions: 2,  analyzed: false },
+      { id: 5, name: "Consultation & Écoute",         verb: "ÉCOUTER",    totalActions: 16, analyzed: false },
+      { id: 6, name: "Influence & Représentation",    verb: "CONVAINCRE", totalActions: 6,  analyzed: false },
+      { id: 7, name: "Événements & Rayonnement",      verb: "ANIMER",     totalActions: 11, analyzed: false },
+    ];
+
+    const ANALYSE_DATA = {
+      1: {
+        projects: [
+          {
+            id: "G1",
+            name: "Harmonisation des bonnes pratiques méthodologiques",
+            description: "Produire un cadre commun de bonnes pratiques pour la communauté de recherche, accessible en français.",
+            actions: [
+              { id: "A2-OS2-a", axe: "Axe 2 : Modélisation et méthodes numériques", objectif: "Colliger et harmoniser les bonnes pratiques et les rendre accessibles", action: "Établir un guide/template standard pour encadrer l'harmonisation des bonnes pratiques en méthodologie", status: "keep", notes: "Ces 3 actions (a, b, c) partagent le même objectif stratégique — à fusionner en un seul livrable de projet." },
+              { id: "A2-OS2-b", axe: "Axe 2 : Modélisation et méthodes numériques", objectif: "Colliger et harmoniser les bonnes pratiques et les rendre accessibles", action: "Identifier les bonnes pratiques à formaliser pour la communauté et produire les guides associés", status: "keep", notes: "À fusionner avec A2-OS2-a." },
+              { id: "A2-OS2-c", axe: "Axe 2 : Modélisation et méthodes numériques", objectif: "Colliger et harmoniser les bonnes pratiques et les rendre accessibles", action: "Assurer l'offre de ressources en français", status: "keep", notes: "À fusionner avec A2-OS2-a — devient une contrainte du livrable, pas une action séparée." },
+            ],
+          },
+          {
+            id: "G2",
+            name: "Lexique RSN — Définitions communes",
+            description: "Établir une définition partagée pour chacun des principes directeurs du RSN. Tous les principes devraient être représentés.",
+            actions: [
+              { id: "PD-CONF-OS1-c", axe: "Principe directeur : Numérique de confiance", objectif: "Intégrer une vision partagée du numérique de confiance dans les axes et les actions du RSN", action: "Produire une première ébauche de la définition sous forme de fiche ou infographie à valider collectivement", status: "keep", notes: "" },
+              { id: "PD-DUR-OS1-b", axe: "Principe directeur : Santé durable", objectif: "Former et sensibiliser les membres du réseau et les parties prenantes sur la santé numérique durable", action: "Proposer une définition commune de la santé durable dans un contexte de santé numérique pour le RSN (lexique commun ou cartographie des concepts clés)", status: "keep", notes: "" },
+              { id: "PD-EDIA-OS1-b", axe: "Principe directeur : EDIA", objectif: "Favoriser une culture inclusive et respectueuse", action: "Établir une définition commune de l'EDIA pour le RSN", status: "keep", notes: "" },
+              { id: "PD-ENG-OS3-a", axe: "Principe directeur : Engagement citoyen", objectif: "Favoriser l'accessibilité de la patientèle et du public aux connaissances et interventions en santé numérique", action: "Définir les modalités d'engagement et de partage des connaissances (symposium, journée scientifique, feuille de route, etc.)", status: "rewrite", notes: "L'action porte sur des modalités organisationnelles, pas sur la définition du principe. À reformuler : « Établir une définition commune de l'Engagement citoyen pour le RSN »." },
+              { id: "GAP-DEF-SCI", axe: "Principe directeur : Science ouverte", objectif: "—", action: "Définition commune de la Science ouverte pour le RSN", status: "gap", notes: "Absent du fichier source. Tous les principes directeurs devraient avoir une définition dans ce projet — Science ouverte manque." },
+            ],
+          },
+          {
+            id: "G3",
+            name: "Grilles de référence par principe directeur",
+            description: "Pour chaque principe directeur, produire UNE grille de référence couvrant à la fois les critères d'intégration dans les projets ET les indicateurs de mesure d'impact. Les deux dimensions sont indissociables : définir les critères en amont, c'est se donner les moyens de mesurer en aval.",
+            actions: [
+              { id: "CA-RENF-OS3-b", axe: "Champ d'action : Renforcement des capacités", objectif: "Outiller les chercheur(e)s pour mesurer adéquatement l'impact de leurs activités en termes de capacité", action: "Revoir les critères et cadres existants, et définir ce qu'il est nécessaire de suivre et comment le faire", status: "keep", notes: "Cadre général et méthodologique — devient la base commune des grilles de référence." },
+              { id: "PD-CONF-OS3-a", axe: "Principe directeur : Numérique de confiance", objectif: "Favoriser des normes et pratiques partagées autour de la transparence, la sécurité, l'éthique, l'éco-responsabilité et la réciprocité", action: "Développer une feuille de route de critères de confiance à appliquer dans les projets (sécurité, éthique, validité, UX)", status: "rewrite", notes: "À reformuler : « Développer une grille de référence Numérique de confiance — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact ». Seule grille existante, modèle pour les autres." },
+              { id: "PD-EDIA-OS2-b", axe: "Principe directeur : EDIA", objectif: "Assurer l'équité dans le processus de dotation des organisations", action: "Développer ou adapter un outil d'évaluation EDIA des processus organisationnels (avec une dimension recrutement)", status: "keep", notes: "Contribue à la grille EDIA — dimension évaluation des processus." },
+              { id: "PD-EDIA-OS3-b", axe: "Principe directeur : EDIA", objectif: "Encourager la diversité des approches de recherche et de méthodologies", action: "Prévoir l'observation et l'évaluation à court terme de l'EDIA dès la conception des projets", status: "keep", notes: "Contribue à la grille EDIA — dimension intégration dès la conception." },
+              { id: "PD-EDIA-OS1-c", axe: "Principe directeur : EDIA", objectif: "Favoriser une culture inclusive et respectueuse", action: "Mettre en évidence les bénéfices concrets de l'EDIA (p. ex. dans l'enseignement, les pratiques de gouvernance, l'accueil des populations vulnérables)", status: "rewrite", notes: "À reformuler en indicateurs d'impact EDIA : « Développer des indicateurs et exemples concrets pour mesurer et démontrer l'impact de l'EDIA dans les projets RSN »." },
+              { id: "PD-EDIA-OS3-a", axe: "Principe directeur : EDIA", objectif: "Encourager la diversité des approches de recherche et de méthodologies", action: "Mettre en évidence les bénéfices de l'intégration de l'EDIA dans la recherche (démonstration par l'exemple)", status: "rewrite", notes: "Même logique que PD-EDIA-OS1-c. À reformuler en mesure d'impact démonstrative et reproductible — contribue à la grille EDIA." },
+              { id: "GAP-GR-SCI", axe: "Principe directeur : Science ouverte", objectif: "—", action: "Développer une grille de référence Science ouverte — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact", status: "gap", notes: "À créer sur le modèle de la grille Numérique de confiance (PD-CONF-OS3-a réécrit)." },
+              { id: "GAP-GR-DUR", axe: "Principe directeur : Santé durable", objectif: "—", action: "Développer une grille de référence Santé durable — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact", status: "gap", notes: "À créer sur le modèle de la grille Numérique de confiance." },
+              { id: "GAP-GR-ENG", axe: "Principe directeur : Engagement citoyen", objectif: "—", action: "Développer une grille de référence Engagement citoyen — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact", status: "gap", notes: "À créer sur le modèle de la grille Numérique de confiance." },
+            ],
+          },
+          {
+            id: "G4",
+            name: "Infrastructure Science ouverte",
+            description: "Mettre en place les espaces et outils partagés pour la science ouverte — transversale à tous les projets RSN.",
+            actions: [
+              { id: "PD-SCI-OS2-a", axe: "Principe directeur : Science ouverte", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Créer un espace GitHub RSN avec un modèle de gouvernance et le diffuser dans la communauté", status: "keep", notes: "Clair et bien placé ici." },
+              { id: "PD-SCI-OS2-b", axe: "Principe directeur : Science ouverte", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Partager des packages R et Python avec la communauté", status: "rewrite", notes: "Action trop vague comme infrastructure. À reformuler en guide pratique : « Produire un guide de partage de code et packages (R, Python) dans une logique de science ouverte »." },
+              { id: "PD-SCI-OS3-a", axe: "Principe directeur : Science ouverte", objectif: "Promouvoir une culture de la science ouverte au sein du réseau et à l'externe", action: "Développer des connaissances accessibles pour les chercheurs sur la science ouverte (capsules, guides)", status: "move", notes: "Double appartenance : appartient aussi à Événements & Rayonnement (capsules = rayonnement). À conserver ici ET dupliquer dans ce chantier." },
+            ],
+          },
+          {
+            id: "G5",
+            name: "Guides de gouvernance",
+            description: "Produire des guides et cadres de référence sur les différents types de gouvernance pertinents pour le RSN.",
+            actions: [
+              { id: "A1-OS3-c", axe: "Axe 1 : Plateformes numériques et gouvernance", objectif: "Représenter les besoins de la communauté des chercheurs en matière de gouvernance de l'information et influencer les décisions gouvernementales", action: "Partage des cadres de gestion et des modèles d'entente", status: "keep", notes: "" },
+              { id: "GAP-GOV-TYPES", axe: "Axe 1 : Plateformes numériques et gouvernance", objectif: "—", action: "Identifier et documenter les types de gouvernance manquants (gouvernance des données, des plateformes, éthique, etc.) et produire les guides associés", status: "gap", notes: "Question ouverte : quels types de gouvernance manque-t-il à ce projet ? Un seul guide de gouvernance semble insuffisant pour un réseau de cette ampleur." },
+            ],
+          },
+        ],
+        parkingLot: [
+          { id: "CA-MOB-OS2-a", axe: "Champ d'action : Mobilisation des connaissances", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Élaborer des résumés conviviaux des connaissances et articles", destination: "Événements & Rayonnement", notes: "Produire des résumés pour diffusion = rayonnement, pas production de guides méthodologiques." },
+          { id: "CA-MOB-OS3-b", axe: "Champ d'action : Mobilisation des connaissances", objectif: "Renforcer l'engagement citoyen et la littératie numérique en santé par la diffusion des connaissances", action: "Développer un bulletin d'informations régulier pour le partage des résultats de recherche", destination: "Événements & Rayonnement", notes: "Un bulletin = outil de communication et de rayonnement, pas un guide." },
+          { id: "A1-OS1-b", axe: "Axe 1 : Plateformes numériques et gouvernance", objectif: "Favoriser l'acceptabilité sociale de l'utilisation des données de santé dans un contexte de recherche", action: "Produire un document annexe mettant de l'avant les bénéfices et les manques à gagner (use case)", destination: "Influence & Représentation", notes: "Orphelin sans les autres A1-OS1. À fusionner avec A1-OS1-a (manifeste) et A1-OS1-c (comité patients) qui sont dans d'autres chantiers." },
+          { id: "PD-EDIA-OS1-a", axe: "Principe directeur : EDIA", objectif: "Favoriser une culture inclusive et respectueuse", action: "Élaborer un formulaire d'auto-identification pour le RSN", destination: "Consultation & Écoute", notes: "Ce n'est pas de l'évaluation — c'est un outil de collecte de données / consultation. Appartient à Consultation & Écoute." },
+          { id: "CA-MOB-OS2-d", axe: "Champ d'action : Mobilisation des connaissances", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Porter attention au problème de disponibilité et de biais pour les données des populations marginalisées", destination: "Guides & Outils (à développer)", notes: "Intention valide mais trop vague comme action. À transformer en guide concret : « Produire un guide sur l'intégration et la représentation des populations marginalisées dans les données de recherche »." },
+        ],
+      },
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ANALYSE CHANTIERS — COMPOSANTS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function StatusBadge({ status, darkMode }) {
+      const s = getS(status, darkMode);
+      return (
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${s.bg} ${s.border} ${s.text}`}>
+          {s.icon} {s.label}
+        </span>
+      );
+    }
+
+    function ActionRow({ action, darkMode }) {
+      const [expanded, setExpanded] = useState(false);
+      const s = getS(action.status, darkMode);
+      const metaText  = darkMode ? 'text-slate-400' : 'text-gray-500';
+      const metaBold  = darkMode ? 'text-slate-300' : 'text-gray-600';
+      const noteBorder = darkMode ? 'border-slate-600' : 'border-gray-200';
+      const noteText   = darkMode ? 'text-slate-400' : 'text-gray-600';
+      const btnText    = darkMode ? 'text-slate-500 hover:text-slate-200' : 'text-gray-400 hover:text-gray-600';
+      return (
+        <div className={`rounded-lg border ${s.border} ${s.bg} p-3 mb-2`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <span className={`font-mono text-xs font-bold ${metaText} shrink-0`}>{action.id}</span>
+                <span className={`text-xs ${metaText} italic truncate`}>{action.axe}</span>
+              </div>
+              {action.objectif !== "—" && (
+                <p className={`text-xs ${metaText} mb-1.5 leading-relaxed`}>
+                  <span className={`font-medium ${metaBold}`}>Objectif :</span> {action.objectif}
+                </p>
+              )}
+              <p className={`text-sm font-medium ${s.text} leading-snug`}>{action.action}</p>
+            </div>
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
+              <StatusBadge status={action.status} darkMode={darkMode} />
+              {action.notes && (
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className={`text-xs ${btnText} underline underline-offset-2`}
+                >
+                  {expanded ? "Masquer note ▲" : "Note ▼"}
+                </button>
+              )}
+            </div>
+          </div>
+          {expanded && action.notes && (
+            <div className={`mt-2 pt-2 border-t ${noteBorder} text-xs ${noteText} italic leading-relaxed`}>
+              💬 {action.notes}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function ProjectCard({ project, darkMode }) {
+      const [open, setOpen] = useState(true);
+      const counts = project.actions.reduce((acc, a) => {
+        acc[a.status] = (acc[a.status] || 0) + 1;
+        return acc;
+      }, {});
+
+      const cardBg     = darkMode ? 'bg-slate-800'   : 'bg-white';
+      const cardBorder = darkMode ? 'border-slate-700' : 'border-gray-200';
+      const hoverBg    = darkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-50';
+      const chevron    = darkMode ? 'text-slate-500'  : 'text-gray-400';
+      const titleColor = darkMode ? 'text-slate-100'  : 'text-gray-900';
+      const descColor  = darkMode ? 'text-slate-400'  : 'text-gray-500';
+      const countColor = darkMode ? 'text-slate-500'  : 'text-gray-400';
+      const divider    = darkMode ? 'border-slate-700' : 'border-gray-100';
+
+      return (
+        <div className={`${cardBg} rounded-xl border ${cardBorder} shadow-sm mb-4 overflow-hidden`}>
+          <button
+            onClick={() => setOpen(!open)}
+            className={`w-full flex items-start justify-between p-4 text-left ${hoverBg} transition-colors`}
+          >
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span className={`${chevron} mt-0.5 shrink-0`}>{open ? "▼" : "▶"}</span>
+              <div className="min-w-0">
+                <h3 className={`font-semibold ${titleColor} leading-snug`}>{project.name}</h3>
+                {project.description && (
+                  <p className={`text-xs ${descColor} mt-1 leading-relaxed pr-4`}>{project.description}</p>
+                )}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {Object.entries(counts).map(([status, count]) => {
+                    const s = getS(status, darkMode);
+                    return (
+                      <span key={status} className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${s.bg} ${s.border} ${s.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`}></span>
+                        {count} {s.label.toLowerCase()}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <span className={`text-xs ${countColor} shrink-0 mt-1 ml-2`}>
+              {project.actions.length} action{project.actions.length > 1 ? "s" : ""}
+            </span>
+          </button>
+          {open && (
+            <div className={`px-4 pb-4 pt-1 border-t ${divider}`}>
+              {project.actions.map((a) => (
+                <ActionRow key={a.id} action={a} darkMode={darkMode} />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function ParkingLot({ items, darkMode }) {
+      const [open, setOpen] = useState(false);
+      if (!items || items.length === 0) return null;
+
+      const byDest = items.reduce((acc, item) => {
+        const d = item.destination;
+        if (!acc[d]) acc[d] = [];
+        acc[d].push(item);
+        return acc;
+      }, {});
+
+      const containerBg     = darkMode ? 'bg-sky-950'   : 'bg-sky-50';
+      const containerBorder = darkMode ? 'border-sky-800' : 'border-sky-200';
+      const hoverBg         = darkMode ? 'hover:bg-sky-900' : 'hover:bg-sky-100';
+      const titleColor      = darkMode ? 'text-sky-200'  : 'text-sky-900';
+      const subtitleColor   = darkMode ? 'text-sky-400'  : 'text-sky-600';
+      const chevronColor    = darkMode ? 'text-sky-600'  : 'text-sky-400';
+      const destLabel       = darkMode ? 'text-sky-400'  : 'text-sky-700';
+      const itemBg          = darkMode ? 'bg-slate-800'  : 'bg-white';
+      const itemBorder      = darkMode ? 'border-sky-800' : 'border-sky-200';
+      const idColor         = darkMode ? 'text-slate-400' : 'text-gray-500';
+      const objColor        = darkMode ? 'text-slate-400' : 'text-gray-500';
+      const objBold         = darkMode ? 'text-slate-300' : '';
+      const actionColor     = darkMode ? 'text-slate-200' : 'text-gray-800';
+      const noteColor       = darkMode ? 'text-sky-400'   : 'text-sky-700';
+
+      return (
+        <div className={`mt-6 rounded-xl border ${containerBorder} ${containerBg} overflow-hidden`}>
+          <button
+            onClick={() => setOpen(!open)}
+            className={`w-full flex items-center justify-between p-4 text-left ${hoverBg} transition-colors`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🅿️</span>
+              <div>
+                <h3 className={`font-semibold ${titleColor}`}>Parking lot — Actions à rediriger</h3>
+                <p className={`text-xs ${subtitleColor} mt-0.5`}>
+                  {items.length} action{items.length > 1 ? "s" : ""} identifiée{items.length > 1 ? "s" : ""} comme mal placée{items.length > 1 ? "s" : ""} dans ce chantier
+                </p>
+              </div>
+            </div>
+            <span className={`${chevronColor} text-sm`}>{open ? "▲" : "▼"}</span>
+          </button>
+          {open && (
+            <div className="px-4 pb-4 space-y-4">
+              {Object.entries(byDest).map(([dest, destItems]) => (
+                <div key={dest}>
+                  <p className={`text-xs font-semibold ${destLabel} mb-2 flex items-center gap-1.5`}>
+                    <span>→</span> {dest}
+                  </p>
+                  <div className="space-y-2">
+                    {destItems.map((item) => (
+                      <div key={item.id} className={`${itemBg} rounded-lg border ${itemBorder} p-3`}>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className={`font-mono text-xs font-bold ${idColor}`}>{item.id}</span>
+                          <span className="text-xs bg-sky-600 text-white px-2 py-0.5 rounded-full font-medium shrink-0">→ {item.destination}</span>
+                        </div>
+                        <p className={`text-xs ${objColor} italic mb-1`}>
+                          <span className={`font-medium ${objBold}`}>Objectif :</span> {item.objectif}
+                        </p>
+                        <p className={`text-sm ${actionColor} mb-1.5 font-medium`}>{item.action}</p>
+                        {item.notes && (
+                          <p className={`text-xs ${noteColor} italic leading-relaxed`}>💬 {item.notes}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function StatsBar({ projects, parkingLot, darkMode }) {
+      const counts = { keep: 0, rewrite: 0, gap: 0, move: 0 };
+      projects.forEach((p) => p.actions.forEach((a) => { counts[a.status]++; }));
+      const sourceTotal = counts.keep + counts.rewrite + counts.move;
+      const gapTotal = counts.gap;
+
+      const summaryBg     = darkMode ? 'bg-slate-800'   : 'bg-gray-50';
+      const summaryBorder = darkMode ? 'border-slate-700' : 'border-gray-200';
+      const summaryCount  = darkMode ? 'text-slate-300'  : 'text-gray-700';
+      const summaryLabel  = darkMode ? 'text-slate-500'  : 'text-gray-500';
+      const summaryDiv    = darkMode ? 'text-slate-600'  : 'text-gray-300';
+      const gapBadgeBg    = darkMode ? 'bg-red-950'      : 'bg-red-50';
+      const gapBadgeBd    = darkMode ? 'border-red-800'  : 'border-red-200';
+      const gapBadgeTxt   = darkMode ? 'text-red-300'    : 'text-red-800';
+      const gapBadgeSub   = darkMode ? 'text-red-400'    : 'text-red-700';
+      const pkBadgeBg     = darkMode ? 'bg-sky-950'      : 'bg-sky-50';
+      const pkBadgeBd     = darkMode ? 'border-sky-800'  : 'border-sky-200';
+      const pkBadgeTxt    = darkMode ? 'text-sky-300'    : 'text-sky-800';
+      const pkBadgeSub    = darkMode ? 'text-sky-400'    : 'text-sky-700';
+
+      return (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {["keep", "rewrite", "move"].map((status) => {
+            const s = getS(status, darkMode);
+            return (
+              <div key={status} className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${s.bg} ${s.border}`}>
+                <span className={`w-2.5 h-2.5 rounded-full ${s.dot} shrink-0`}></span>
+                <span className={`text-sm font-bold ${s.text}`}>{counts[status]}</span>
+                <span className={`text-xs ${s.text}`}>{s.label}</span>
+              </div>
+            );
+          })}
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${gapBadgeBd} ${gapBadgeBg}`}>
+            <span className={`w-2.5 h-2.5 rounded-full ${getS('gap', darkMode).dot} shrink-0`}></span>
+            <span className={`text-sm font-bold ${gapBadgeTxt}`}>{gapTotal}</span>
+            <span className={`text-xs ${gapBadgeSub}`}>Gap — À créer</span>
+          </div>
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${pkBadgeBd} ${pkBadgeBg}`}>
+            <span className="text-sm">🅿️</span>
+            <span className={`text-sm font-bold ${pkBadgeTxt}`}>{parkingLot?.length || 0}</span>
+            <span className={`text-xs ${pkBadgeSub}`}>À rediriger</span>
+          </div>
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${summaryBorder} ${summaryBg} ml-auto`}>
+            <span className={`text-sm font-bold ${summaryCount}`}>{sourceTotal}</span>
+            <span className={`text-xs ${summaryLabel}`}>actions source</span>
+            <span className={`${summaryDiv} text-xs`}>·</span>
+            <span className="text-sm font-bold text-red-400">{gapTotal}</span>
+            <span className={`text-xs ${summaryLabel}`}>gaps</span>
+          </div>
+        </div>
+      );
+    }
+
+    function AnalyseLegend({ darkMode }) {
+      const textColor = darkMode ? '#94a3b8' : '#9ca3af';
+      const labelColor = darkMode ? '#cbd5e1' : '#6b7280';
+      const borderColor = darkMode ? '#334155' : '#f3f4f6';
+      return (
+        <div style={{ padding: "12px 16px", borderTop: `1px solid ${borderColor}` }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: textColor, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: '0 0 8px 0' }}>Légende</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {Object.values(STATUS).map((s) => (
+              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 10 }}>{s.icon}</span>
+                <span style={{ fontSize: 12, color: labelColor }}>{s.label}</span>
+              </div>
+            ))}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10 }}>🅿️</span>
+              <span style={{ fontSize: 12, color: labelColor }}>À rediriger</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function AnalyseChantiers({ darkMode }) {
+      const [selectedId, setSelectedId] = useState(1);
+      const meta = CHANTIERS_META.find((c) => c.id === selectedId);
+      const chantierData = ANALYSE_DATA[selectedId];
+
+      const sidebarBg = darkMode ? '#1e293b' : 'white';
+      const sidebarBorder = darkMode ? '#334155' : '#e5e7eb';
+      const headerBorder = darkMode ? '#334155' : '#f3f4f6';
+      const titleColor = darkMode ? '#f1f5f9' : '#1f2937';
+      const subtitleColor = darkMode ? '#94a3b8' : '#9ca3af';
+      const mainBg = darkMode ? '#0f172a' : '#f3f4f6';
+
+      return (
+        <div style={{ display: "flex", height: "calc(100vh - 49px)", fontFamily: "system-ui, sans-serif", backgroundColor: mainBg }}>
+          {/* ── SIDEBAR ── */}
+          <div style={{ width: 256, backgroundColor: sidebarBg, borderRight: `1px solid ${sidebarBorder}`, display: "flex", flexDirection: "column", overflowY: "auto", flexShrink: 0 }}>
+            <div style={{ padding: "16px", borderBottom: `1px solid ${headerBorder}` }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: titleColor }}>Chantiers RSN</div>
+              <div style={{ fontSize: 11, color: subtitleColor, marginTop: 2 }}>Analyse transversale</div>
+            </div>
+
+            <nav style={{ flex: 1, padding: "8px" }}>
+              {CHANTIERS_META.map((c) => {
+                const active = selectedId === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelectedId(c.id)}
+                    style={{
+                      width: "100%",
+                      textAlign: "left",
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      marginBottom: 4,
+                      border: active ? "1px solid #c7d2fe" : "1px solid transparent",
+                      backgroundColor: active ? (darkMode ? '#1e3a5f' : '#eef2ff') : 'transparent',
+                      cursor: "pointer",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = darkMode ? '#334155' : '#f9fafb'; }}
+                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: active ? (darkMode ? '#818cf8' : '#3730a3') : (darkMode ? '#cbd5e1' : '#374151') }}>
+                        {c.id}. {c.name}
+                      </span>
+                      {c.analyzed ? (
+                        <span style={{ fontSize: 12, color: "#10b981" }}>✓</span>
+                      ) : (
+                        <span style={{ fontSize: 12, color: darkMode ? '#475569' : '#d1d5db' }}>○</span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 4, alignItems: "center" }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 4, fontFamily: "monospace", backgroundColor: active ? (darkMode ? '#312e81' : '#e0e7ff') : (darkMode ? '#334155' : '#f3f4f6'), color: active ? (darkMode ? '#a5b4fc' : '#4338ca') : (darkMode ? '#94a3b8' : '#6b7280') }}>
+                        {c.verb}
+                      </span>
+                      <span style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{c.totalActions} actions</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+
+            <AnalyseLegend darkMode={darkMode} />
+          </div>
+
+          {/* ── MAIN ── */}
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            <div style={{ maxWidth: 780, margin: "0 auto", padding: "32px 24px" }}>
+              {/* Header */}
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+                  <span style={{ backgroundColor: "#4f46e5", color: "white", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6, fontFamily: "monospace", letterSpacing: 1 }}>
+                    {meta.verb}
+                  </span>
+                  <h2 style={{ fontSize: 24, fontWeight: 800, color: darkMode ? '#f1f5f9' : '#111827', margin: 0 }}>
+                    {meta.id}. {meta.name}
+                  </h2>
+                </div>
+                <p style={{ fontSize: 13, color: darkMode ? '#64748b' : '#9ca3af', margin: 0 }}>
+                  {meta.totalActions} actions dans le fichier source
+                  {meta.analyzed ? " · Analyse complète" : " · En attente d'analyse"}
+                </p>
+              </div>
+
+              {/* Content */}
+              {chantierData ? (
+                <>
+                  <StatsBar projects={chantierData.projects} parkingLot={chantierData.parkingLot} darkMode={darkMode} />
+                  {chantierData.projects.map((p) => (
+                    <ProjectCard key={p.id} project={p} darkMode={darkMode} />
+                  ))}
+                  <ParkingLot items={chantierData.parkingLot} darkMode={darkMode} />
+                </>
+              ) : (
+                <div style={{ backgroundColor: darkMode ? '#1e293b' : 'white', borderRadius: 16, border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, padding: "48px 32px", textAlign: "center" }}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+                  <h3 style={{ fontSize: 18, fontWeight: 600, color: darkMode ? '#e2e8f0' : '#374151', marginBottom: 8 }}>
+                    Ce chantier n'a pas encore été analysé
+                  </h3>
+                  <p style={{ fontSize: 14, color: darkMode ? '#64748b' : '#9ca3af' }}>
+                    Poursuivez l'analyse pour remplir ce tableau chantier par chantier.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // VUE GLOBALE — COMPOSANT GRAPHE RADIAL
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function RSNRadialGraph({ darkMode }) {
+      const [selectedNode, setSelectedNode] = useState(null);
+      const [hoveredConnection, setHoveredConnection] = useState(null);
+      const [searchTerm, setSearchTerm] = useState('');
+
+      const searchResults = useMemo(() => {
+        if (!searchTerm.trim()) return [];
+        const term = searchTerm.toLowerCase();
+        return vueGlobaleData.actions.filter(a =>
+          a.action.toLowerCase().includes(term) ||
+          a.id.toLowerCase().includes(term)
+        );
+      }, [searchTerm]);
+
+      const highlightedAxes = useMemo(() => [...new Set(searchResults.map(a => a.axe))], [searchResults]);
+      const highlightedChantiers = useMemo(() => [...new Set(searchResults.map(a => a.chantier))], [searchResults]);
+
+      const theme = {
+        bg: darkMode ? 'bg-slate-950' : 'bg-gray-100',
+        text: darkMode ? 'text-white' : 'text-gray-900',
+        textMuted: darkMode ? 'text-slate-400' : 'text-gray-500',
+        textLight: darkMode ? 'text-slate-500' : 'text-gray-400',
+        cardBg: darkMode ? 'bg-slate-900' : 'bg-white',
+        cardBorder: darkMode ? 'border-slate-800' : 'border-gray-200',
+        buttonBg: darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-gray-200 hover:bg-gray-300',
+        svgBg: darkMode ? '#0F172A' : '#FFFFFF',
+        svgStroke: darkMode ? '#334155' : '#E5E7EB',
+        svgNodeBg: darkMode ? '#1E293B' : '#F3F4F6',
+        svgLabelPrimary: darkMode ? '#E2E8F0' : '#1F2937',
+        svgLabelSecondary: darkMode ? '#94A3B8' : '#6B7280',
+        svgLabelTertiary: darkMode ? '#64748B' : '#9CA3AF',
+      };
+
+      const width = 900;
+      const height = 900;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const innerRadius = 70;
+      const axeRadius = 320;
+      const chantierRadius = 200;
+      const effetRadius = 70;
+
+      const effetsStrategiques = [
+        { id: 'ES1', name: 'Consolidation écosystème', color: '#3B82F6', chantiers: ['C1', 'C2'] },
+        { id: 'ES2', name: 'Maillage environnement', color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
+        { id: 'ES3', name: 'Rapprochement preneurs/décideurs', color: '#F59E0B', chantiers: ['C5', 'C6'] },
+      ];
+
+      const effetPositions = useMemo(() => {
+        return effetsStrategiques.map((effet, i) => {
+          const angle = (i / effetsStrategiques.length) * 2 * Math.PI - Math.PI / 2;
+          return { ...effet, x: centerX + Math.cos(angle) * effetRadius, y: centerY + Math.sin(angle) * effetRadius, angle };
+        });
+      }, []);
+
+      const connections = useMemo(() => {
+        const conn = [];
+        vueGlobaleData.chantiers.forEach(chantier => {
+          vueGlobaleData.axes.forEach(axe => {
+            const actions = vueGlobaleData.actions.filter(a => a.axe === axe.id && a.chantier === chantier.id);
+            if (actions.length > 0) conn.push({ axe: axe.id, chantier: chantier.id, count: actions.length, actions });
+          });
+        });
+        return conn;
+      }, []);
+
+      const axePositions = useMemo(() => {
+        return vueGlobaleData.axes.map((axe, i) => {
+          const angle = (i / vueGlobaleData.axes.length) * 2 * Math.PI - Math.PI / 2;
+          return { ...axe, x: centerX + Math.cos(angle) * axeRadius, y: centerY + Math.sin(angle) * axeRadius, angle };
+        });
+      }, []);
+
+      const chantierPositions = useMemo(() => {
+        return vueGlobaleData.chantiers.map((chantier, i) => {
+          const angle = (i / vueGlobaleData.chantiers.length) * 2 * Math.PI - Math.PI / 2;
+          return { ...chantier, x: centerX + Math.cos(angle) * chantierRadius, y: centerY + Math.sin(angle) * chantierRadius, angle };
+        });
+      }, []);
+
+      const getAxePos = (id) => axePositions.find(a => a.id === id);
+      const getChantierPos = (id) => chantierPositions.find(c => c.id === id);
+
+      const isHighlighted = (conn) => {
+        if (!selectedNode) return true;
+        return conn.axe === selectedNode.id || conn.chantier === selectedNode.id;
+      };
+
+      const selectedActions = useMemo(() => {
+        if (!selectedNode) return [];
+        if (selectedNode.type === 'chantier') return vueGlobaleData.actions.filter(a => a.chantier === selectedNode.id);
+        return vueGlobaleData.actions.filter(a => a.axe === selectedNode.id);
+      }, [selectedNode]);
+
+      return (
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex-1"></div>
+                <div className="flex-1 max-w-md mx-4">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Rechercher une action..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className={`w-full px-4 py-2 pl-10 rounded-full text-sm ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                    />
+                    <svg className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${darkMode ? 'text-slate-400' : 'text-gray-400'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    {searchTerm && (
+                      <button onClick={() => setSearchTerm('')} className={`absolute right-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-slate-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'}`}>✕</button>
+                    )}
+                  </div>
+                  {searchTerm && (
+                    <div className={`mt-1 text-xs ${theme.textMuted}`}>
+                      {searchResults.length} action{searchResults.length !== 1 ? 's' : ''} trouvée{searchResults.length !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1"></div>
+              </div>
+              <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-2`}>
+                Réseau des Actions RSN
+              </h1>
+              <p className={`${theme.textMuted} text-sm`}>
+                Cliquez sur un nœud pour voir ses connexions • 97 actions • 12 axes • 7 chantiers
+              </p>
+              {selectedNode && (
+                <button onClick={() => setSelectedNode(null)} className={`mt-2 px-4 py-1 ${theme.buttonBg} rounded-full text-sm transition-colors ${theme.text}`}>
+                  ✕ Réinitialiser la sélection
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="flex-1 flex justify-center">
+                <svg width={width} height={height} className="max-w-full h-auto">
+                  <defs>
+                    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#6366F1" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#6366F1" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <circle cx={centerX} cy={centerY} r={chantierRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+                  <circle cx={centerX} cy={centerY} r={axeRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+
+                  {effetPositions.map((effet) => {
+                    const isEffetSelected = selectedNode?.id === effet.id && selectedNode?.type === 'effet';
+                    const anyEffetSelected = selectedNode?.type === 'effet';
+                    return effet.chantiers.map((chantierId) => {
+                      const chantierPos = getChantierPos(chantierId);
+                      if (!chantierPos) return null;
+                      const highlighted = isEffetSelected || !anyEffetSelected;
+                      return (
+                        <line key={`${effet.id}-${chantierId}`} x1={effet.x} y1={effet.y} x2={chantierPos.x} y2={chantierPos.y}
+                          stroke={effet.color} strokeWidth={isEffetSelected ? 4 : 3}
+                          opacity={highlighted ? (isEffetSelected ? 0.8 : 0.4) : 0.1} className="transition-opacity duration-300" />
+                      );
+                    });
+                  })}
+
+                  {connections.map((conn, i) => {
+                    const axePos = getAxePos(conn.axe);
+                    const chantierPos = getChantierPos(conn.chantier);
+                    const highlighted = isHighlighted(conn) && selectedNode?.type !== 'effet';
+                    const isHovered = hoveredConnection === `${conn.axe}-${conn.chantier}`;
+                    const midX = (axePos.x + chantierPos.x) / 2;
+                    const midY = (axePos.y + chantierPos.y) / 2;
+                    const ctrlX = centerX + (midX - centerX) * 0.3;
+                    const ctrlY = centerY + (midY - centerY) * 0.3;
+                    return (
+                      <g key={i}>
+                        <path d={`M ${chantierPos.x} ${chantierPos.y} Q ${ctrlX} ${ctrlY} ${axePos.x} ${axePos.y}`}
+                          fill="none" stroke={axePos.color} strokeWidth={Math.max(1, conn.count * 1.5)}
+                          opacity={highlighted ? (isHovered ? 0.9 : 0.5) : 0.08} className="transition-opacity duration-300"
+                          onMouseEnter={() => setHoveredConnection(`${conn.axe}-${conn.chantier}`)}
+                          onMouseLeave={() => setHoveredConnection(null)} style={{ cursor: 'pointer' }} />
+                        {isHovered && selectedNode?.type !== 'effet' && (
+                          <text x={ctrlX} y={ctrlY} fill={theme.svgLabelPrimary} fontSize="12" textAnchor="middle" className="pointer-events-none">
+                            {conn.count} action{conn.count > 1 ? 's' : ''}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })}
+
+                  {chantierPositions.map((chantier) => {
+                    const isSelected = selectedNode?.id === chantier.id;
+                    const isRelated = selectedNode && connections.some(c => c.chantier === chantier.id && c.axe === selectedNode.id);
+                    const isRelatedToEffet = selectedNode?.type === 'effet' && selectedNode?.chantiers?.includes(chantier.id);
+                    const isSearchHighlighted = searchTerm && highlightedChantiers.includes(chantier.id);
+                    const dimmed = (selectedNode && !isSelected && !isRelated && selectedNode.type !== 'chantier' && selectedNode.type !== 'effet') ||
+                                   (selectedNode?.type === 'effet' && !isRelatedToEffet) ||
+                                   (searchTerm && !isSearchHighlighted);
+                    const chantierActionCount = vueGlobaleData.actions.filter(a => a.chantier === chantier.id).length;
+                    const searchCount = searchResults.filter(a => a.chantier === chantier.id).length;
+                    const percentage = Math.round((chantierActionCount / vueGlobaleData.actions.length) * 100);
+                    return (
+                      <g key={chantier.id} onClick={() => setSelectedNode(isSelected ? null : {...chantier, type: 'chantier'})}
+                        style={{ cursor: 'pointer' }} opacity={dimmed ? 0.3 : 1} className="transition-opacity duration-300">
+                        <circle cx={chantier.x} cy={chantier.y} r={isSelected || isSearchHighlighted ? 42 : 38}
+                          fill={theme.svgNodeBg} stroke={isSearchHighlighted && !isSelected ? '#A855F7' : chantier.color}
+                          strokeWidth={isSelected || isSearchHighlighted ? 4 : 2} />
+                        <text x={chantier.x} y={chantier.y - 10} fill={theme.svgLabelPrimary} fontSize="18" textAnchor="middle">{chantier.icon}</text>
+                        <text x={chantier.x} y={chantier.y + 6} fill={isSearchHighlighted ? '#A855F7' : chantier.color} fontSize="10" fontWeight="bold" textAnchor="middle">
+                          {isSearchHighlighted ? searchCount : percentage + '%'}
+                        </text>
+                        <text x={chantier.x} y={chantier.y + 18} fill={theme.svgLabelSecondary} fontSize="7" textAnchor="middle">
+                          {isSearchHighlighted ? 'résultat' + (searchCount > 1 ? 's' : '') : chantier.verb}
+                        </text>
+                        <text x={chantier.x} y={chantier.y + (chantier.y > centerY ? 58 : -48)}
+                          fill={theme.svgLabelPrimary} fontSize="11" fontWeight="500" textAnchor="middle">{chantier.name}</text>
+                      </g>
+                    );
+                  })}
+
+                  {axePositions.map((axe) => {
+                    const isSelected = selectedNode?.id === axe.id;
+                    const isRelated = selectedNode && connections.some(c => c.axe === axe.id && c.chantier === selectedNode.id);
+                    const isSearchHighlighted = searchTerm && highlightedAxes.includes(axe.id);
+                    const dimmed = (selectedNode && !isSelected && !isRelated && selectedNode.type === 'chantier') ||
+                                   (selectedNode?.type === 'effet') ||
+                                   (searchTerm && !isSearchHighlighted);
+                    const labelAngle = axe.angle;
+                    const labelRadius = axeRadius + 45;
+                    const labelX = centerX + Math.cos(labelAngle) * labelRadius;
+                    const labelY = centerY + Math.sin(labelAngle) * labelRadius;
+                    const actionCount = vueGlobaleData.actions.filter(a => a.axe === axe.id).length;
+                    const searchCount = searchResults.filter(a => a.axe === axe.id).length;
+                    return (
+                      <g key={axe.id} onClick={() => setSelectedNode(isSelected ? null : axe)}
+                        style={{ cursor: 'pointer' }} opacity={dimmed ? 0.3 : 1} className="transition-opacity duration-300">
+                        <circle cx={axe.x} cy={axe.y} r={isSelected || isSearchHighlighted ? 28 : 24}
+                          fill={axe.color} opacity={0.9}
+                          stroke={isSelected ? 'white' : isSearchHighlighted ? '#A855F7' : 'transparent'} strokeWidth={3} />
+                        <text x={axe.x} y={axe.y + 5} fill="white" fontSize="11" fontWeight="bold" textAnchor="middle">
+                          {isSearchHighlighted ? searchCount : actionCount}
+                        </text>
+                        <text x={labelX} y={labelY} fill={theme.svgLabelPrimary} fontSize="10" fontWeight="500"
+                          textAnchor={labelX > centerX ? "start" : "end"} dominantBaseline="middle">{axe.name}</text>
+                        <text x={labelX} y={labelY + 12} fill={theme.svgLabelTertiary} fontSize="8"
+                          textAnchor={labelX > centerX ? "start" : "end"}>
+                          {axe.type === 'axe' ? 'Axe' : axe.type === 'champ' ? "Champ d'action" : 'Principe'}
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {effetPositions.map((effet) => {
+                    const effetActionCount = effet.chantiers.reduce((sum, cId) => sum + vueGlobaleData.actions.filter(a => a.chantier === cId).length, 0);
+                    const percentage = Math.round((effetActionCount / vueGlobaleData.actions.length) * 100);
+                    const isSelected = selectedNode?.id === effet.id;
+                    return (
+                      <g key={effet.id} onClick={() => setSelectedNode(isSelected ? null : {...effet, type: 'effet'})} style={{ cursor: 'pointer' }}>
+                        <circle cx={effet.x} cy={effet.y} r={isSelected ? 42 : 38}
+                          fill={theme.svgBg} stroke={effet.color} strokeWidth={isSelected ? 4 : 3} />
+                        <text x={effet.x} y={effet.y - 8} fill={effet.color} fontSize="12" fontWeight="bold" textAnchor="middle">{percentage}%</text>
+                        <text x={effet.x} y={effet.y + 5} fill={theme.svgLabelPrimary} fontSize="7" fontWeight="500" textAnchor="middle">{effet.name.split(' ')[0]}</text>
+                        <text x={effet.x} y={effet.y + 14} fill={theme.svgLabelSecondary} fontSize="6" textAnchor="middle">{effet.name.split(' ').slice(1).join(' ')}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+
+              {searchTerm && searchResults.length > 0 && !selectedNode && (
+                <div className={`lg:w-80 ${theme.cardBg} rounded-2xl p-5 max-h-[700px] overflow-y-auto border ${theme.cardBorder}`}>
+                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder}`}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-purple-500">{searchResults.length}</div>
+                    <div>
+                      <h3 className={`font-bold ${theme.text} text-sm`}>Résultats de recherche</h3>
+                      <span className={`text-xs ${theme.textLight}`}>"{searchTerm}"</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {vueGlobaleData.chantiers.map(chantier => {
+                      const chantierResults = searchResults.filter(a => a.chantier === chantier.id);
+                      if (chantierResults.length === 0) return null;
+                      return (
+                        <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-xl p-3`}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span>{chantier.icon}</span>
+                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                            <span className={`text-xs ${theme.textLight}`}>({chantierResults.length})</span>
+                          </div>
+                          {chantierResults.map(action => {
+                            const axe = vueGlobaleData.axes.find(a => a.id === action.axe);
+                            return (
+                              <div key={action.id} className={`text-xs ${theme.textMuted} py-2 pl-3 border-l-2 ml-1 mb-1`} style={{ borderColor: axe?.color }}>
+                                <div className="flex items-center gap-1 mb-1">
+                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: axe?.color }}></div>
+                                  <span className={`text-xs ${theme.textLight}`}>{axe?.name}</span>
+                                </div>
+                                {action.action}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {selectedNode && (
+                <div className={`lg:w-80 ${theme.cardBg} rounded-2xl p-5 max-h-[700px] overflow-y-auto border ${theme.cardBorder}`}>
+                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder}`}>
+                    {selectedNode.type === 'chantier' ? (
+                      <>
+                        <span className="text-3xl">{selectedNode.icon}</span>
+                        <div>
+                          <h3 className={`font-bold ${theme.text}`}>{selectedNode.name}</h3>
+                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color }}>{selectedNode.verb}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: selectedNode.color }}>
+                          {vueGlobaleData.actions.filter(a => a.axe === selectedNode.id).length}
+                        </div>
+                        <div>
+                          <h3 className={`font-bold ${theme.text} text-sm`}>{selectedNode.name}</h3>
+                          <span className={`text-xs ${theme.textLight}`}>
+                            {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="space-y-4">
+                    <div className={`text-sm ${theme.textMuted} mb-2`}>{selectedActions.length} action{selectedActions.length > 1 ? 's' : ''}</div>
+                    {selectedNode.type === 'chantier' ? (
+                      vueGlobaleData.axes.map(axe => {
+                        const axeActions = selectedActions.filter(a => a.axe === axe.id);
+                        if (axeActions.length === 0) return null;
+                        return (
+                          <div key={axe.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-xl p-3`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: axe.color }} />
+                              <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{axe.name}</span>
+                              <span className={`text-xs ${theme.textLight}`}>({axeActions.length})</span>
+                            </div>
+                            {axeActions.map(action => (
+                              <div key={action.id} className={`text-xs ${theme.textMuted} py-1 pl-5 border-l-2 ${darkMode ? 'border-slate-700' : 'border-gray-300'} ml-1 mb-1`}>
+                                {action.action}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      vueGlobaleData.chantiers.map(chantier => {
+                        const chantierActions = selectedActions.filter(a => a.chantier === chantier.id);
+                        if (chantierActions.length === 0) return null;
+                        return (
+                          <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-xl p-3`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span>{chantier.icon}</span>
+                              <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                              <span className={`text-xs ${theme.textLight}`}>({chantierActions.length})</span>
+                            </div>
+                            {chantierActions.map(action => (
+                              <div key={action.id} className={`text-xs ${theme.textMuted} py-1 pl-5 border-l-2 ${darkMode ? 'border-slate-700' : 'border-gray-300'} ml-1 mb-1`}>
+                                {action.action}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs pb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                <span className={theme.textMuted}>Axes thématiques (4)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+                <span className={theme.textMuted}>Champs d'action (3)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                <span className={theme.textMuted}>Principes directeurs (5)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-lg ${darkMode ? 'bg-slate-800' : 'bg-gray-200'} flex items-center justify-center`}>🎯</div>
+                <span className={theme.textMuted}>Chantiers (7)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // APP PRINCIPALE — ONGLETS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function MainApp() {
+      const [darkMode, setDarkMode] = useState(true);
+      const [activeTab, setActiveTab] = useState('vue-globale');
+
+      const tabs = [
+        { id: 'vue-globale', label: 'Vue globale', icon: '🕸️' },
+        { id: 'analyse',     label: 'Analyse des chantiers', icon: '🔍' },
+      ];
+
+      const tabBarBg = darkMode ? '#0f172a' : '#ffffff';
+      const tabBarBorder = darkMode ? '#1e293b' : '#e5e7eb';
+      const tabActiveText = darkMode ? '#e2e8f0' : '#111827';
+      const tabInactiveText = darkMode ? '#64748b' : '#6b7280';
+      const tabActiveBg = darkMode ? '#1e293b' : '#f3f4f6';
+      const tabHoverBg = darkMode ? '#1e293b' : '#f9fafb';
+
+      return (
+        <div style={{ minHeight: '100vh', backgroundColor: darkMode ? '#0f172a' : '#f3f4f6' }}>
+          {/* ── TAB BAR ── */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 49, backgroundColor: tabBarBg, borderBottom: `1px solid ${tabBarBorder}`, position: 'sticky', top: 0, zIndex: 100 }}>
+            {/* Tabs */}
+            <div style={{ display: 'flex', gap: 4 }}>
+              {tabs.map(tab => {
+                const active = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '6px 14px',
+                      borderRadius: 8,
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: 13,
+                      fontWeight: active ? 600 : 400,
+                      color: active ? tabActiveText : tabInactiveText,
+                      backgroundColor: active ? tabActiveBg : 'transparent',
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = tabHoverBg; }}
+                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <span style={{ fontSize: 14 }}>{tab.icon}</span>
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Title */}
+            <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 13, fontWeight: 600, color: darkMode ? '#94a3b8' : '#6b7280', letterSpacing: '0.02em', pointerEvents: 'none' }}>
+              RSN — Tableau de bord
+            </div>
+
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                borderRadius: 20,
+                border: `1px solid ${darkMode ? '#334155' : '#d1d5db'}`,
+                backgroundColor: darkMode ? '#1e293b' : '#f9fafb',
+                color: darkMode ? '#94a3b8' : '#6b7280',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 500,
+                transition: 'all 0.15s',
+              }}
+            >
+              {darkMode ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  Mode clair
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                  Mode sombre
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* ── CONTENT ── */}
+          {activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
+          {activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} />}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<MainApp />);
+  </script>
+</body>
+</html>
