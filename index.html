@@ -13,135 +13,107 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useMemo } = React;
+    const { useState, useMemo, useEffect } = React;
 
     // ═══════════════════════════════════════════════════════════════════════════
     // VUE GLOBALE — DONNÉES
     // ═══════════════════════════════════════════════════════════════════════════
 
+    // ── Configuration statique des axes et chantiers (graphe radial) ──
+    const AXES_CONFIG = [
+      { id: 'A1', name: 'Plateformes numériques', fullName: 'Axe 1 : Plateformes numériques et gouvernance', type: 'axe', color: '#3B82F6' },
+      { id: 'A2', name: 'Modélisation et méthodes', fullName: 'Axe 2 : Modélisation et méthodes numériques', type: 'axe', color: '#8B5CF6' },
+      { id: 'A3', name: 'Interventions numériques', fullName: 'Axe 3 : Interventions numériques', type: 'axe', color: '#EC4899' },
+      { id: 'A4', name: 'Transformation numérique', fullName: 'Axe 4 : Transformation numérique', type: 'axe', color: '#F59E0B' },
+      { id: 'CA-FORM', name: 'Formation', fullName: "Champ d'action : Formation interdisciplinaire", type: 'champ', color: '#10B981' },
+      { id: 'CA-MOB', name: 'Mobilisation', fullName: "Champ d'action : Mobilisation des connaissances", type: 'champ', color: '#14B8A6' },
+      { id: 'CA-RENF', name: 'Renforcement', fullName: "Champ d'action : Renforcement des capacités", type: 'champ', color: '#06B6D4' },
+      { id: 'PD-ENG', name: 'Engagement citoyen', fullName: 'Principe directeur : Engagement citoyen', type: 'principe', color: '#6366F1' },
+      { id: 'PD-CONF', name: 'Numérique de confiance', fullName: 'Principe directeur : Numérique de confiance', type: 'principe', color: '#A855F7' },
+      { id: 'PD-DUR', name: 'Santé durable', fullName: 'Principe directeur : Santé durable', type: 'principe', color: '#22C55E' },
+      { id: 'PD-SCI', name: 'Science ouverte', fullName: 'Principe directeur : Science ouverte', type: 'principe', color: '#EAB308' },
+      { id: 'PD-EDIA', name: 'EDIA', fullName: 'Principe directeur : EDIA', type: 'principe', color: '#EF4444' },
+    ];
+
+    const CHANTIERS_CONFIG = [
+      { id: 'C1', name: 'Guides & Outils', verb: 'PRODUIRE', color: '#2563EB', icon: '📘' },
+      { id: 'C2', name: 'Répertoires', verb: 'RECENSER', color: '#7C3AED', icon: '🗺️' },
+      { id: 'C3', name: 'Concertation', verb: 'CONNECTER', color: '#DB2777', icon: '🤝' },
+      { id: 'C4', name: 'Formation', verb: 'FORMER', color: '#059669', icon: '🎓' },
+      { id: 'C5', name: 'Consultation', verb: 'ÉCOUTER', color: '#0891B2', icon: '👂' },
+      { id: 'C6', name: 'Influence', verb: 'CONVAINCRE', color: '#DC2626', icon: '📢' },
+      { id: 'C7', name: 'Événements', verb: 'ANIMER', color: '#D97706', icon: '🎪' },
+    ];
+
+    // ── Tables de correspondance CSV → IDs internes ──
+    const AXE_NAME_TO_ID = {};
+    AXES_CONFIG.forEach(a => { AXE_NAME_TO_ID[a.fullName] = a.id; });
+
+    const CHANTIER_NAME_TO_ID = {
+      'Guides & Outils': 'C1',
+      'Répertoires & Cartographie': 'C2',
+      'Concertation & Maillage': 'C3',
+      'Formation & Relève': 'C4',
+      'Consultation & Écoute': 'C5',
+      'Influence & Représentation': 'C6',
+      'Événements & Rayonnement': 'C7',
+    };
+
+    // ── Parseur CSV minimal (gère les virgules dans les guillemets) ──
+    function parseCSV(text) {
+      const lines = text.split('\n');
+      const headers = parseCSVLine(lines[0]);
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const values = parseCSVLine(line);
+        const row = {};
+        headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+          else if (ch === '"') { inQuotes = false; }
+          else { current += ch; }
+        } else {
+          if (ch === '"') { inQuotes = true; }
+          else if (ch === ',') { result.push(current.trim()); current = ''; }
+          else { current += ch; }
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    // ── Chargement CSV → actions pour le graphe ──
+    function csvRowsToActions(rows) {
+      return rows.map(row => ({
+        id: row['ID Action'],
+        axe: AXE_NAME_TO_ID[row['Axe']] || row['Axe'],
+        chantier: CHANTIER_NAME_TO_ID[row['Chantier suggéré']] || row['Chantier suggéré'],
+        action: row['Action réécrite'] || row['Action originale'],
+        actionOriginale: row['Action originale'],
+        objectif: row['Objectif stratégique'],
+        axeFullName: row['Axe'],
+        chantierFullName: row['Chantier suggéré'],
+      }));
+    }
+
+    // ── Objet vueGlobaleData — axes et chantiers statiques, actions chargées dynamiquement ──
     const vueGlobaleData = {
-      axes: [
-        { id: 'A1', name: 'Plateformes numériques', fullName: 'Axe 1 : Plateformes numériques et gouvernance', type: 'axe', color: '#3B82F6' },
-        { id: 'A2', name: 'Modélisation et méthodes', fullName: 'Axe 2 : Modélisation et méthodes numériques', type: 'axe', color: '#8B5CF6' },
-        { id: 'A3', name: 'Interventions numériques', fullName: 'Axe 3 : Interventions numériques', type: 'axe', color: '#EC4899' },
-        { id: 'A4', name: 'Transformation numérique', fullName: 'Axe 4 : Transformation numérique', type: 'axe', color: '#F59E0B' },
-        { id: 'CA-FORM', name: 'Formation', fullName: "Champ d'action : Formation interdisciplinaire", type: 'champ', color: '#10B981' },
-        { id: 'CA-MOB', name: 'Mobilisation', fullName: "Champ d'action : Mobilisation des connaissances", type: 'champ', color: '#14B8A6' },
-        { id: 'CA-RENF', name: 'Renforcement', fullName: "Champ d'action : Renforcement des capacités", type: 'champ', color: '#06B6D4' },
-        { id: 'PD-ENG', name: 'Engagement citoyen', fullName: 'Principe directeur : Engagement citoyen', type: 'principe', color: '#6366F1' },
-        { id: 'PD-CONF', name: 'Numérique de confiance', fullName: 'Principe directeur : Numérique de confiance', type: 'principe', color: '#A855F7' },
-        { id: 'PD-DUR', name: 'Santé durable', fullName: 'Principe directeur : Santé durable', type: 'principe', color: '#22C55E' },
-        { id: 'PD-SCI', name: 'Science ouverte', fullName: 'Principe directeur : Science ouverte', type: 'principe', color: '#EAB308' },
-        { id: 'PD-EDIA', name: 'EDIA', fullName: 'Principe directeur : EDIA', type: 'principe', color: '#EF4444' },
-      ],
-      chantiers: [
-        { id: 'C1', name: 'Guides & Outils', verb: 'PRODUIRE', color: '#2563EB', icon: '📘' },
-        { id: 'C2', name: 'Répertoires', verb: 'RECENSER', color: '#7C3AED', icon: '🗺️' },
-        { id: 'C3', name: 'Concertation', verb: 'CONNECTER', color: '#DB2777', icon: '🤝' },
-        { id: 'C4', name: 'Formation', verb: 'FORMER', color: '#059669', icon: '🎓' },
-        { id: 'C5', name: 'Consultation', verb: 'ÉCOUTER', color: '#0891B2', icon: '👂' },
-        { id: 'C6', name: 'Influence', verb: 'CONVAINCRE', color: '#DC2626', icon: '📢' },
-        { id: 'C7', name: 'Événements', verb: 'ANIMER', color: '#D97706', icon: '🎪' },
-      ],
-      actions: [
-        { id: 'A1-OS1-a', axe: 'A1', chantier: 'C6', action: "Rédiger un manifeste en faveur de l'accès aux données" },
-        { id: 'A1-OS1-b', axe: 'A1', chantier: 'C1', action: "Produire un document annexe mettant de l'avant les bénéfices" },
-        { id: 'A1-OS1-c', axe: 'A1', chantier: 'C3', action: "Former un comité de patients et usagers sur l'acceptabilité" },
-        { id: 'A1-OS2-a', axe: 'A1', chantier: 'C3', action: 'Lancer une table de concertation entre les plateformes' },
-        { id: 'A1-OS2-b', axe: 'A1', chantier: 'C2', action: 'Cartographier les actifs informationnels et les expertises' },
-        { id: 'A1-OS2-c', axe: 'A1', chantier: 'C3', action: "S'arrimer aux initiatives et communautés de pratiques existantes" },
-        { id: 'A1-OS3-a', axe: 'A1', chantier: 'C6', action: 'Se joindre aux comités sur le DSN et aux instances de Santé Québec' },
-        { id: 'A1-OS3-b', axe: 'A1', chantier: 'C3', action: 'Table inter-axes de concertation en gouvernance informationnelle' },
-        { id: 'A1-OS3-c', axe: 'A1', chantier: 'C1', action: "Partage des cadres de gestion et des modèles d'entente" },
-        { id: 'A2-OS1-a', axe: 'A2', chantier: 'C2', action: "Effectuer une cartographie des différents champs d'expertise" },
-        { id: 'A2-OS1-b', axe: 'A2', chantier: 'C3', action: 'Lancer une communauté de pratique des méthodologistes' },
-        { id: 'A2-OS2-a', axe: 'A2', chantier: 'C1', action: "Établir un guide/template standard pour encadrer l'harmonisation" },
-        { id: 'A2-OS2-b', axe: 'A2', chantier: 'C1', action: 'Identifier les bonnes pratiques à formaliser pour la communauté' },
-        { id: 'A2-OS2-c', axe: 'A2', chantier: 'C1', action: "Assurer l'offre de ressources en français" },
-        { id: 'A2-OS3-a', axe: 'A2', chantier: 'C7', action: 'Organiser des journal clubs pour le partage des connaissances' },
-        { id: 'A2-OS3-b', axe: 'A2', chantier: 'C7', action: 'Organiser des activités avec des partenaires (ex. IVADO)' },
-        { id: 'A3-OS1-a', axe: 'A3', chantier: 'C2', action: 'Effectuer une cartographie des meilleures pratiques' },
-        { id: 'A3-OS1-b', axe: 'A3', chantier: 'C5', action: 'Identifier des problèmes communs rencontrés par les chercheurs' },
-        { id: 'A3-OS1-c', axe: 'A3', chantier: 'C2', action: 'Effectuer une cartographie des living labs dans les milieux' },
-        { id: 'A3-OS2-a', axe: 'A3', chantier: 'C3', action: 'Organiser une table de concertation chercheurs-milieux preneurs' },
-        { id: 'A3-OS2-b', axe: 'A3', chantier: 'C3', action: 'Identifier des ambassadeurs dans le RSN' },
-        { id: 'A3-OS3-a', axe: 'A3', chantier: 'C5', action: 'Lancer une consultation pour identifier les enjeux' },
-        { id: 'A3-OS3-b', axe: 'A3', chantier: 'C7', action: "Organiser des événements en partenariat avec l'industrie" },
-        { id: 'A4-OS1-a', axe: 'A4', chantier: 'C2', action: 'Cartographier les initiatives, formations et projets existants' },
-        { id: 'A4-OS1-b', axe: 'A4', chantier: 'C4', action: 'Former la communauté de recherche à la vulgarisation' },
-        { id: 'A4-OS1-c', axe: 'A4', chantier: 'C5', action: 'Organiser des ateliers de travail et de consultation' },
-        { id: 'A4-OS2-a', axe: 'A4', chantier: 'C3', action: "Mobiliser les experts de l'axe aux compétences diverses" },
-        { id: 'A4-OS2-b', axe: 'A4', chantier: 'C3', action: 'Mettre en place une table de concertation sur la gouvernance' },
-        { id: 'A4-OS2-c', axe: 'A4', chantier: 'C6', action: 'Éclairer la décision publique en lien avec le DSN' },
-        { id: 'A4-OS3-a', axe: 'A4', chantier: 'C3', action: 'Prendre contact avec des experts en vulgarisation juridique' },
-        { id: 'A4-OS3-b', axe: 'A4', chantier: 'C2', action: 'Réunir les formations et ressources sur les lois 5 et 25' },
-        { id: 'CA-FORM-OS1-a', axe: 'CA-FORM', chantier: 'C7', action: 'Soutien aux événements de formation' },
-        { id: 'CA-FORM-OS1-b', axe: 'CA-FORM', chantier: 'C2', action: 'Effectuer une analyse du paysage de la formation' },
-        { id: 'CA-FORM-OS1-c', axe: 'CA-FORM', chantier: 'C5', action: 'Effectuer une analyse des lacunes' },
-        { id: 'CA-FORM-OS2-a', axe: 'CA-FORM', chantier: 'C5', action: 'Consultation sur les besoins des étudiants' },
-        { id: 'CA-FORM-OS2-b', axe: 'CA-FORM', chantier: 'C7', action: 'Soutien aux manifestations étudiantes sur la santé numérique' },
-        { id: 'CA-FORM-OS3-a', axe: 'CA-FORM', chantier: 'C2', action: 'Inventaire des programmes de formation existants' },
-        { id: 'CA-FORM-OS3-b', axe: 'CA-FORM', chantier: 'C5', action: 'Consultation sur les besoins des chercheurs' },
-        { id: 'CA-MOB-OS1-a', axe: 'CA-MOB', chantier: 'C3', action: 'Établir des réunions interdisciplinaires régulières' },
-        { id: 'CA-MOB-OS1-b', axe: 'CA-MOB', chantier: 'C2', action: 'Identifier les expertises des différents membres' },
-        { id: 'CA-MOB-OS1-c', axe: 'CA-MOB', chantier: 'C2', action: 'Identifier les communautés existantes et identifier les gaps' },
-        { id: 'CA-MOB-OS1-d', axe: 'CA-MOB', chantier: 'C5', action: 'Préciser le public et objectif en matière de mobilisation' },
-        { id: 'CA-MOB-OS2-a', axe: 'CA-MOB', chantier: 'C1', action: 'Élaborer des résumés conviviaux des connaissances et articles' },
-        { id: 'CA-MOB-OS2-b', axe: 'CA-MOB', chantier: 'C5', action: "Identifier les besoins des groupes cibles en matière d'accès" },
-        { id: 'CA-MOB-OS2-c', axe: 'CA-MOB', chantier: 'C3', action: 'Collaborer activement avec les axes et le comité étudiant' },
-        { id: 'CA-MOB-OS2-d', axe: 'CA-MOB', chantier: 'C1', action: 'Porter attention au problème de disponibilité et de biais' },
-        { id: 'CA-MOB-OS3-a', axe: 'CA-MOB', chantier: 'C2', action: 'Accéder aux revues de littérature existantes et les compiler' },
-        { id: 'CA-MOB-OS3-b', axe: 'CA-MOB', chantier: 'C1', action: "Développer un bulletin d'informations régulier" },
-        { id: 'CA-MOB-OS3-c', axe: 'CA-MOB', chantier: 'C5', action: 'Identifier les besoins des groupes cibles' },
-        { id: 'CA-RENF-OS1-a', axe: 'CA-RENF', chantier: 'C3', action: 'Développer des communautés de pratique' },
-        { id: 'CA-RENF-OS1-b', axe: 'CA-RENF', chantier: 'C3', action: "Créer des réseaux d'apprentissages collaboratifs" },
-        { id: 'CA-RENF-OS2-a', axe: 'CA-RENF', chantier: 'C2', action: 'Assurer la réalisation des cartographies des assets critiques' },
-        { id: 'CA-RENF-OS3-a', axe: 'CA-RENF', chantier: 'C3', action: "Mettre en place un comité de suivi chargé d'évaluer les progrès" },
-        { id: 'CA-RENF-OS3-b', axe: 'CA-RENF', chantier: 'C1', action: 'Revoir les critères et cadres existants' },
-        { id: 'PD-ENG-OS1-a', axe: 'PD-ENG', chantier: 'C3', action: 'Travailler en partenariat avec des organisations et communautés' },
-        { id: 'PD-ENG-OS1-b', axe: 'PD-ENG', chantier: 'C5', action: 'Recenser et analyser les attentes de la patientèle' },
-        { id: 'PD-ENG-OS2-a', axe: 'PD-ENG', chantier: 'C6', action: "Favoriser l'intégration de la co-construction dans le DSN" },
-        { id: 'PD-ENG-OS2-b', axe: 'PD-ENG', chantier: 'C3', action: 'Former un comité patientèle et public au sein du RSN' },
-        { id: 'PD-ENG-OS3-a', axe: 'PD-ENG', chantier: 'C1', action: "Définir les modalités d'engagement et de partage" },
-        { id: 'PD-ENG-OS3-b', axe: 'PD-ENG', chantier: 'C7', action: 'Développer ou promouvoir des balados et webinaires' },
-        { id: 'PD-ENG-OS3-c', axe: 'PD-ENG', chantier: 'C7', action: "Soutenir l'organisation de conférences accessibles au public" },
-        { id: 'PD-ENG-OS3-d', axe: 'PD-ENG', chantier: 'C5', action: 'Considérer les spécificités du Québec' },
-        { id: 'PD-CONF-OS1-a', axe: 'PD-CONF', chantier: 'C3', action: 'Organiser des rencontres transversales avec les axes' },
-        { id: 'PD-CONF-OS1-b', axe: 'PD-CONF', chantier: 'C5', action: "Identifier les attentes spécifiques par axe ou champ d'action" },
-        { id: 'PD-CONF-OS1-c', axe: 'PD-CONF', chantier: 'C1', action: 'Produire une ébauche de la définition sous forme de fiche' },
-        { id: 'PD-CONF-OS2-a', axe: 'PD-CONF', chantier: 'C2', action: 'Cartographier les acteurs concernés (patients partenaires, CEPPP)' },
-        { id: 'PD-CONF-OS2-b', axe: 'PD-CONF', chantier: 'C5', action: 'Organiser des groupes de discussion citoyens pour coconstruire' },
-        { id: 'PD-CONF-OS2-c', axe: 'PD-CONF', chantier: 'C5', action: 'Mobiliser les comités de patients partenaires' },
-        { id: 'PD-CONF-OS3-a', axe: 'PD-CONF', chantier: 'C1', action: 'Développer une feuille de route de critères de confiance' },
-        { id: 'PD-CONF-OS3-b', axe: 'PD-CONF', chantier: 'C3', action: 'Déployer cette feuille de route dans des projets pilotes' },
-        { id: 'PD-CONF-OS3-c', axe: 'PD-CONF', chantier: 'C7', action: 'Faire connaître ces outils aux parties prenantes' },
-        { id: 'PD-DUR-OS1-a', axe: 'PD-DUR', chantier: 'C2', action: 'Effectuer une revue de la littérature nationale et internationale' },
-        { id: 'PD-DUR-OS1-b', axe: 'PD-DUR', chantier: 'C1', action: 'Proposer une définition commune de la santé durable' },
-        { id: 'PD-DUR-OS1-c', axe: 'PD-DUR', chantier: 'C3', action: 'Organiser une réflexion stratégique sur les données et la santé' },
-        { id: 'PD-DUR-OS2-a', axe: 'PD-DUR', chantier: 'C2', action: 'Identifier et cartographier les partenariats potentiels' },
-        { id: 'PD-DUR-OS2-b', axe: 'PD-DUR', chantier: 'C5', action: 'Solliciter les citoyens et citoyennes prioritaires' },
-        { id: 'PD-DUR-OS2-c', axe: 'PD-DUR', chantier: 'C2', action: 'Identifier des projets dans les autres axes du RSN' },
-        { id: 'PD-DUR-OS2-d', axe: 'PD-DUR', chantier: 'C2', action: 'Identifier les chercheurs-euses en santé durable' },
-        { id: 'PD-DUR-OS3-a', axe: 'PD-DUR', chantier: 'C6', action: "Élaborer un énoncé politique ou manifeste de l'axe santé durable" },
-        { id: 'PD-DUR-OS3-b', axe: 'PD-DUR', chantier: 'C7', action: "Organiser un atelier de réflexion autour de l'IA et durabilité" },
-        { id: 'PD-SCI-OS1-a', axe: 'PD-SCI', chantier: 'C5', action: 'Élaborer un sondage auprès des membres du Réseau' },
-        { id: 'PD-SCI-OS1-b', axe: 'PD-SCI', chantier: 'C2', action: 'Réaliser une veille des initiatives internationales' },
-        { id: 'PD-SCI-OS1-c', axe: 'PD-SCI', chantier: 'C2', action: 'Regarder les initiatives au Québec en particulier' },
-        { id: 'PD-SCI-OS2-a', axe: 'PD-SCI', chantier: 'C1', action: 'Créer un espace GitHub RSN avec un modèle de gouvernance' },
-        { id: 'PD-SCI-OS2-b', axe: 'PD-SCI', chantier: 'C1', action: 'Partager des packages R et Python avec la communauté' },
-        { id: 'PD-SCI-OS2-c', axe: 'PD-SCI', chantier: 'C4', action: 'Proposer des formations pratiques sur rmarkdown et quarto' },
-        { id: 'PD-SCI-OS3-a', axe: 'PD-SCI', chantier: 'C1', action: 'Développer des connaissances accessibles pour les chercheurs sur la science ouverte' },
-        { id: 'PD-SCI-OS3-b', axe: 'PD-SCI', chantier: 'C7', action: 'Organiser une Journée science ouverte annuelle' },
-        { id: 'PD-EDIA-OS1-a', axe: 'PD-EDIA', chantier: 'C1', action: "Élaborer un formulaire d'auto-identification pour le RSN" },
-        { id: 'PD-EDIA-OS1-b', axe: 'PD-EDIA', chantier: 'C1', action: "Établir une définition commune de l'EDIA pour le RSN" },
-        { id: 'PD-EDIA-OS1-c', axe: 'PD-EDIA', chantier: 'C1', action: "Mettre en évidence les bénéfices concrets de l'EDIA" },
-        { id: 'PD-EDIA-OS1-d', axe: 'PD-EDIA', chantier: 'C2', action: 'Recenser les outils et ressources disponibles EDIA' },
-        { id: 'PD-EDIA-OS2-a', axe: 'PD-EDIA', chantier: 'C7', action: "Sensibiliser à l'importance d'un recrutement équitable" },
-        { id: 'PD-EDIA-OS2-b', axe: 'PD-EDIA', chantier: 'C1', action: "Développer ou adapter un outil d'évaluation EDIA" },
-        { id: 'PD-EDIA-OS2-c', axe: 'PD-EDIA', chantier: 'C6', action: "Inclure des critères EDIA dans les procédures d'évaluation" },
-        { id: 'PD-EDIA-OS3-a', axe: 'PD-EDIA', chantier: 'C1', action: "Mettre en évidence les bénéfices de l'intégration de l'EDIA" },
-        { id: 'PD-EDIA-OS3-b', axe: 'PD-EDIA', chantier: 'C1', action: "Prévoir l'observation et l'évaluation à court terme de l'EDIA" },
-      ]
+      axes: AXES_CONFIG,
+      chantiers: CHANTIERS_CONFIG,
+      actions: [],   // sera rempli par le CSV au démarrage
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -622,6 +594,60 @@
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // VUE GLOBALE — DÉTAIL D'UNE ACTION (panneau latéral)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
+      const [expanded, setExpanded] = useState(false);
+      const axe = showAxeLabel ? vueGlobaleData.axes.find(a => a.id === action.axe) : null;
+      const hasExtra = action.objectif || (action.actionOriginale && action.actionOriginale !== action.action);
+
+      return (
+        <div
+          className={`text-xs ${theme.textMuted} py-2 pl-3 border-l-2 ml-1 mb-1`}
+          style={{ borderColor: borderColor || (darkMode ? '#334155' : '#d1d5db') }}
+        >
+          {axe && (
+            <div className="flex items-center gap-1 mb-1">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: axe.color }}></div>
+              <span className={`text-xs ${theme.textLight}`}>{axe.name}</span>
+            </div>
+          )}
+          <div className="flex items-start justify-between gap-1">
+            <div className="flex-1">
+              <span className={`font-mono ${theme.textLight}`} style={{ fontSize: 10 }}>{action.id}</span>
+              <p className={`${darkMode ? 'text-slate-200' : 'text-gray-800'} mt-0.5 leading-relaxed`}>{action.action}</p>
+            </div>
+            {hasExtra && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className={`${theme.textLight} hover:${theme.text} shrink-0 mt-0.5`}
+                style={{ fontSize: 10 }}
+                title="Détails"
+              >
+                {expanded ? '▲' : '▼'}
+              </button>
+            )}
+          </div>
+          {expanded && (
+            <div className={`mt-1.5 pt-1.5 space-y-1`} style={{ borderTop: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}` }}>
+              {action.objectif && (
+                <p className={theme.textLight} style={{ fontSize: 10, lineHeight: '1.4' }}>
+                  <span className={`font-semibold ${theme.textMuted}`}>Objectif :</span> {action.objectif}
+                </p>
+              )}
+              {action.actionOriginale && action.actionOriginale !== action.action && (
+                <p className={theme.textLight} style={{ fontSize: 10, lineHeight: '1.4', fontStyle: 'italic' }}>
+                  <span className={`font-semibold ${theme.textMuted}`}>Action originale :</span> {action.actionOriginale}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // VUE GLOBALE — COMPOSANT GRAPHE RADIAL
     // ═══════════════════════════════════════════════════════════════════════════
 
@@ -753,7 +779,7 @@
                 Réseau des Actions RSN
               </h1>
               <p className={`${theme.textMuted} text-sm`}>
-                Cliquez sur un nœud pour voir ses connexions • 97 actions • 12 axes • 7 chantiers
+                Cliquez sur un nœud pour voir ses connexions • {vueGlobaleData.actions.length} actions • {vueGlobaleData.axes.length} axes • {vueGlobaleData.chantiers.length} chantiers
               </p>
               {selectedNode && (
                 <button onClick={() => setSelectedNode(null)} className={`mt-2 px-4 py-1 ${theme.buttonBg} rounded-full text-sm transition-colors ${theme.text}`}>
@@ -916,13 +942,7 @@
                           {chantierResults.map(action => {
                             const axe = vueGlobaleData.axes.find(a => a.id === action.axe);
                             return (
-                              <div key={action.id} className={`text-xs ${theme.textMuted} py-2 pl-3 border-l-2 ml-1 mb-1`} style={{ borderColor: axe?.color }}>
-                                <div className="flex items-center gap-1 mb-1">
-                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: axe?.color }}></div>
-                                  <span className={`text-xs ${theme.textLight}`}>{axe?.name}</span>
-                                </div>
-                                {action.action}
-                              </div>
+                              <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} borderColor={axe?.color} showAxeLabel={true} />
                             );
                           })}
                         </div>
@@ -971,9 +991,7 @@
                               <span className={`text-xs ${theme.textLight}`}>({axeActions.length})</span>
                             </div>
                             {axeActions.map(action => (
-                              <div key={action.id} className={`text-xs ${theme.textMuted} py-1 pl-5 border-l-2 ${darkMode ? 'border-slate-700' : 'border-gray-300'} ml-1 mb-1`}>
-                                {action.action}
-                              </div>
+                              <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} borderColor={axe.color} />
                             ))}
                           </div>
                         );
@@ -990,9 +1008,7 @@
                               <span className={`text-xs ${theme.textLight}`}>({chantierActions.length})</span>
                             </div>
                             {chantierActions.map(action => (
-                              <div key={action.id} className={`text-xs ${theme.textMuted} py-1 pl-5 border-l-2 ${darkMode ? 'border-slate-700' : 'border-gray-300'} ml-1 mb-1`}>
-                                {action.action}
-                              </div>
+                              <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} />
                             ))}
                           </div>
                         );
@@ -1033,6 +1049,22 @@
     function MainApp() {
       const [darkMode, setDarkMode] = useState(true);
       const [activeTab, setActiveTab] = useState('vue-globale');
+      const [csvActions, setCsvActions] = useState([]);
+      const [csvLoading, setCsvLoading] = useState(true);
+      const [csvError, setCsvError] = useState(null);
+
+      useEffect(() => {
+        fetch('data.csv')
+          .then(r => { if (!r.ok) throw new Error('CSV introuvable'); return r.text(); })
+          .then(text => {
+            const rows = parseCSV(text);
+            const actions = csvRowsToActions(rows);
+            vueGlobaleData.actions = actions;
+            setCsvActions(actions);
+            setCsvLoading(false);
+          })
+          .catch(err => { setCsvError(err.message); setCsvLoading(false); });
+      }, []);
 
       const tabs = [
         { id: 'vue-globale', label: 'Vue globale', icon: '🕸️' },
@@ -1124,8 +1156,25 @@
           </div>
 
           {/* ── CONTENT ── */}
-          {activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
-          {activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} />}
+          {csvLoading && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 49px)', color: darkMode ? '#94a3b8' : '#6b7280' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
+                <p>Chargement des données...</p>
+              </div>
+            </div>
+          )}
+          {csvError && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 49px)', color: '#ef4444' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+                <p>Erreur : {csvError}</p>
+                <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>Vérifiez que data.csv est présent à côté de index.html</p>
+              </div>
+            </div>
+          )}
+          {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
+          {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} />}
         </div>
       );
     }
