@@ -95,8 +95,8 @@
       return result;
     }
 
-    // ── Chargement CSV → actions pour le graphe ──
-    function csvRowsToActions(rows) {
+    // ── Chargement CSV → toutes les lignes enrichies ──
+    function csvRowsToAllData(rows) {
       return rows.map(row => ({
         id: row['ID Action'],
         axe: AXE_NAME_TO_ID[row['Axe']] || row['Axe'],
@@ -106,14 +106,83 @@
         objectif: row['Objectif stratégique'],
         axeFullName: row['Axe'],
         chantierFullName: row['Chantier suggéré'],
+        // Champs analyse
+        statusAnalyse: row['Statut analyse'] || '',
+        projet: row['Projet'] || '',
+        nomProjet: row['Nom projet'] || '',
+        descriptionProjet: row['Description projet'] || '',
+        notesAnalyse: row['Notes analyse'] || '',
+        destination: row['Destination'] || '',
+        approuve: (row['Approuvé'] || 'oui').toLowerCase(),
       }));
+    }
+
+    // ── Construire ANALYSE_DATA dynamiquement depuis les lignes CSV ──
+    function buildAnalyseData(allRows) {
+      const byChantier = {};
+
+      allRows.forEach(row => {
+        const chantierId = row.chantier;
+        if (!byChantier[chantierId]) byChantier[chantierId] = { projets: {}, parking: [] };
+
+        // Parking lot : actions avec une destination (status = move)
+        if (row.destination) {
+          byChantier[chantierId].parking.push({
+            id: row.id, axe: row.axeFullName, objectif: row.objectif,
+            action: row.action, destination: row.destination,
+            notes: row.notesAnalyse, status: 'move',
+          });
+          return;
+        }
+
+        // Actions assignées à un projet
+        if (row.projet) {
+          if (!byChantier[chantierId].projets[row.projet]) {
+            byChantier[chantierId].projets[row.projet] = {
+              id: row.projet, name: row.nomProjet, description: row.descriptionProjet, actions: [],
+            };
+          }
+          byChantier[chantierId].projets[row.projet].actions.push({
+            id: row.id, axe: row.axeFullName, objectif: row.objectif,
+            action: row.action, status: row.statusAnalyse || 'keep',
+            notes: row.notesAnalyse,
+          });
+        }
+      });
+
+      // Convertir en format attendu par les composants (clé numérique = id chantier)
+      const result = {};
+      const chantierIdToNum = { C1: 1, C2: 2, C3: 3, C4: 4, C5: 5, C6: 6, C7: 7 };
+      Object.entries(byChantier).forEach(([cId, data]) => {
+        const num = chantierIdToNum[cId];
+        if (!num) return;
+        const projects = Object.values(data.projets);
+        if (projects.length === 0 && data.parking.length === 0) return;
+        result[num] = { projects, parkingLot: data.parking };
+      });
+
+      return result;
+    }
+
+    // ── Construire CHANTIERS_META dynamiquement ──
+    function buildChantiersMeta(allRows, analyseData) {
+      const verbMap = { C1: 'PRODUIRE', C2: 'RECENSER', C3: 'CONNECTER', C4: 'FORMER', C5: 'ÉCOUTER', C6: 'CONVAINCRE', C7: 'ANIMER' };
+      const nameMap = { C1: 'Guides & Outils', C2: 'Répertoires & Cartographie', C3: 'Concertation & Maillage', C4: 'Formation & Relève', C5: 'Consultation & Écoute', C6: 'Influence & Représentation', C7: 'Événements & Rayonnement' };
+      const chantierIdToNum = { C1: 1, C2: 2, C3: 3, C4: 4, C5: 5, C6: 6, C7: 7 };
+
+      return CHANTIERS_CONFIG.map(c => {
+        const num = chantierIdToNum[c.id];
+        const totalActions = allRows.filter(r => r.chantier === c.id && r.approuve !== 'non').length;
+        const analyzed = !!analyseData[num];
+        return { id: num, name: nameMap[c.id], verb: verbMap[c.id], totalActions, analyzed };
+      });
     }
 
     // ── Objet vueGlobaleData — axes et chantiers statiques, actions chargées dynamiquement ──
     const vueGlobaleData = {
       axes: AXES_CONFIG,
       chantiers: CHANTIERS_CONFIG,
-      actions: [],   // sera rempli par le CSV au démarrage
+      actions: [],   // sera rempli par le CSV au démarrage (actions approuvées uniquement)
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -136,86 +205,7 @@
 
     const getS = (status, darkMode) => darkMode ? STATUS_DARK[status] : STATUS[status];
 
-    const CHANTIERS_META = [
-      { id: 1, name: "Guides & Outils",               verb: "PRODUIRE",   totalActions: 22, analyzed: true  },
-      { id: 2, name: "Répertoires & Cartographie",    verb: "RECENSER",   totalActions: 20, analyzed: false },
-      { id: 3, name: "Concertation & Maillage",       verb: "CONNECTER",  totalActions: 20, analyzed: false },
-      { id: 4, name: "Formation & Relève",            verb: "FORMER",     totalActions: 2,  analyzed: false },
-      { id: 5, name: "Consultation & Écoute",         verb: "ÉCOUTER",    totalActions: 16, analyzed: false },
-      { id: 6, name: "Influence & Représentation",    verb: "CONVAINCRE", totalActions: 6,  analyzed: false },
-      { id: 7, name: "Événements & Rayonnement",      verb: "ANIMER",     totalActions: 11, analyzed: false },
-    ];
-
-    const ANALYSE_DATA = {
-      1: {
-        projects: [
-          {
-            id: "G1",
-            name: "Harmonisation des bonnes pratiques méthodologiques",
-            description: "Produire un cadre commun de bonnes pratiques pour la communauté de recherche, accessible en français.",
-            actions: [
-              { id: "A2-OS2-a", axe: "Axe 2 : Modélisation et méthodes numériques", objectif: "Colliger et harmoniser les bonnes pratiques et les rendre accessibles", action: "Établir un guide/template standard pour encadrer l'harmonisation des bonnes pratiques en méthodologie", status: "keep", notes: "Ces 3 actions (a, b, c) partagent le même objectif stratégique — à fusionner en un seul livrable de projet." },
-              { id: "A2-OS2-b", axe: "Axe 2 : Modélisation et méthodes numériques", objectif: "Colliger et harmoniser les bonnes pratiques et les rendre accessibles", action: "Identifier les bonnes pratiques à formaliser pour la communauté et produire les guides associés", status: "keep", notes: "À fusionner avec A2-OS2-a." },
-              { id: "A2-OS2-c", axe: "Axe 2 : Modélisation et méthodes numériques", objectif: "Colliger et harmoniser les bonnes pratiques et les rendre accessibles", action: "Assurer l'offre de ressources en français", status: "keep", notes: "À fusionner avec A2-OS2-a — devient une contrainte du livrable, pas une action séparée." },
-            ],
-          },
-          {
-            id: "G2",
-            name: "Lexique RSN — Définitions communes",
-            description: "Établir une définition partagée pour chacun des principes directeurs du RSN. Tous les principes devraient être représentés.",
-            actions: [
-              { id: "PD-CONF-OS1-c", axe: "Principe directeur : Numérique de confiance", objectif: "Intégrer une vision partagée du numérique de confiance dans les axes et les actions du RSN", action: "Produire une première ébauche de la définition sous forme de fiche ou infographie à valider collectivement", status: "keep", notes: "" },
-              { id: "PD-DUR-OS1-b", axe: "Principe directeur : Santé durable", objectif: "Former et sensibiliser les membres du réseau et les parties prenantes sur la santé numérique durable", action: "Proposer une définition commune de la santé durable dans un contexte de santé numérique pour le RSN (lexique commun ou cartographie des concepts clés)", status: "keep", notes: "" },
-              { id: "PD-EDIA-OS1-b", axe: "Principe directeur : EDIA", objectif: "Favoriser une culture inclusive et respectueuse", action: "Établir une définition commune de l'EDIA pour le RSN", status: "keep", notes: "" },
-              { id: "PD-ENG-OS3-a", axe: "Principe directeur : Engagement citoyen", objectif: "Favoriser l'accessibilité de la patientèle et du public aux connaissances et interventions en santé numérique", action: "Définir les modalités d'engagement et de partage des connaissances (symposium, journée scientifique, feuille de route, etc.)", status: "rewrite", notes: "L'action porte sur des modalités organisationnelles, pas sur la définition du principe. À reformuler : « Établir une définition commune de l'Engagement citoyen pour le RSN »." },
-              { id: "GAP-DEF-SCI", axe: "Principe directeur : Science ouverte", objectif: "—", action: "Définition commune de la Science ouverte pour le RSN", status: "gap", notes: "Absent du fichier source. Tous les principes directeurs devraient avoir une définition dans ce projet — Science ouverte manque." },
-            ],
-          },
-          {
-            id: "G3",
-            name: "Grilles de référence par principe directeur",
-            description: "Pour chaque principe directeur, produire UNE grille de référence couvrant à la fois les critères d'intégration dans les projets ET les indicateurs de mesure d'impact. Les deux dimensions sont indissociables : définir les critères en amont, c'est se donner les moyens de mesurer en aval.",
-            actions: [
-              { id: "CA-RENF-OS3-b", axe: "Champ d'action : Renforcement des capacités", objectif: "Outiller les chercheur(e)s pour mesurer adéquatement l'impact de leurs activités en termes de capacité", action: "Revoir les critères et cadres existants, et définir ce qu'il est nécessaire de suivre et comment le faire", status: "keep", notes: "Cadre général et méthodologique — devient la base commune des grilles de référence." },
-              { id: "PD-CONF-OS3-a", axe: "Principe directeur : Numérique de confiance", objectif: "Favoriser des normes et pratiques partagées autour de la transparence, la sécurité, l'éthique, l'éco-responsabilité et la réciprocité", action: "Développer une feuille de route de critères de confiance à appliquer dans les projets (sécurité, éthique, validité, UX)", status: "rewrite", notes: "À reformuler : « Développer une grille de référence Numérique de confiance — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact ». Seule grille existante, modèle pour les autres." },
-              { id: "PD-EDIA-OS2-b", axe: "Principe directeur : EDIA", objectif: "Assurer l'équité dans le processus de dotation des organisations", action: "Développer ou adapter un outil d'évaluation EDIA des processus organisationnels (avec une dimension recrutement)", status: "keep", notes: "Contribue à la grille EDIA — dimension évaluation des processus." },
-              { id: "PD-EDIA-OS3-b", axe: "Principe directeur : EDIA", objectif: "Encourager la diversité des approches de recherche et de méthodologies", action: "Prévoir l'observation et l'évaluation à court terme de l'EDIA dès la conception des projets", status: "keep", notes: "Contribue à la grille EDIA — dimension intégration dès la conception." },
-              { id: "PD-EDIA-OS1-c", axe: "Principe directeur : EDIA", objectif: "Favoriser une culture inclusive et respectueuse", action: "Mettre en évidence les bénéfices concrets de l'EDIA (p. ex. dans l'enseignement, les pratiques de gouvernance, l'accueil des populations vulnérables)", status: "rewrite", notes: "À reformuler en indicateurs d'impact EDIA : « Développer des indicateurs et exemples concrets pour mesurer et démontrer l'impact de l'EDIA dans les projets RSN »." },
-              { id: "PD-EDIA-OS3-a", axe: "Principe directeur : EDIA", objectif: "Encourager la diversité des approches de recherche et de méthodologies", action: "Mettre en évidence les bénéfices de l'intégration de l'EDIA dans la recherche (démonstration par l'exemple)", status: "rewrite", notes: "Même logique que PD-EDIA-OS1-c. À reformuler en mesure d'impact démonstrative et reproductible — contribue à la grille EDIA." },
-              { id: "GAP-GR-SCI", axe: "Principe directeur : Science ouverte", objectif: "—", action: "Développer une grille de référence Science ouverte — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact", status: "gap", notes: "À créer sur le modèle de la grille Numérique de confiance (PD-CONF-OS3-a réécrit)." },
-              { id: "GAP-GR-DUR", axe: "Principe directeur : Santé durable", objectif: "—", action: "Développer une grille de référence Santé durable — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact", status: "gap", notes: "À créer sur le modèle de la grille Numérique de confiance." },
-              { id: "GAP-GR-ENG", axe: "Principe directeur : Engagement citoyen", objectif: "—", action: "Développer une grille de référence Engagement citoyen — critères d'intégration dans les projets et indicateurs d'évaluation de l'impact", status: "gap", notes: "À créer sur le modèle de la grille Numérique de confiance." },
-            ],
-          },
-          {
-            id: "G4",
-            name: "Infrastructure Science ouverte",
-            description: "Mettre en place les espaces et outils partagés pour la science ouverte — transversale à tous les projets RSN.",
-            actions: [
-              { id: "PD-SCI-OS2-a", axe: "Principe directeur : Science ouverte", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Créer un espace GitHub RSN avec un modèle de gouvernance et le diffuser dans la communauté", status: "keep", notes: "Clair et bien placé ici." },
-              { id: "PD-SCI-OS2-b", axe: "Principe directeur : Science ouverte", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Partager des packages R et Python avec la communauté", status: "rewrite", notes: "Action trop vague comme infrastructure. À reformuler en guide pratique : « Produire un guide de partage de code et packages (R, Python) dans une logique de science ouverte »." },
-              { id: "PD-SCI-OS3-a", axe: "Principe directeur : Science ouverte", objectif: "Promouvoir une culture de la science ouverte au sein du réseau et à l'externe", action: "Développer des connaissances accessibles pour les chercheurs sur la science ouverte (capsules, guides)", status: "move", notes: "Double appartenance : appartient aussi à Événements & Rayonnement (capsules = rayonnement). À conserver ici ET dupliquer dans ce chantier." },
-            ],
-          },
-          {
-            id: "G5",
-            name: "Guides de gouvernance",
-            description: "Produire des guides et cadres de référence sur les différents types de gouvernance pertinents pour le RSN.",
-            actions: [
-              { id: "A1-OS3-c", axe: "Axe 1 : Plateformes numériques et gouvernance", objectif: "Représenter les besoins de la communauté des chercheurs en matière de gouvernance de l'information et influencer les décisions gouvernementales", action: "Partage des cadres de gestion et des modèles d'entente", status: "keep", notes: "" },
-              { id: "GAP-GOV-TYPES", axe: "Axe 1 : Plateformes numériques et gouvernance", objectif: "—", action: "Identifier et documenter les types de gouvernance manquants (gouvernance des données, des plateformes, éthique, etc.) et produire les guides associés", status: "gap", notes: "Question ouverte : quels types de gouvernance manque-t-il à ce projet ? Un seul guide de gouvernance semble insuffisant pour un réseau de cette ampleur." },
-            ],
-          },
-        ],
-        parkingLot: [
-          { id: "CA-MOB-OS2-a", axe: "Champ d'action : Mobilisation des connaissances", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Élaborer des résumés conviviaux des connaissances et articles", destination: "Événements & Rayonnement", notes: "Produire des résumés pour diffusion = rayonnement, pas production de guides méthodologiques." },
-          { id: "CA-MOB-OS3-b", axe: "Champ d'action : Mobilisation des connaissances", objectif: "Renforcer l'engagement citoyen et la littératie numérique en santé par la diffusion des connaissances", action: "Développer un bulletin d'informations régulier pour le partage des résultats de recherche", destination: "Événements & Rayonnement", notes: "Un bulletin = outil de communication et de rayonnement, pas un guide." },
-          { id: "A1-OS1-b", axe: "Axe 1 : Plateformes numériques et gouvernance", objectif: "Favoriser l'acceptabilité sociale de l'utilisation des données de santé dans un contexte de recherche", action: "Produire un document annexe mettant de l'avant les bénéfices et les manques à gagner (use case)", destination: "Influence & Représentation", notes: "Orphelin sans les autres A1-OS1. À fusionner avec A1-OS1-a (manifeste) et A1-OS1-c (comité patients) qui sont dans d'autres chantiers." },
-          { id: "PD-EDIA-OS1-a", axe: "Principe directeur : EDIA", objectif: "Favoriser une culture inclusive et respectueuse", action: "Élaborer un formulaire d'auto-identification pour le RSN", destination: "Consultation & Écoute", notes: "Ce n'est pas de l'évaluation — c'est un outil de collecte de données / consultation. Appartient à Consultation & Écoute." },
-          { id: "CA-MOB-OS2-d", axe: "Champ d'action : Mobilisation des connaissances", objectif: "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique", action: "Porter attention au problème de disponibilité et de biais pour les données des populations marginalisées", destination: "Guides & Outils (à développer)", notes: "Intention valide mais trop vague comme action. À transformer en guide concret : « Produire un guide sur l'intégration et la représentation des populations marginalisées dans les données de recherche »." },
-        ],
-      },
-    };
+    // (ANALYSE_DATA et CHANTIERS_META sont désormais construits dynamiquement depuis le CSV)
 
     // ═══════════════════════════════════════════════════════════════════════════
     // ANALYSE CHANTIERS — COMPOSANTS
@@ -482,10 +472,10 @@
       );
     }
 
-    function AnalyseChantiers({ darkMode }) {
+    function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
       const [selectedId, setSelectedId] = useState(1);
-      const meta = CHANTIERS_META.find((c) => c.id === selectedId);
-      const chantierData = ANALYSE_DATA[selectedId];
+      const meta = chantiersMeta.find((c) => c.id === selectedId) || { id: selectedId, name: '...', verb: '...', totalActions: 0, analyzed: false };
+      const chantierData = analyseData[selectedId];
 
       const sidebarBg = darkMode ? '#1e293b' : 'white';
       const sidebarBorder = darkMode ? '#334155' : '#e5e7eb';
@@ -504,7 +494,7 @@
             </div>
 
             <nav style={{ flex: 1, padding: "8px" }}>
-              {CHANTIERS_META.map((c) => {
+              {chantiersMeta.map((c) => {
                 const active = selectedId === c.id;
                 return (
                   <button
@@ -633,7 +623,7 @@
             <div className={`mt-1.5 pt-1.5 space-y-1`} style={{ borderTop: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}` }}>
               {action.objectif && (
                 <p className={theme.textLight} style={{ fontSize: 10, lineHeight: '1.4' }}>
-                  <span className={`font-semibold ${theme.textMuted}`}>Objectif :</span> {action.objectif}
+                  <span className={`font-semibold ${theme.textMuted}`}>Objectif stratégique :</span> {action.objectif}
                 </p>
               )}
               {action.actionOriginale && action.actionOriginale !== action.action && (
@@ -1049,18 +1039,26 @@
     function MainApp() {
       const [darkMode, setDarkMode] = useState(true);
       const [activeTab, setActiveTab] = useState('vue-globale');
-      const [csvActions, setCsvActions] = useState([]);
       const [csvLoading, setCsvLoading] = useState(true);
       const [csvError, setCsvError] = useState(null);
+      const [analyseData, setAnalyseData] = useState({});
+      const [chantiersMeta, setChantiersMeta] = useState([]);
 
       useEffect(() => {
         fetch('data.csv')
           .then(r => { if (!r.ok) throw new Error('CSV introuvable'); return r.text(); })
           .then(text => {
             const rows = parseCSV(text);
-            const actions = csvRowsToActions(rows);
-            vueGlobaleData.actions = actions;
-            setCsvActions(actions);
+            const allRows = csvRowsToAllData(rows);
+
+            // Vue globale : seulement les actions approuvées
+            const approvedActions = allRows.filter(r => r.approuve !== 'non');
+            vueGlobaleData.actions = approvedActions;
+
+            // Analyse : toutes les lignes (y compris GAPs non approuvés)
+            const ad = buildAnalyseData(allRows);
+            setAnalyseData(ad);
+            setChantiersMeta(buildChantiersMeta(allRows, ad));
             setCsvLoading(false);
           })
           .catch(err => { setCsvError(err.message); setCsvLoading(false); });
@@ -1174,7 +1172,7 @@
             </div>
           )}
           {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
-          {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} />}
+          {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} analyseData={analyseData} chantiersMeta={chantiersMeta} />}
         </div>
       );
     }
