@@ -114,6 +114,7 @@
         notesAnalyse: row['Notes analyse'] || '',
         destination: row['Destination'] || '',
         approuve: (row['Approuvé'] || 'oui').toLowerCase(),
+        statutObjectif: row['Statut objectif'] || 'non démarré',
       }));
     }
 
@@ -131,6 +132,7 @@
             id: row.id, axe: row.axeFullName, objectif: row.objectif,
             action: row.action, destination: row.destination,
             notes: row.notesAnalyse, status: 'move',
+            statutObjectif: row.statutObjectif,
           });
           return;
         }
@@ -146,6 +148,7 @@
             id: row.id, axe: row.axeFullName, objectif: row.objectif,
             action: row.action, status: row.statusAnalyse || 'keep',
             notes: row.notesAnalyse,
+            statutObjectif: row.statutObjectif,
           });
         }
       });
@@ -205,6 +208,31 @@
 
     const getS = (status, darkMode) => darkMode ? STATUS_DARK[status] : STATUS[status];
 
+    // ── Statut de progression des objectifs ──
+    const PROGRESS = {
+      'non démarré': { label: 'Non démarré', color: '#6b7280', bgLight: '#f3f4f6', bgDark: '#1e293b', borderLight: '#d1d5db', borderDark: '#475569', icon: '○' },
+      'en cours':    { label: 'En cours',    color: '#f59e0b', bgLight: '#fffbeb', bgDark: '#451a03', borderLight: '#fcd34d', borderDark: '#92400e', icon: '◐' },
+      'terminé':     { label: 'Terminé',     color: '#22c55e', bgLight: '#f0fdf4', bgDark: '#052e16', borderLight: '#86efac', borderDark: '#166534', icon: '●' },
+    };
+
+    function ProgressBadge({ statut, darkMode, size = 'sm' }) {
+      const p = PROGRESS[statut] || PROGRESS['non démarré'];
+      const bg = darkMode ? p.bgDark : p.bgLight;
+      const border = darkMode ? p.borderDark : p.borderLight;
+      const fontSize = size === 'xs' ? 10 : 11;
+      const padding = size === 'xs' ? '1px 6px' : '2px 8px';
+      return (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          fontSize, padding, borderRadius: 12,
+          backgroundColor: bg, border: `1px solid ${border}`, color: p.color,
+          fontWeight: 600, whiteSpace: 'nowrap',
+        }}>
+          <span style={{ fontSize: fontSize + 2 }}>{p.icon}</span> {p.label}
+        </span>
+      );
+    }
+
     // (ANALYSE_DATA et CHANTIERS_META sont désormais construits dynamiquement depuis le CSV)
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -244,6 +272,7 @@
               <p className={`text-sm font-medium ${s.text} leading-snug`}>{action.action}</p>
             </div>
             <div className="flex flex-col items-end gap-1.5 shrink-0">
+              <ProgressBadge statut={action.statutObjectif} darkMode={darkMode} size="xs" />
               <StatusBadge status={action.status} darkMode={darkMode} />
               {action.notes && (
                 <button
@@ -455,7 +484,7 @@
       const borderColor = darkMode ? '#334155' : '#f3f4f6';
       return (
         <div style={{ padding: "12px 16px", borderTop: `1px solid ${borderColor}` }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: textColor, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: '0 0 8px 0' }}>Légende</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: textColor, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: '0 0 8px 0' }}>Analyse</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {Object.values(STATUS).map((s) => (
               <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -468,8 +497,27 @@
               <span style={{ fontSize: 12, color: labelColor }}>À rediriger</span>
             </div>
           </div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: textColor, textTransform: 'uppercase', letterSpacing: '0.05em', margin: '12px 0 8px 0' }}>Progression</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {Object.entries(PROGRESS).map(([key, p]) => (
+              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: p.color }}>{p.icon}</span>
+                <span style={{ fontSize: 12, color: labelColor }}>{p.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       );
+    }
+
+    function getProgressStats(analyseData, chantierId) {
+      const data = analyseData[chantierId];
+      if (!data) return null;
+      const allActions = data.projects.flatMap(p => p.actions);
+      const counts = {};
+      Object.keys(PROGRESS).forEach(k => { counts[k] = 0; });
+      allActions.forEach(a => { const s = a.statutObjectif || 'non démarré'; counts[s] = (counts[s] || 0) + 1; });
+      return counts;
     }
 
     function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
@@ -530,6 +578,21 @@
                       </span>
                       <span style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{c.totalActions} actions</span>
                     </div>
+                    {(() => {
+                      const stats = getProgressStats(analyseData, c.id);
+                      if (!stats) return null;
+                      const total = Object.values(stats).reduce((s, v) => s + v, 0);
+                      if (total === 0) return null;
+                      return (
+                        <div style={{ display: 'flex', borderRadius: 4, overflow: 'hidden', height: 3, marginTop: 6, backgroundColor: darkMode ? '#334155' : '#e5e7eb' }}>
+                          {Object.entries(PROGRESS).map(([key, p]) => {
+                            const pct = (stats[key] / total) * 100;
+                            if (pct === 0) return null;
+                            return <div key={key} style={{ width: `${pct}%`, backgroundColor: p.color }} />;
+                          })}
+                        </div>
+                      );
+                    })()}
                   </button>
                 );
               })}
@@ -560,6 +623,35 @@
               {/* Content */}
               {chantierData ? (
                 <>
+                  {/* Progress bar */}
+                  {(() => {
+                    const allActions = chantierData.projects.flatMap(p => p.actions);
+                    const progressCounts = {};
+                    Object.keys(PROGRESS).forEach(k => { progressCounts[k] = 0; });
+                    allActions.forEach(a => { const s = a.statutObjectif || 'non démarré'; progressCounts[s] = (progressCounts[s] || 0) + 1; });
+                    const total = allActions.length;
+                    if (total === 0) return null;
+                    return (
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 8, backgroundColor: darkMode ? '#1e293b' : '#e5e7eb' }}>
+                          {Object.entries(PROGRESS).map(([key, p]) => {
+                            const pct = (progressCounts[key] / total) * 100;
+                            if (pct === 0) return null;
+                            return <div key={key} style={{ width: `${pct}%`, backgroundColor: p.color, transition: 'width 0.3s' }} />;
+                          })}
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
+                          {Object.entries(PROGRESS).map(([key, p]) => (
+                            progressCounts[key] > 0 && (
+                              <span key={key} style={{ fontSize: 11, color: p.color, fontWeight: 500 }}>
+                                {p.icon} {progressCounts[key]} {p.label.toLowerCase()}
+                              </span>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <StatsBar projects={chantierData.projects} parkingLot={chantierData.parkingLot} darkMode={darkMode} />
                   {chantierData.projects.map((p) => (
                     <ProjectCard key={p.id} project={p} darkMode={darkMode} />
@@ -605,7 +697,10 @@
           )}
           <div className="flex items-start justify-between gap-1">
             <div className="flex-1">
-              <span className={`font-mono ${theme.textLight}`} style={{ fontSize: 10 }}>{action.id}</span>
+              <div className="flex items-center gap-2">
+                <span className={`font-mono ${theme.textLight}`} style={{ fontSize: 10 }}>{action.id}</span>
+                <ProgressBadge statut={action.statutObjectif} darkMode={darkMode} size="xs" />
+              </div>
               <p className={`${darkMode ? 'text-slate-200' : 'text-gray-800'} mt-0.5 leading-relaxed`}>{action.action}</p>
             </div>
             {hasExtra && (
