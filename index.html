@@ -845,19 +845,149 @@
       }, [selectedNode]);
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-1 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-1">
-              <h1 className={`text-2xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
+            <div className="text-center mb-3">
+              <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-1`}>
                 Réseau des Actions RSN
               </h1>
-              <p className={`${theme.textMuted} text-xs`}>
+              <p className={`${theme.textMuted} text-sm`}>
                 Cliquez sur un nœud pour voir ses connexions • {vueGlobaleData.actions.length} actions • {vueGlobaleData.axes.length} axes • {vueGlobaleData.chantiers.length} chantiers
               </p>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-3">
-              <div className="flex-1">
+            <div className="relative">
+              {/* ── Left panel — search + cards ── */}
+              <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110 }}>
+                {/* Search bar */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Rechercher une action..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={`w-full px-3 py-2 pl-9 rounded-full text-xs ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                  />
+                  <svg className={`absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 ${darkMode ? 'text-slate-400' : 'text-gray-400'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  {searchTerm && (
+                    <button onClick={() => setSearchTerm('')} className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${darkMode ? 'text-slate-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'}`}>✕</button>
+                  )}
+                </div>
+                {searchTerm && (
+                  <div className={`text-xs ${theme.textMuted} px-1`}>
+                    {searchResults.length} action{searchResults.length !== 1 ? 's' : ''} trouvée{searchResults.length !== 1 ? 's' : ''}
+                  </div>
+                )}
+
+                {/* Search results panel */}
+                {searchTerm && searchResults.length > 0 && !selectedNode && (
+                  <div ref={panelRef} className={`${theme.cardBg} rounded-xl p-3 overflow-y-auto border ${theme.cardBorder}`} style={{ maxHeight: 'calc(100vh - 180px)' }}>
+                    <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${theme.cardBorder}`}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs bg-purple-500">{searchResults.length}</div>
+                      <div>
+                        <div className={`font-bold ${theme.text} text-xs`}>Résultats</div>
+                        <div className={`text-xs ${theme.textLight}`}>{searchResults.length} action{searchResults.length !== 1 ? 's' : ''}</div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {vueGlobaleData.chantiers.map(chantier => {
+                        const chantierResults = searchResults.filter(a => a.chantier === chantier.id);
+                        if (chantierResults.length === 0) return null;
+                        return (
+                          <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <span className="text-sm">{chantier.icon}</span>
+                              <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                              <span className={`text-xs ${theme.textLight}`}>({chantierResults.length})</span>
+                            </div>
+                            {chantierResults.map(action => {
+                              const axe = vueGlobaleData.axes.find(a => a.id === action.axe);
+                              return (
+                                <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} borderColor={axe?.color} showAxeLabel={true} />
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected node panel */}
+                {selectedNode && (
+                  <div ref={panelRef} className={`${theme.cardBg} rounded-xl p-3 overflow-y-auto border ${theme.cardBorder}`} style={{ position: 'relative', maxHeight: 'calc(100vh - 180px)' }}>
+                    <button onClick={() => setSelectedNode(null)}
+                      style={{ position: 'absolute', top: 8, right: 10, background: 'none', border: 'none', cursor: 'pointer',
+                        fontSize: 16, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1 }}>✕</button>
+                    <div className={`flex items-center gap-2 mb-3 pb-2 border-b ${theme.cardBorder} pr-5`}>
+                      {selectedNode.type === 'chantier' ? (
+                        <>
+                          <span className="text-2xl">{selectedNode.icon}</span>
+                          <div>
+                            <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
+                            <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color, fontSize: 10 }}>{selectedNode.verb}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: selectedNode.color }}>
+                            {vueGlobaleData.actions.filter(a => a.axe === selectedNode.id).length}
+                          </div>
+                          <div>
+                            <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
+                            <span className={`text-xs ${theme.textLight}`} style={{ fontSize: 10 }}>
+                              {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      <div className={`text-xs ${theme.textMuted} mb-1`}>{selectedActions.length} action{selectedActions.length > 1 ? 's' : ''}</div>
+                      {selectedNode.type === 'chantier' ? (
+                        vueGlobaleData.axes.map(axe => {
+                          const axeActions = selectedActions.filter(a => a.axe === axe.id);
+                          if (axeActions.length === 0) return null;
+                          return (
+                            <div key={axe.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: axe.color }} />
+                                <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{axe.name}</span>
+                                <span className={`text-xs ${theme.textLight}`}>({axeActions.length})</span>
+                              </div>
+                              {axeActions.map(action => (
+                                <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} borderColor={axe.color} />
+                              ))}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        vueGlobaleData.chantiers.map(chantier => {
+                          const chantierActions = selectedActions.filter(a => a.chantier === chantier.id);
+                          if (chantierActions.length === 0) return null;
+                          return (
+                            <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <span className="text-sm">{chantier.icon}</span>
+                                <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                                <span className={`text-xs ${theme.textLight}`}>({chantierActions.length})</span>
+                              </div>
+                              {chantierActions.map(action => (
+                                <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} />
+                              ))}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ── SVG radial diagram — centered ── */}
+              <div className="flex justify-center">
                 <svg ref={svgRef} viewBox={`-40 40 ${width + 120} ${height - 40}`} className="max-w-full h-auto">
                   <defs>
                     <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
@@ -987,131 +1117,6 @@
                 </svg>
               </div>
 
-              <div className="lg:w-80 flex-shrink-0 flex flex-col gap-3">
-                {/* Search bar */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Rechercher une action..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className={`w-full px-4 py-2 pl-10 rounded-full text-sm ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
-                  />
-                  <svg className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${darkMode ? 'text-slate-400' : 'text-gray-400'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  {searchTerm && (
-                    <button onClick={() => setSearchTerm('')} className={`absolute right-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-slate-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'}`}>✕</button>
-                  )}
-                </div>
-                {searchTerm && (
-                  <div className={`text-xs ${theme.textMuted} px-2`}>
-                    {searchResults.length} action{searchResults.length !== 1 ? 's' : ''} trouvée{searchResults.length !== 1 ? 's' : ''}
-                  </div>
-                )}
-
-              {searchTerm && searchResults.length > 0 && !selectedNode && (
-                <div className={`${theme.cardBg} rounded-2xl p-5 max-h-[700px] overflow-y-auto border ${theme.cardBorder}`}>
-                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder}`}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-purple-500">{searchResults.length}</div>
-                    <div>
-                      <h3 className={`font-bold ${theme.text} text-sm`}>Résultats de recherche</h3>
-                      <span className={`text-xs ${theme.textLight}`}>"{searchTerm}"</span>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {vueGlobaleData.chantiers.map(chantier => {
-                      const chantierResults = searchResults.filter(a => a.chantier === chantier.id);
-                      if (chantierResults.length === 0) return null;
-                      return (
-                        <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-xl p-3`}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span>{chantier.icon}</span>
-                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
-                            <span className={`text-xs ${theme.textLight}`}>({chantierResults.length})</span>
-                          </div>
-                          {chantierResults.map(action => {
-                            const axe = vueGlobaleData.axes.find(a => a.id === action.axe);
-                            return (
-                              <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} borderColor={axe?.color} showAxeLabel={true} />
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {selectedNode && (
-                <div ref={panelRef} className={`${theme.cardBg} rounded-2xl p-5 max-h-[700px] overflow-y-auto border ${theme.cardBorder}`} style={{ position: 'relative' }}>
-                  <button onClick={() => setSelectedNode(null)}
-                    style={{ position: 'absolute', top: 12, right: 14, background: 'none', border: 'none', cursor: 'pointer',
-                      fontSize: 18, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1 }}>✕</button>
-                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder} pr-6`}>
-                    {selectedNode.type === 'chantier' ? (
-                      <>
-                        <span className="text-3xl">{selectedNode.icon}</span>
-                        <div>
-                          <h3 className={`font-bold ${theme.text}`}>{selectedNode.name}</h3>
-                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color }}>{selectedNode.verb}</span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: selectedNode.color }}>
-                          {vueGlobaleData.actions.filter(a => a.axe === selectedNode.id).length}
-                        </div>
-                        <div>
-                          <h3 className={`font-bold ${theme.text} text-sm`}>{selectedNode.name}</h3>
-                          <span className={`text-xs ${theme.textLight}`}>
-                            {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <div className="space-y-4">
-                    <div className={`text-sm ${theme.textMuted} mb-2`}>{selectedActions.length} action{selectedActions.length > 1 ? 's' : ''}</div>
-                    {selectedNode.type === 'chantier' ? (
-                      vueGlobaleData.axes.map(axe => {
-                        const axeActions = selectedActions.filter(a => a.axe === axe.id);
-                        if (axeActions.length === 0) return null;
-                        return (
-                          <div key={axe.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-xl p-3`}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: axe.color }} />
-                              <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{axe.name}</span>
-                              <span className={`text-xs ${theme.textLight}`}>({axeActions.length})</span>
-                            </div>
-                            {axeActions.map(action => (
-                              <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} borderColor={axe.color} />
-                            ))}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      vueGlobaleData.chantiers.map(chantier => {
-                        const chantierActions = selectedActions.filter(a => a.chantier === chantier.id);
-                        if (chantierActions.length === 0) return null;
-                        return (
-                          <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-xl p-3`}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <span>{chantier.icon}</span>
-                              <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
-                              <span className={`text-xs ${theme.textLight}`}>({chantierActions.length})</span>
-                            </div>
-                            {chantierActions.map(action => (
-                              <ActionDetail key={action.id} action={action} darkMode={darkMode} theme={theme} />
-                            ))}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-              )}
-              </div>
             </div>
 
           </div>
