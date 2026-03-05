@@ -1194,10 +1194,10 @@
         return () => document.removeEventListener('mousedown', handler);
       }, [selectedNode]);
 
-      // Bigger SVG with bigger nodes
-      const width = 800, height = 800;
+      // SVG sized to fit without top truncation
+      const width = 740, height = 740;
       const cx = width / 2, cy = height / 2;
-      const axeR = 130, champR = 255, princR = 370;
+      const axeR = 115, champR = 230, princR = 340;
       const axeNodeR = 42, champNodeR = 38, princNodeR = 34;
 
       const axePositions = useMemo(() => {
@@ -1233,19 +1233,32 @@
       // Color for gov items
       const govColor = darkMode ? '#3b82f6' : '#2563eb';
 
-      // Member card component (reused in gov boxes and detail panel)
-      const MemberCard = ({ p, color }) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: 12, backgroundColor: color + '25', color: color,
-          }}>{p.initials}</div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
-            {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{p.role}</div>}
+      // Photo URL helper — expects photos/<initials_lowercase>.jpg
+      const photoUrl = (initials) => `photos/${initials.toLowerCase()}.jpg`;
+
+      // Member card with circular photo (fallback to initials)
+      const MemberCard = ({ p, color }) => {
+        const [imgOk, setImgOk] = useState(true);
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
+            <div style={{
+              width: 38, height: 38, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 700, fontSize: 12, backgroundColor: color + '25', color: color,
+            }}>
+              {imgOk ? (
+                <img src={photoUrl(p.initials)} alt={p.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={() => setImgOk(false)} />
+              ) : p.initials}
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
+              {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{p.role}</div>}
+            </div>
           </div>
-        </div>
-      );
+        );
+      };
 
       // Governance box — expands inline on click
       const GovBox = ({ id, name, members, color }) => {
@@ -1294,22 +1307,17 @@
         );
       };
 
-      // Ring label positions — placed at angles where no nodes sit
-      // Axes nodes at: -90° (top), 0° (right), 90° (bottom), 180° (left)
-      // Safe: 225° (lower-left diagonal)
-      const axeLblAngle = (225 * Math.PI) / 180;
-      const axeLblX = cx + Math.cos(axeLblAngle) * (axeR + 2);
-      const axeLblY = cy + Math.sin(axeLblAngle) * (axeR + 2);
-      // Champs nodes at: -60° (upper-right), 60° (lower-right), 180° (left)
-      // Safe: ~260° (lower-left, below left)
-      const champLblAngle = (250 * Math.PI) / 180;
-      const champLblX = cx + Math.cos(champLblAngle) * (champR + 2);
-      const champLblY = cy + Math.sin(champLblAngle) * (champR + 2);
-      // Principes nodes at: -90°, -18°, 54°, 126°, 198°
-      // Safe: ~235° (between 198° and 270°)
-      const princLblAngle = (235 * Math.PI) / 180;
-      const princLblX = cx + Math.cos(princLblAngle) * (princR + 2);
-      const princLblY = cy + Math.sin(princLblAngle) * (princR + 2);
+      // Arc path for curved text: creates an arc from startAngle to endAngle (degrees)
+      // We draw the arc in the upper-left quadrant where no nodes sit (around 210-250°)
+      const arcPath = (r, startDeg, endDeg) => {
+        const toRad = d => (d * Math.PI) / 180;
+        const x1 = cx + Math.cos(toRad(startDeg)) * r;
+        const y1 = cy + Math.sin(toRad(startDeg)) * r;
+        const x2 = cx + Math.cos(toRad(endDeg)) * r;
+        const y2 = cy + Math.sin(toRad(endDeg)) * r;
+        const largeArc = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+        return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`;
+      };
 
       return (
         <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
@@ -1326,7 +1334,7 @@
 
             <div className="relative">
               {/* ── Gouvernance boxes — top left, expand inline ── */}
-              <div className="absolute left-0 top-0 z-20 flex flex-col gap-2" style={{ width: 220 }}>
+              <div className="absolute left-0 top-0 z-20 flex flex-col gap-2" style={{ width: 260 }}>
                 <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
                   Gouvernance
                 </div>
@@ -1344,13 +1352,21 @@
                   <circle cx={cx} cy={cy} r={champR} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
                   <circle cx={cx} cy={cy} r={princR} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
 
-                  {/* Ring labels — at angles clear of all nodes */}
-                  <text x={axeLblX} y={axeLblY} fill={theme.svgLabelDim} fontSize="8" textAnchor="end" fontWeight="600" letterSpacing="0.06em" opacity="0.6"
-                    transform={`rotate(${225 - 180}, ${axeLblX}, ${axeLblY})`}>AXES</text>
-                  <text x={champLblX} y={champLblY} fill={theme.svgLabelDim} fontSize="8" textAnchor="end" fontWeight="600" letterSpacing="0.06em" opacity="0.6"
-                    transform={`rotate(${250 - 180}, ${champLblX}, ${champLblY})`}>CHAMPS D'ACTION</text>
-                  <text x={princLblX} y={princLblY} fill={theme.svgLabelDim} fontSize="8" textAnchor="end" fontWeight="600" letterSpacing="0.06em" opacity="0.6"
-                    transform={`rotate(${235 - 180}, ${princLblX}, ${princLblY})`}>PRINCIPES DIRECTEURS</text>
+                  {/* Ring labels — curved along dashed circles */}
+                  <defs>
+                    <path id="axeArc" d={arcPath(axeR + 12, 205, 260)} fill="none" />
+                    <path id="champArc" d={arcPath(champR + 12, 210, 275)} fill="none" />
+                    <path id="princArc" d={arcPath(princR + 12, 212, 268)} fill="none" />
+                  </defs>
+                  <text fill={theme.svgLabelDim} fontSize="8.5" fontWeight="600" letterSpacing="0.1em" opacity="0.55">
+                    <textPath href="#axeArc" startOffset="50%" textAnchor="middle">AXES THÉMATIQUES</textPath>
+                  </text>
+                  <text fill={theme.svgLabelDim} fontSize="8.5" fontWeight="600" letterSpacing="0.1em" opacity="0.55">
+                    <textPath href="#champArc" startOffset="50%" textAnchor="middle">CHAMPS D'ACTION</textPath>
+                  </text>
+                  <text fill={theme.svgLabelDim} fontSize="8.5" fontWeight="600" letterSpacing="0.1em" opacity="0.55">
+                    <textPath href="#princArc" startOffset="50%" textAnchor="middle">PRINCIPES DIRECTEURS</textPath>
+                  </text>
 
                   {/* Center — RSN */}
                   <circle cx={cx} cy={cy} r={36} fill={theme.svgNodeBg}
