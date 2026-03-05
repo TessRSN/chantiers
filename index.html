@@ -1166,6 +1166,9 @@
 
     function StructureGouvernance({ darkMode }) {
       const [selectedNode, setSelectedNode] = useState(null);
+      const [expandedGov, setExpandedGov] = useState(null); // id of expanded gov box
+      const panelRef = React.useRef(null);
+      const { useRef, useCallback } = React;
 
       const theme = {
         text: darkMode ? 'text-white' : 'text-gray-900',
@@ -1173,7 +1176,6 @@
         textLight: darkMode ? 'text-slate-500' : 'text-gray-400',
         cardBg: darkMode ? 'bg-slate-900' : 'bg-white',
         cardBorder: darkMode ? 'border-slate-800' : 'border-gray-200',
-        buttonBg: darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-gray-200 hover:bg-gray-300',
         svgStroke: darkMode ? '#334155' : '#CBD5E1',
         svgNodeBg: darkMode ? '#1E293B' : '#F3F4F6',
         svgLabelFill: darkMode ? '#E2E8F0' : '#1F2937',
@@ -1181,11 +1183,22 @@
         svgLabelDim: darkMode ? '#64748B' : '#9CA3AF',
       };
 
-      // Larger SVG with labels inside nodes — no external labels = no overlap
-      const width = 750, height = 750;
+      // Click outside panel to close
+      useEffect(() => {
+        const handler = (e) => {
+          if (selectedNode && panelRef.current && !panelRef.current.contains(e.target)) {
+            setSelectedNode(null);
+          }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+      }, [selectedNode]);
+
+      // Bigger SVG with bigger nodes
+      const width = 800, height = 800;
       const cx = width / 2, cy = height / 2;
-      const axeR = 120, champR = 235, princR = 340;
-      const axeNodeR = 34, champNodeR = 30, princNodeR = 28;
+      const axeR = 130, champR = 255, princR = 370;
+      const axeNodeR = 42, champNodeR = 38, princNodeR = 34;
 
       const axePositions = useMemo(() => {
         return GOUVERNANCE_DATA.axes.map((ax, i) => {
@@ -1212,45 +1225,91 @@
         setSelectedNode(prev => prev?.id === node.id ? null : node);
       };
 
-      const handleGovClick = (type, data) => {
-        setSelectedNode(prev => prev?.id === data.id ? null : { ...data, type });
+      // Toggle gov box expansion
+      const toggleGov = (id) => {
+        setExpandedGov(prev => prev === id ? null : id);
       };
 
-      // Governance box component (Direction + comités)
-      const GovBox = ({ item, type, icon }) => {
-        const isSelected = selectedNode?.id === item.id;
-        const dimmed = selectedNode && !isSelected;
-        const borderColor = isSelected ? (darkMode ? '#60a5fa' : '#2563eb') : (darkMode ? '#334155' : '#d1d5db');
+      // Color for gov items
+      const govColor = darkMode ? '#3b82f6' : '#2563eb';
+
+      // Member card component (reused in gov boxes and detail panel)
+      const MemberCard = ({ p, color }) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 700, fontSize: 12, backgroundColor: color + '25', color: color,
+          }}>{p.initials}</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
+            {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{p.role}</div>}
+          </div>
+        </div>
+      );
+
+      // Governance box — expands inline on click
+      const GovBox = ({ id, name, members, color }) => {
+        const isExpanded = expandedGov === id;
+        const count = members.length;
         return (
           <div
-            onClick={() => handleGovClick(type, {
-              ...item, id: item.id || 'direction',
-              fullName: item.name || 'Direction du RSN',
-              color: darkMode ? '#1e40af' : '#3b82f6',
-              responsables: item.responsables || GOUVERNANCE_DATA.direction,
-            })}
-            className="transition-all duration-200"
             style={{
-              padding: '8px 14px', borderRadius: 12, cursor: 'pointer',
-              border: `2px solid ${borderColor}`,
+              borderRadius: 14, cursor: 'pointer', overflow: 'hidden',
+              border: `1.5px solid ${isExpanded ? color : (darkMode ? '#334155' : '#d1d5db')}`,
               backgroundColor: darkMode ? '#1e293b' : '#ffffff',
-              opacity: dimmed ? 0.4 : 1,
+              transition: 'all 0.2s',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 14 }}>{icon}</span>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{item.name || 'Direction'}</div>
+            <div onClick={() => toggleGov(id)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px' }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: 12, color: 'white', backgroundColor: color,
+                flexShrink: 0,
+              }}>{count || '—'}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{name}</div>
                 <div style={{ fontSize: 10, color: darkMode ? '#64748b' : '#9ca3af' }}>
-                  {(item.responsables || GOUVERNANCE_DATA.direction).length > 0
-                    ? `${(item.responsables || GOUVERNANCE_DATA.direction).length} membre${(item.responsables || GOUVERNANCE_DATA.direction).length > 1 ? 's' : ''}`
-                    : 'À venir'}
+                  {count > 0 ? `${count} membre${count > 1 ? 's' : ''}` : 'À venir'}
                 </div>
               </div>
+              <div style={{ fontSize: 14, color: darkMode ? '#64748b' : '#9ca3af', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}>▾</div>
             </div>
+            {isExpanded && (
+              <div style={{ padding: '4px 14px 12px', borderTop: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}` }}>
+                {count > 0 ? (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 6, marginTop: 6 }}>
+                      Membres
+                    </div>
+                    {members.map(p => <MemberCard key={p.name} p={p} color={color} />)}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', fontStyle: 'italic', padding: '8px 0' }}>
+                    Membres à venir
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
       };
+
+      // Ring label positions — placed at angles where no nodes sit
+      // Axes nodes at: -90° (top), 0° (right), 90° (bottom), 180° (left)
+      // Safe: 225° (lower-left diagonal)
+      const axeLblAngle = (225 * Math.PI) / 180;
+      const axeLblX = cx + Math.cos(axeLblAngle) * (axeR + 2);
+      const axeLblY = cy + Math.sin(axeLblAngle) * (axeR + 2);
+      // Champs nodes at: -60° (upper-right), 60° (lower-right), 180° (left)
+      // Safe: ~260° (lower-left, below left)
+      const champLblAngle = (250 * Math.PI) / 180;
+      const champLblX = cx + Math.cos(champLblAngle) * (champR + 2);
+      const champLblY = cy + Math.sin(champLblAngle) * (champR + 2);
+      // Principes nodes at: -90°, -18°, 54°, 126°, 198°
+      // Safe: ~235° (between 198° and 270°)
+      const princLblAngle = (235 * Math.PI) / 180;
+      const princLblX = cx + Math.cos(princLblAngle) * (princR + 2);
+      const princLblY = cy + Math.sin(princLblAngle) * (princR + 2);
 
       return (
         <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
@@ -1263,22 +1322,17 @@
               <p className={`${theme.textMuted} text-sm`}>
                 Cliquez sur un élément pour voir ses responsables
               </p>
-              {selectedNode && (
-                <button onClick={() => setSelectedNode(null)} className={`mt-2 px-4 py-1 ${theme.buttonBg} rounded-full text-sm transition-colors ${theme.text}`}>
-                  ✕ Réinitialiser
-                </button>
-              )}
             </div>
 
             <div className="relative">
-              {/* ── Gouvernance boxes — top left ── */}
-              <div className="absolute left-0 top-0 z-20 flex flex-col gap-2" style={{ width: 200 }}>
+              {/* ── Gouvernance boxes — top left, expand inline ── */}
+              <div className="absolute left-0 top-0 z-20 flex flex-col gap-2" style={{ width: 220 }}>
                 <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
                   Gouvernance
                 </div>
-                <GovBox item={{ id: 'direction', name: 'Direction', responsables: GOUVERNANCE_DATA.direction }} type="direction" icon="◆" />
+                <GovBox id="direction" name="Direction" members={GOUVERNANCE_DATA.direction} color={govColor} />
                 {GOUVERNANCE_DATA.comites.map(c => (
-                  <GovBox key={c.id} item={c} type="comite" icon="◇" />
+                  <GovBox key={c.id} id={c.id} name={c.name} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
                 ))}
               </div>
 
@@ -1290,84 +1344,87 @@
                   <circle cx={cx} cy={cy} r={champR} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
                   <circle cx={cx} cy={cy} r={princR} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
 
-                  {/* Ring labels — positioned in clear areas between nodes */}
-                  <text x={cx} y={cy - axeR - 10} fill={theme.svgLabelDim} fontSize="8" textAnchor="middle" fontWeight="600" letterSpacing="0.08em" opacity="0.7">AXES THÉMATIQUES</text>
-                  <text x={cx} y={cy - champR - 8} fill={theme.svgLabelDim} fontSize="8" textAnchor="middle" fontWeight="600" letterSpacing="0.08em" opacity="0.7">CHAMPS D'ACTION</text>
-                  <text x={cx} y={cy - princR - 8} fill={theme.svgLabelDim} fontSize="8" textAnchor="middle" fontWeight="600" letterSpacing="0.08em" opacity="0.7">PRINCIPES DIRECTEURS</text>
+                  {/* Ring labels — at angles clear of all nodes */}
+                  <text x={axeLblX} y={axeLblY} fill={theme.svgLabelDim} fontSize="8" textAnchor="end" fontWeight="600" letterSpacing="0.06em" opacity="0.6"
+                    transform={`rotate(${225 - 180}, ${axeLblX}, ${axeLblY})`}>AXES</text>
+                  <text x={champLblX} y={champLblY} fill={theme.svgLabelDim} fontSize="8" textAnchor="end" fontWeight="600" letterSpacing="0.06em" opacity="0.6"
+                    transform={`rotate(${250 - 180}, ${champLblX}, ${champLblY})`}>CHAMPS D'ACTION</text>
+                  <text x={princLblX} y={princLblY} fill={theme.svgLabelDim} fontSize="8" textAnchor="end" fontWeight="600" letterSpacing="0.06em" opacity="0.6"
+                    transform={`rotate(${235 - 180}, ${princLblX}, ${princLblY})`}>PRINCIPES DIRECTEURS</text>
 
                   {/* Center — RSN */}
-                  <circle cx={cx} cy={cy} r={32} fill={theme.svgNodeBg}
+                  <circle cx={cx} cy={cy} r={36} fill={theme.svgNodeBg}
                     stroke={darkMode ? '#475569' : '#94a3b8'} strokeWidth="1.5" />
-                  <text x={cx} y={cy + 1} fill={theme.svgLabelFill} fontSize="13" fontWeight="700" textAnchor="middle" dominantBaseline="middle">RSN</text>
+                  <text x={cx} y={cy + 1} fill={theme.svgLabelFill} fontSize="14" fontWeight="700" textAnchor="middle" dominantBaseline="middle">RSN</text>
 
-                  {/* ── Axes (inner ring) — labels INSIDE nodes ── */}
+                  {/* ── Axes (inner ring) ── */}
                   {axePositions.map(ax => {
                     const isSel = selectedNode?.id === ax.id;
                     const dim = selectedNode && !isSel;
                     return (
-                      <g key={ax.id} onClick={() => handleClick(ax)} style={{ cursor: 'pointer' }}
+                      <g key={ax.id} onClick={(e) => { e.stopPropagation(); handleClick(ax); }} style={{ cursor: 'pointer' }}
                         opacity={dim ? 0.25 : 1} className="transition-opacity duration-300">
                         <circle cx={ax.x} cy={ax.y} r={isSel ? axeNodeR + 3 : axeNodeR}
                           fill={ax.color} opacity={0.9}
                           stroke={isSel ? 'white' : 'transparent'} strokeWidth={3} />
-                        <text x={ax.x} y={ax.y - 8} fill="white" fontSize="8" fontWeight="700" textAnchor="middle">{ax.shortName}</text>
-                        <text x={ax.x} y={ax.y + 4} fill="rgba(255,255,255,0.85)" fontSize="8" textAnchor="middle">{ax.label}</text>
-                        <text x={ax.x} y={ax.y + 15} fill="rgba(255,255,255,0.5)" fontSize="7" textAnchor="middle">{ax.responsables.length} resp.</text>
+                        <text x={ax.x} y={ax.y - 10} fill="white" fontSize="9" fontWeight="700" textAnchor="middle">{ax.shortName}</text>
+                        <text x={ax.x} y={ax.y + 3} fill="rgba(255,255,255,0.9)" fontSize="9.5" textAnchor="middle">{ax.label}</text>
+                        <text x={ax.x} y={ax.y + 16} fill="rgba(255,255,255,0.5)" fontSize="7.5" textAnchor="middle">{ax.responsables.length} resp.</text>
                       </g>
                     );
                   })}
 
-                  {/* ── Champs d'action (middle ring) — labels INSIDE ── */}
+                  {/* ── Champs d'action (middle ring) ── */}
                   {champPositions.map(ch => {
                     const isSel = selectedNode?.id === ch.id;
                     const dim = selectedNode && !isSel;
                     return (
-                      <g key={ch.id} onClick={() => handleClick(ch)} style={{ cursor: 'pointer' }}
+                      <g key={ch.id} onClick={(e) => { e.stopPropagation(); handleClick(ch); }} style={{ cursor: 'pointer' }}
                         opacity={dim ? 0.25 : 1} className="transition-opacity duration-300">
                         <circle cx={ch.x} cy={ch.y} r={isSel ? champNodeR + 3 : champNodeR}
                           fill={theme.svgNodeBg} stroke={ch.color} strokeWidth={isSel ? 3.5 : 2} />
-                        <text x={ch.x} y={ch.y - 4} fill={ch.color} fontSize="9" fontWeight="700" textAnchor="middle">{ch.label}</text>
-                        <text x={ch.x} y={ch.y + 9} fill={theme.svgLabelMuted} fontSize="7" textAnchor="middle">{ch.responsables.length} resp.</text>
+                        <text x={ch.x} y={ch.y - 5} fill={ch.color} fontSize="10" fontWeight="700" textAnchor="middle">{ch.label}</text>
+                        <text x={ch.x} y={ch.y + 10} fill={theme.svgLabelMuted} fontSize="8" textAnchor="middle">{ch.responsables.length} resp.</text>
                       </g>
                     );
                   })}
 
-                  {/* ── Principes directeurs (outer ring) — labels INSIDE ── */}
+                  {/* ── Principes directeurs (outer ring) ── */}
                   {principePositions.map(pr => {
                     const isSel = selectedNode?.id === pr.id;
                     const dim = selectedNode && !isSel;
                     return (
-                      <g key={pr.id} onClick={() => handleClick(pr)} style={{ cursor: 'pointer' }}
+                      <g key={pr.id} onClick={(e) => { e.stopPropagation(); handleClick(pr); }} style={{ cursor: 'pointer' }}
                         opacity={dim ? 0.25 : 1} className="transition-opacity duration-300">
                         <circle cx={pr.x} cy={pr.y} r={isSel ? princNodeR + 3 : princNodeR}
                           fill={pr.color} opacity={0.9}
                           stroke={isSel ? 'white' : 'transparent'} strokeWidth={3} />
-                        <text x={pr.x} y={pr.y - 3} fill="white" fontSize="8.5" fontWeight="600" textAnchor="middle">{pr.label}</text>
-                        <text x={pr.x} y={pr.y + 9} fill="rgba(255,255,255,0.6)" fontSize="7" textAnchor="middle">{pr.responsables.length} resp.</text>
+                        <text x={pr.x} y={pr.y - 4} fill="white" fontSize="9.5" fontWeight="600" textAnchor="middle">{pr.label}</text>
+                        <text x={pr.x} y={pr.y + 10} fill="rgba(255,255,255,0.55)" fontSize="7.5" textAnchor="middle">{pr.responsables.length} resp.</text>
                       </g>
                     );
                   })}
                 </svg>
               </div>
 
-              {/* ── Detail panel — overlay right ── */}
+              {/* ── Detail panel — overlay right, X close, click-outside-close ── */}
               {selectedNode && (
-                <div className={`absolute right-0 top-0 w-80 ${theme.cardBg} rounded-2xl p-5 max-h-[600px] overflow-y-auto border ${theme.cardBorder} shadow-xl z-10`}
+                <div ref={panelRef} className={`absolute right-0 top-0 w-80 ${theme.cardBg} rounded-2xl p-5 max-h-[600px] overflow-y-auto border ${theme.cardBorder} shadow-xl z-30`}
                   style={{ backdropFilter: 'blur(8px)' }}>
-                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder}`}>
+                  {/* X close button */}
+                  <button onClick={() => setSelectedNode(null)}
+                    style={{ position: 'absolute', top: 12, right: 14, background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 18, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1 }}>✕</button>
+
+                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder} pr-6`}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
                       style={{ backgroundColor: selectedNode.color }}>
-                      {selectedNode.type === 'direction' || selectedNode.type === 'comite'
-                        ? (selectedNode.responsables?.length || '—')
-                        : selectedNode.type === 'axe' ? selectedNode.shortName?.replace('Axe ', '') : selectedNode.responsables?.length}
+                      {selectedNode.type === 'axe' ? selectedNode.shortName?.replace('Axe ', '') : selectedNode.responsables?.length || '—'}
                     </div>
                     <div>
                       <h3 className={`font-bold ${theme.text} text-sm`}>{selectedNode.fullName || selectedNode.name}</h3>
                       <span className={`text-xs ${theme.textLight}`}>
-                        {selectedNode.type === 'direction' ? 'Directrice et codirecteurs'
-                          : selectedNode.type === 'comite' ? 'Comité'
-                          : selectedNode.type === 'axe' ? 'Axe thématique'
-                          : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                        {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
                       </span>
                     </div>
                   </div>
@@ -1376,29 +1433,15 @@
                     <p className={`text-xs ${theme.textMuted} mb-4 leading-relaxed`}>{selectedNode.description}</p>
                   )}
 
-                  {selectedNode.responsables && selectedNode.responsables.length > 0 ? (
-                    <>
-                      <div className={`text-xs font-semibold ${theme.textLight} uppercase tracking-wider mb-3`}>
-                        {selectedNode.type === 'direction' || selectedNode.type === 'comite' ? 'Membres' : `Responsable${selectedNode.responsables.length > 1 ? 's' : ''}`}
-                      </div>
-                      <div className="space-y-3">
-                        {selectedNode.responsables.map(p => (
-                          <div key={p.name} className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                              style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color }}>
-                              {p.initials}
-                            </div>
-                            <div>
-                              <span className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'}`}>{p.name}</span>
-                              {p.role && <div className={`text-xs ${theme.textLight}`}>{p.role}</div>}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <p className={`text-xs ${theme.textMuted} italic`}>Les membres de ce comité seront ajoutés prochainement.</p>
-                  )}
+                  <div className={`text-xs font-semibold ${theme.textLight} uppercase tracking-wider mb-3`}>
+                    Responsable{selectedNode.responsables?.length > 1 ? 's' : ''}
+                  </div>
+
+                  <div className="space-y-2">
+                    {selectedNode.responsables?.map(p => (
+                      <MemberCard key={p.name} p={p} color={selectedNode.color} />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
