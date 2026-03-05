@@ -1233,12 +1233,15 @@
       // Color for gov items
       const govColor = darkMode ? '#3b82f6' : '#2563eb';
 
-      // Photo URL helper — expects photos/<initials_lowercase>.jpg
-      const photoUrl = (initials) => `photos/${initials.toLowerCase()}.jpg`;
-
-      // Member card with circular photo (fallback to initials)
+      // Photo: try .jpg then .png, then fallback to initials
       const MemberCard = ({ p, color }) => {
+        const base = p.initials.toLowerCase();
+        const [imgSrc, setImgSrc] = useState(`photos/${base}.jpg`);
         const [imgOk, setImgOk] = useState(true);
+        const handleError = () => {
+          if (imgSrc.endsWith('.jpg')) { setImgSrc(`photos/${base}.png`); }
+          else { setImgOk(false); }
+        };
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
             <div style={{
@@ -1247,9 +1250,9 @@
               fontWeight: 700, fontSize: 12, backgroundColor: color + '25', color: color,
             }}>
               {imgOk ? (
-                <img src={photoUrl(p.initials)} alt={p.name}
+                <img src={imgSrc} alt={p.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={() => setImgOk(false)} />
+                  onError={handleError} />
               ) : p.initials}
             </div>
             <div>
