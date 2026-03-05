@@ -762,7 +762,7 @@
         cardBorder: darkMode ? 'border-slate-800' : 'border-gray-200',
         buttonBg: darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-gray-200 hover:bg-gray-300',
         svgBg: darkMode ? '#0F172A' : '#FFFFFF',
-        svgStroke: darkMode ? '#334155' : '#E5E7EB',
+        svgStroke: darkMode ? '#334155' : '#CBD5E1',
         svgNodeBg: darkMode ? '#1E293B' : '#F3F4F6',
         svgLabelPrimary: darkMode ? '#E2E8F0' : '#1F2937',
         svgLabelSecondary: darkMode ? '#94A3B8' : '#6B7280',
@@ -1170,18 +1170,22 @@
         cardBg: darkMode ? 'bg-slate-900' : 'bg-white',
         cardBorder: darkMode ? 'border-slate-800' : 'border-gray-200',
         buttonBg: darkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-gray-200 hover:bg-gray-300',
-        svgStroke: darkMode ? '#334155' : '#E5E7EB',
+        svgStroke: darkMode ? '#334155' : '#CBD5E1',
         svgNodeBg: darkMode ? '#1E293B' : '#F3F4F6',
         svgLabelPrimary: darkMode ? '#E2E8F0' : '#1F2937',
         svgLabelSecondary: darkMode ? '#94A3B8' : '#6B7280',
         svgLabelTertiary: darkMode ? '#64748B' : '#9CA3AF',
       };
 
-      const width = 680, height = 680;
-      const cx = width / 2, cy = height / 2;
-      const axeRadius = 95;
-      const champRadius = 185;
-      const principeRadius = 275;
+      // SVG dimensions — diagram centered, Direction on the left outside circles
+      const width = 720, height = 640;
+      const cx = 380, cy = height / 2;
+      const axeRadius = 90;
+      const champRadius = 170;
+      const principeRadius = 255;
+
+      // Direction node position — left side, outside the circles
+      const dirX = 60, dirY = cy;
 
       const axePositions = useMemo(() => {
         return GOUVERNANCE_DATA.axes.map((ax, i) => {
@@ -1192,7 +1196,6 @@
 
       const champPositions = useMemo(() => {
         return GOUVERNANCE_DATA.champs.map((ch, i) => {
-          // Offset champs to sit between axes, starting from ~2 o'clock
           const angle = (i / 3) * 2 * Math.PI - Math.PI / 2 + Math.PI / 6;
           return { ...ch, type: 'champ', x: cx + Math.cos(angle) * champRadius, y: cy + Math.sin(angle) * champRadius, angle };
         });
@@ -1209,7 +1212,7 @@
         setSelectedNode(prev => prev?.id === node.id ? null : node);
       };
 
-      const handleCenterClick = () => {
+      const handleDirectionClick = () => {
         setSelectedNode(prev => prev?.type === 'direction' ? null : {
           type: 'direction', id: 'direction', name: 'Direction du RSN',
           fullName: 'Direction du RSN', color: darkMode ? '#1e40af' : '#3b82f6',
@@ -1217,19 +1220,31 @@
         });
       };
 
-      // Helper: smart label anchor depending on angle
+      // Helper: smart label positioning with wrap for long names
       const labelAnchor = (angle) => {
-        const deg = ((angle * 180 / Math.PI) % 360 + 360) % 360;
-        if (deg > 60 && deg < 120) return 'middle'; // bottom
-        if (deg > 240 && deg < 300) return 'middle'; // top
-        return (Math.cos(angle) >= 0) ? 'start' : 'end';
+        const cosA = Math.cos(angle);
+        if (Math.abs(cosA) < 0.25) return 'middle';
+        return cosA >= 0 ? 'start' : 'end';
       };
 
-      // Helper: offset label radially outward, with special vertical handling
       const labelPos = (angle, radius) => {
         const lx = cx + Math.cos(angle) * radius;
         const ly = cy + Math.sin(angle) * radius;
         return { x: lx, y: ly, anchor: labelAnchor(angle) };
+      };
+
+      // Helper: split long text into lines of max ~lineLen chars
+      const wrapText = (text, lineLen) => {
+        if (text.length <= lineLen) return [text];
+        const words = text.split(' ');
+        const lines = [];
+        let cur = '';
+        words.forEach(w => {
+          if (cur && (cur + ' ' + w).length > lineLen) { lines.push(cur); cur = w; }
+          else { cur = cur ? cur + ' ' + w : w; }
+        });
+        if (cur) lines.push(cur);
+        return lines;
       };
 
       return (
@@ -1250,46 +1265,53 @@
               )}
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-4 items-start justify-center">
+            <div className="relative flex justify-center">
               {/* ── SVG radial ── */}
-              <div className="flex-shrink-0 flex justify-center">
-                <svg width={width} height={height} className="max-w-full h-auto">
+              <div className="flex justify-center">
+                <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="max-w-full h-auto">
                   {/* Guide circles */}
-                  <circle cx={cx} cy={cy} r={axeRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
-                  <circle cx={cx} cy={cy} r={champRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
-                  <circle cx={cx} cy={cy} r={principeRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+                  <circle cx={cx} cy={cy} r={axeRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
+                  <circle cx={cx} cy={cy} r={champRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
+                  <circle cx={cx} cy={cy} r={principeRadius} fill="none" stroke={theme.svgStroke} strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
 
-                  {/* Center — Direction (clickable) */}
-                  <g onClick={handleCenterClick} style={{ cursor: 'pointer' }}
+                  {/* Center — RSN label (non-clickable, just a marker) */}
+                  <circle cx={cx} cy={cy} r={28} fill={theme.svgNodeBg}
+                    stroke={darkMode ? '#475569' : '#94a3b8'} strokeWidth="1.5" />
+                  <text x={cx} y={cy + 1} fill={theme.svgLabelPrimary} fontSize="11" fontWeight="700" textAnchor="middle" dominantBaseline="middle">RSN</text>
+
+                  {/* ── Direction node (independent, left side) ── */}
+                  <g onClick={handleDirectionClick} style={{ cursor: 'pointer' }}
                     opacity={selectedNode && selectedNode.type !== 'direction' ? 0.3 : 1} className="transition-opacity duration-300">
-                    <circle cx={cx} cy={cy} r={36} fill={theme.svgNodeBg}
-                      stroke={selectedNode?.type === 'direction' ? 'white' : (darkMode ? '#3b82f6' : '#2563eb')}
+                    <circle cx={dirX} cy={dirY} r={32} fill={theme.svgNodeBg}
+                      stroke={selectedNode?.type === 'direction' ? (darkMode ? '#60a5fa' : '#2563eb') : (darkMode ? '#3b82f6' : '#2563eb')}
                       strokeWidth={selectedNode?.type === 'direction' ? 3 : 2} />
-                    <text x={cx} y={cy - 7} fill={theme.svgLabelPrimary} fontSize="11" fontWeight="700" textAnchor="middle">RSN</text>
-                    <text x={cx} y={cy + 6} fill={theme.svgLabelSecondary} fontSize="8" textAnchor="middle">Direction</text>
-                    <text x={cx} y={cy + 17} fill={theme.svgLabelTertiary} fontSize="7" textAnchor="middle">5 membres</text>
+                    <text x={dirX} y={dirY - 6} fill={theme.svgLabelPrimary} fontSize="9" fontWeight="700" textAnchor="middle">Direction</text>
+                    <text x={dirX} y={dirY + 7} fill={theme.svgLabelSecondary} fontSize="7" textAnchor="middle">5 membres</text>
                   </g>
 
                   {/* ── Axes (inner ring) ── */}
                   {axePositions.map(ax => {
                     const isSelected = selectedNode?.id === ax.id;
                     const dimmed = selectedNode && !isSelected;
-                    const lbl = labelPos(ax.angle, axeRadius + 36);
+                    const lbl = labelPos(ax.angle, axeRadius + 32);
+                    const lines = wrapText(ax.name, 22);
                     return (
                       <g key={ax.id} onClick={() => handleClick(ax)} style={{ cursor: 'pointer' }}
                         opacity={dimmed ? 0.3 : 1} className="transition-opacity duration-300">
-                        <circle cx={ax.x} cy={ax.y} r={isSelected ? 28 : 24}
+                        <circle cx={ax.x} cy={ax.y} r={isSelected ? 24 : 20}
                           fill={ax.color} opacity={0.9}
                           stroke={isSelected ? 'white' : 'transparent'} strokeWidth={3} />
-                        <text x={ax.x} y={ax.y - 3} fill="white" fontSize="10" fontWeight="bold" textAnchor="middle">
+                        <text x={ax.x} y={ax.y - 2} fill="white" fontSize="9" fontWeight="bold" textAnchor="middle">
                           {ax.shortName.replace('Axe ', '')}
                         </text>
-                        <text x={ax.x} y={ax.y + 9} fill="rgba(255,255,255,0.7)" fontSize="7" textAnchor="middle">
+                        <text x={ax.x} y={ax.y + 9} fill="rgba(255,255,255,0.7)" fontSize="6" textAnchor="middle">
                           {ax.responsables.length} resp.
                         </text>
-                        <text x={lbl.x} y={lbl.y} fill={theme.svgLabelPrimary} fontSize="9" fontWeight="500"
-                          textAnchor={lbl.anchor} dominantBaseline="middle">{ax.name}</text>
-                        <text x={lbl.x} y={lbl.y + 12} fill={theme.svgLabelTertiary} fontSize="7"
+                        {lines.map((line, li) => (
+                          <text key={li} x={lbl.x} y={lbl.y + li * 11} fill={theme.svgLabelPrimary} fontSize="8.5" fontWeight="500"
+                            textAnchor={lbl.anchor} dominantBaseline="middle">{line}</text>
+                        ))}
+                        <text x={lbl.x} y={lbl.y + lines.length * 11} fill={theme.svgLabelTertiary} fontSize="7"
                           textAnchor={lbl.anchor}>Axe thématique</text>
                       </g>
                     );
@@ -1299,17 +1321,20 @@
                   {champPositions.map(ch => {
                     const isSelected = selectedNode?.id === ch.id;
                     const dimmed = selectedNode && !isSelected;
-                    const lbl = labelPos(ch.angle, champRadius + 34);
+                    const lbl = labelPos(ch.angle, champRadius + 32);
+                    const lines = wrapText(ch.fullName, 20);
                     return (
                       <g key={ch.id} onClick={() => handleClick(ch)} style={{ cursor: 'pointer' }}
                         opacity={dimmed ? 0.3 : 1} className="transition-opacity duration-300">
-                        <circle cx={ch.x} cy={ch.y} r={isSelected ? 30 : 26}
-                          fill={theme.svgNodeBg} stroke={ch.color} strokeWidth={isSelected ? 4 : 2} />
-                        <text x={ch.x} y={ch.y - 3} fill={ch.color} fontSize="9" fontWeight="bold" textAnchor="middle">{ch.responsables.length}</text>
-                        <text x={ch.x} y={ch.y + 9} fill={theme.svgLabelSecondary} fontSize="7" textAnchor="middle">resp.</text>
-                        <text x={lbl.x} y={lbl.y} fill={theme.svgLabelPrimary} fontSize="9" fontWeight="500"
-                          textAnchor={lbl.anchor} dominantBaseline="middle">{ch.fullName}</text>
-                        <text x={lbl.x} y={lbl.y + 12} fill={theme.svgLabelTertiary} fontSize="7"
+                        <circle cx={ch.x} cy={ch.y} r={isSelected ? 26 : 22}
+                          fill={theme.svgNodeBg} stroke={ch.color} strokeWidth={isSelected ? 3.5 : 2} />
+                        <text x={ch.x} y={ch.y - 2} fill={ch.color} fontSize="8" fontWeight="bold" textAnchor="middle">{ch.responsables.length}</text>
+                        <text x={ch.x} y={ch.y + 9} fill={theme.svgLabelSecondary} fontSize="6" textAnchor="middle">resp.</text>
+                        {lines.map((line, li) => (
+                          <text key={li} x={lbl.x} y={lbl.y + li * 11} fill={theme.svgLabelPrimary} fontSize="8.5" fontWeight="500"
+                            textAnchor={lbl.anchor} dominantBaseline="middle">{line}</text>
+                        ))}
+                        <text x={lbl.x} y={lbl.y + lines.length * 11} fill={theme.svgLabelTertiary} fontSize="7"
                           textAnchor={lbl.anchor}>Champ d'action</text>
                       </g>
                     );
@@ -1319,19 +1344,19 @@
                   {principePositions.map(pr => {
                     const isSelected = selectedNode?.id === pr.id;
                     const dimmed = selectedNode && !isSelected;
-                    const lbl = labelPos(pr.angle, principeRadius + 30);
+                    const lbl = labelPos(pr.angle, principeRadius + 26);
                     return (
                       <g key={pr.id} onClick={() => handleClick(pr)} style={{ cursor: 'pointer' }}
                         opacity={dimmed ? 0.3 : 1} className="transition-opacity duration-300">
-                        <circle cx={pr.x} cy={pr.y} r={isSelected ? 24 : 20}
+                        <circle cx={pr.x} cy={pr.y} r={isSelected ? 20 : 17}
                           fill={pr.color} opacity={0.9}
                           stroke={isSelected ? 'white' : 'transparent'} strokeWidth={3} />
-                        <text x={pr.x} y={pr.y + 1} fill="white" fontSize="8" fontWeight="bold" textAnchor="middle" dominantBaseline="middle">
+                        <text x={pr.x} y={pr.y + 1} fill="white" fontSize="7" fontWeight="bold" textAnchor="middle" dominantBaseline="middle">
                           {pr.responsables.length}
                         </text>
-                        <text x={lbl.x} y={lbl.y} fill={theme.svgLabelPrimary} fontSize="9" fontWeight="500"
+                        <text x={lbl.x} y={lbl.y} fill={theme.svgLabelPrimary} fontSize="8.5" fontWeight="500"
                           textAnchor={lbl.anchor} dominantBaseline="middle">{pr.name}</text>
-                        <text x={lbl.x} y={lbl.y + 12} fill={theme.svgLabelTertiary} fontSize="7"
+                        <text x={lbl.x} y={lbl.y + 11} fill={theme.svgLabelTertiary} fontSize="7"
                           textAnchor={lbl.anchor}>Principe directeur</text>
                       </g>
                     );
@@ -1339,47 +1364,19 @@
                 </svg>
               </div>
 
-              {/* ── Panneau détail (clic) ── */}
-              {selectedNode && selectedNode.type === 'direction' && (
-                <div className={`lg:w-80 ${theme.cardBg} rounded-2xl p-5 border ${theme.cardBorder}`}>
+              {/* ── Panneau détail — overlay on the right ── */}
+              {selectedNode && (
+                <div className={`absolute right-0 top-0 w-80 ${theme.cardBg} rounded-2xl p-5 max-h-[600px] overflow-y-auto border ${theme.cardBorder} shadow-xl z-10`}
+                  style={{ backdropFilter: 'blur(8px)' }}>
                   <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder}`}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                       style={{ backgroundColor: selectedNode.color }}>
-                      5
-                    </div>
-                    <div>
-                      <h3 className={`font-bold ${theme.text} text-sm`}>Direction du RSN</h3>
-                      <span className={`text-xs ${theme.textLight}`}>Directrice et codirecteurs</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {GOUVERNANCE_DATA.direction.map(p => (
-                      <div key={p.name} className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                          style={{ backgroundColor: (darkMode ? '#1e3a5f' : '#dbeafe'), color: (darkMode ? '#93c5fd' : '#1e40af') }}>
-                          {p.initials}
-                        </div>
-                        <div>
-                          <span className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'}`}>{p.name}</span>
-                          <div className={`text-xs ${theme.textLight}`}>{p.role}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedNode && selectedNode.type !== 'direction' && (
-                <div className={`lg:w-80 ${theme.cardBg} rounded-2xl p-5 max-h-[700px] overflow-y-auto border ${theme.cardBorder}`}>
-                  <div className={`flex items-center gap-3 mb-4 pb-4 border-b ${theme.cardBorder}`}>
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                      style={{ backgroundColor: selectedNode.color }}>
-                      {selectedNode.type === 'axe' ? selectedNode.shortName.replace('Axe ', '') : selectedNode.responsables.length}
+                      {selectedNode.type === 'direction' ? '5' : selectedNode.type === 'axe' ? selectedNode.shortName.replace('Axe ', '') : selectedNode.responsables.length}
                     </div>
                     <div>
                       <h3 className={`font-bold ${theme.text} text-sm`}>{selectedNode.fullName || selectedNode.name}</h3>
                       <span className={`text-xs ${theme.textLight}`}>
-                        {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                        {selectedNode.type === 'direction' ? 'Directrice et codirecteurs' : selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
                       </span>
                     </div>
                   </div>
@@ -1389,7 +1386,7 @@
                   )}
 
                   <div className={`text-xs font-semibold ${theme.textLight} uppercase tracking-wider mb-3`}>
-                    Responsable{selectedNode.responsables.length > 1 ? 's' : ''}
+                    {selectedNode.type === 'direction' ? 'Membres' : `Responsable${selectedNode.responsables.length > 1 ? 's' : ''}`}
                   </div>
 
                   <div className="space-y-3">
@@ -1399,7 +1396,10 @@
                           style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color }}>
                           {p.initials}
                         </div>
-                        <span className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'}`}>{p.name}</span>
+                        <div>
+                          <span className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'}`}>{p.name}</span>
+                          {p.role && <div className={`text-xs ${theme.textLight}`}>{p.role}</div>}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1452,9 +1452,9 @@
       }, []);
 
       const tabs = [
-        { id: 'structure',   label: 'Structure & Gouvernance', icon: '🏛️' },
-        { id: 'vue-globale', label: 'Vue globale', icon: '🕸️' },
-        { id: 'analyse',     label: 'Analyse des chantiers', icon: '🔍' },
+        { id: 'structure',   label: 'Structure & Gouvernance', icon: 'structure' },
+        { id: 'vue-globale', label: 'Vue globale', icon: 'vue-globale' },
+        { id: 'analyse',     label: 'Analyse des chantiers', icon: 'analyse' },
       ];
 
       const tabBarBg = darkMode ? '#0f172a' : '#ffffff';
@@ -1493,7 +1493,31 @@
                     onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = tabHoverBg; }}
                     onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
                   >
-                    <span style={{ fontSize: 14 }}>{tab.icon}</span>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      {tab.icon === 'structure' && (<>
+                        <circle cx="8" cy="8" r="6.5" /><circle cx="8" cy="8" r="3" />
+                        <circle cx="8" cy="4" r="1" fill="currentColor" stroke="none" />
+                        <circle cx="11.5" cy="9.5" r="1" fill="currentColor" stroke="none" />
+                        <circle cx="4.5" cy="9.5" r="1" fill="currentColor" stroke="none" />
+                      </>)}
+                      {tab.icon === 'vue-globale' && (<>
+                        <circle cx="8" cy="8" r="2" fill="currentColor" stroke="none" />
+                        <circle cx="8" cy="2" r="1.2" fill="currentColor" stroke="none" />
+                        <circle cx="13" cy="5.5" r="1.2" fill="currentColor" stroke="none" />
+                        <circle cx="13" cy="11" r="1.2" fill="currentColor" stroke="none" />
+                        <circle cx="8" cy="14" r="1.2" fill="currentColor" stroke="none" />
+                        <circle cx="3" cy="11" r="1.2" fill="currentColor" stroke="none" />
+                        <circle cx="3" cy="5.5" r="1.2" fill="currentColor" stroke="none" />
+                        <line x1="8" y1="8" x2="8" y2="2" /><line x1="8" y1="8" x2="13" y2="5.5" />
+                        <line x1="8" y1="8" x2="13" y2="11" /><line x1="8" y1="8" x2="8" y2="14" />
+                        <line x1="8" y1="8" x2="3" y2="11" /><line x1="8" y1="8" x2="3" y2="5.5" />
+                      </>)}
+                      {tab.icon === 'analyse' && (<>
+                        <rect x="2" y="7" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
+                        <rect x="6.5" y="4" width="3" height="10" rx="0.5" fill="currentColor" stroke="none" />
+                        <rect x="11" y="2" width="3" height="12" rx="0.5" fill="currentColor" stroke="none" />
+                      </>)}
+                    </svg>
                     {tab.label}
                   </button>
                 );
