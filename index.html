@@ -1233,27 +1233,16 @@
       // Color for gov items
       const govColor = darkMode ? '#3b82f6' : '#2563eb';
 
-      // Photo: try .jpg then .png, then fallback to initials
+      // Member card — initials circle + name/role
       const MemberCard = ({ p, color }) => {
-        const base = p.initials.toLowerCase();
-        const [imgSrc, setImgSrc] = useState(`photos/${base}.jpg`);
-        const [imgOk, setImgOk] = useState(true);
-        const handleError = () => {
-          if (imgSrc.endsWith('.jpg')) { setImgSrc(`photos/${base}.png`); }
-          else { setImgOk(false); }
-        };
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
             <div style={{
-              width: 38, height: 38, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+              width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontWeight: 700, fontSize: 12, backgroundColor: color + '25', color: color,
             }}>
-              {imgOk ? (
-                <img src={imgSrc} alt={p.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={handleError} />
-              ) : p.initials}
+              {p.initials}
             </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
