@@ -1194,10 +1194,10 @@
         return () => document.removeEventListener('mousedown', handler);
       }, [selectedNode]);
 
-      // SVG sized to fit without top truncation
-      const width = 740, height = 740;
-      const cx = width / 2, cy = height / 2;
-      const axeR = 115, champR = 230, princR = 340;
+      // SVG sized to fit — center shifted down slightly to avoid EDIA crop
+      const width = 740, height = 760;
+      const cx = width / 2, cy = height / 2 + 15;
+      const axeR = 115, champR = 230, princR = 335;
       const axeNodeR = 42, champNodeR = 38, princNodeR = 34;
 
       const axePositions = useMemo(() => {
@@ -1337,7 +1337,7 @@
 
             <div className="relative">
               {/* ── Gouvernance boxes — top left, expand inline ── */}
-              <div className="absolute left-0 top-0 z-20 flex flex-col gap-2" style={{ width: 260 }}>
+              <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110 }}>
                 <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
                   Gouvernance
                 </div>
@@ -1362,7 +1362,7 @@
                     <path id="princArc" d={arcPath(princR + 12, 212, 268)} fill="none" />
                   </defs>
                   <text fill={theme.svgLabelDim} fontSize="8.5" fontWeight="600" letterSpacing="0.1em" opacity="0.55">
-                    <textPath href="#axeArc" startOffset="50%" textAnchor="middle">AXES THÉMATIQUES</textPath>
+                    <textPath href="#axeArc" startOffset="50%" textAnchor="middle">AXES</textPath>
                   </text>
                   <text fill={theme.svgLabelDim} fontSize="8.5" fontWeight="600" letterSpacing="0.1em" opacity="0.55">
                     <textPath href="#champArc" startOffset="50%" textAnchor="middle">CHAMPS D'ACTION</textPath>
