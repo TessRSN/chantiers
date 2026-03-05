@@ -845,9 +845,9 @@
       }, [selectedNode]);
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-1 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-1">
+            <div className="text-center mb-0">
               <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-0`}>
                 Réseau des Actions RSN
               </h1>
@@ -988,7 +988,7 @@
 
               {/* ── SVG radial diagram — centered ── */}
               <div className="flex justify-center">
-                <svg ref={svgRef} viewBox={`-40 40 ${width + 120} ${height - 40}`} style={{ maxHeight: 'calc(100vh - 120px)' }} className="max-w-full h-auto">
+                <svg ref={svgRef} viewBox={`-40 40 ${width + 120} ${height - 40}`} style={{ maxHeight: 'calc(100vh - 105px)' }} className="max-w-full h-auto">
                   <defs>
                     <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
                       <stop offset="0%" stopColor="#6366F1" stopOpacity="0.3" />
