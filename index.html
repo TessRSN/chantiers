@@ -1120,6 +1120,165 @@
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // SUIVI DES OBJECTIFS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function SuiviObjectifs({ darkMode, actions }) {
+      const [searchTerm, setSearchTerm] = useState('');
+
+      const theme = {
+        text: darkMode ? 'text-white' : 'text-gray-900',
+        textMuted: darkMode ? 'text-slate-400' : 'text-gray-500',
+        textLight: darkMode ? 'text-slate-500' : 'text-gray-400',
+        cardBg: darkMode ? '#1e293b' : '#ffffff',
+        cardBorder: darkMode ? '#334155' : '#e5e7eb',
+        sectionBg: darkMode ? '#0f172a' : '#f9fafb',
+      };
+
+      // Deduplicate objectives: group actions by objective ID prefix (e.g. A1-OS1)
+      const objectifs = useMemo(() => {
+        const map = {};
+        actions.forEach(a => {
+          // Extract objective ID: "A1-OS1-a" → "A1-OS1"
+          const parts = a.id.split('-');
+          const objId = parts.length >= 3 ? parts.slice(0, -1).join('-') : a.id;
+          if (!map[objId]) {
+            const axeConfig = vueGlobaleData.axes.find(ax => ax.id === a.axe);
+            const chantierConfig = vueGlobaleData.chantiers.find(ch => ch.id === a.chantier);
+            map[objId] = {
+              id: objId,
+              texte: a.objectif,
+              statut: a.statutObjectif || 'non démarré',
+              axe: axeConfig?.name || a.axe,
+              axeColor: axeConfig?.color || '#6b7280',
+              chantier: chantierConfig?.name || a.chantier,
+              chantierIcon: chantierConfig?.icon || '',
+              actionCount: 0,
+            };
+          }
+          map[objId].actionCount++;
+        });
+        return Object.values(map);
+      }, [actions]);
+
+      // Filter by search
+      const filtered = useMemo(() => {
+        if (!searchTerm.trim()) return objectifs;
+        const term = searchTerm.toLowerCase();
+        return objectifs.filter(o =>
+          o.texte.toLowerCase().includes(term) ||
+          o.id.toLowerCase().includes(term) ||
+          o.axe.toLowerCase().includes(term) ||
+          o.chantier.toLowerCase().includes(term)
+        );
+      }, [objectifs, searchTerm]);
+
+      // Group by status
+      const groups = useMemo(() => ({
+        'en cours': filtered.filter(o => o.statut === 'en cours'),
+        'terminé': filtered.filter(o => o.statut === 'terminé'),
+        'non démarré': filtered.filter(o => o.statut === 'non démarré'),
+      }), [filtered]);
+
+      const sectionConfig = {
+        'en cours':    { title: 'En cours',    color: '#f59e0b', icon: '◐' },
+        'terminé':     { title: 'Terminés',    color: '#22c55e', icon: '●' },
+        'non démarré': { title: 'Non démarrés', color: '#6b7280', icon: '○' },
+      };
+
+      return (
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-2 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-3">
+              <h1 className={`text-2xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
+                Suivi des objectifs
+              </h1>
+              <p className={`${theme.textMuted} text-xs mt-1`}>
+                {objectifs.length} objectifs • {groups['en cours'].length} en cours · {groups['terminé'].length} terminés · {groups['non démarré'].length} non démarrés
+              </p>
+            </div>
+
+            {/* Search bar */}
+            <div className="max-w-md mx-auto mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Rechercher un objectif..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full px-4 py-2 pl-10 rounded-full text-sm ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                />
+                <svg className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${darkMode ? 'text-slate-400' : 'text-gray-400'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm('')} className={`absolute right-3 top-1/2 -translate-y-1/2 ${darkMode ? 'text-slate-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'}`}>✕</button>
+                )}
+              </div>
+              {searchTerm && (
+                <div className={`mt-1 text-xs ${theme.textMuted} text-center`}>
+                  {filtered.length} objectif{filtered.length !== 1 ? 's' : ''} trouvé{filtered.length !== 1 ? 's' : ''}
+                </div>
+              )}
+            </div>
+
+            {/* Sections by status */}
+            {['en cours', 'terminé', 'non démarré'].map(statut => {
+              const items = groups[statut];
+              const cfg = sectionConfig[statut];
+              if (items.length === 0) return null;
+              return (
+                <div key={statut} className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span style={{ color: cfg.color, fontSize: 16 }}>{cfg.icon}</span>
+                    <span style={{ color: cfg.color, fontWeight: 700, fontSize: 14 }}>{cfg.title}</span>
+                    <span className={`text-xs ${theme.textMuted}`}>({items.length})</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {items.map(obj => (
+                      <div key={obj.id} style={{
+                        backgroundColor: theme.cardBg,
+                        border: `1px solid ${theme.cardBorder}`,
+                        borderRadius: 14,
+                        padding: '14px 16px',
+                        display: 'flex', flexDirection: 'column', gap: 8,
+                        borderLeft: `4px solid ${obj.axeColor}`,
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: obj.axeColor, fontFamily: 'monospace' }}>{obj.id}</span>
+                          <ProgressBadge statut={obj.statut} darkMode={darkMode} size="xs" />
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937', lineHeight: 1.4 }}>
+                          {obj.texte}
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 'auto' }}>
+                          <span style={{
+                            fontSize: 10, padding: '2px 8px', borderRadius: 10,
+                            backgroundColor: obj.axeColor + '20', color: obj.axeColor, fontWeight: 600,
+                          }}>{obj.axe}</span>
+                          <span style={{
+                            fontSize: 10, padding: '2px 8px', borderRadius: 10,
+                            backgroundColor: darkMode ? '#334155' : '#f3f4f6',
+                            color: darkMode ? '#94a3b8' : '#6b7280', fontWeight: 500,
+                          }}>{obj.chantierIcon} {obj.chantier}</span>
+                          <span style={{
+                            fontSize: 10, padding: '2px 8px', borderRadius: 10,
+                            backgroundColor: darkMode ? '#334155' : '#f3f4f6',
+                            color: darkMode ? '#94a3b8' : '#6b7280',
+                          }}>{obj.actionCount} action{obj.actionCount > 1 ? 's' : ''}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // STRUCTURE & GOUVERNANCE
     // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1476,7 +1635,7 @@
 
     function MainApp() {
       const [darkMode, setDarkMode] = useState(true);
-      const validTabs = ['structure', 'vue-globale', 'analyse'];
+      const validTabs = ['structure', 'vue-globale', 'analyse', 'suivi'];
       const tabFromHash = window.location.hash.slice(1);
       const [activeTab, setActiveTab] = useState(
         validTabs.includes(tabFromHash) ? tabFromHash : 'structure'
@@ -1522,6 +1681,7 @@
         { id: 'structure',   label: 'Structure & Gouvernance', icon: 'structure' },
         { id: 'vue-globale', label: 'Vue globale', icon: 'vue-globale' },
         { id: 'analyse',     label: 'Analyse des chantiers', icon: 'analyse' },
+        { id: 'suivi',       label: 'Suivi des objectifs', icon: 'suivi' },
       ];
 
       const tabBarBg = darkMode ? '#0f172a' : '#ffffff';
@@ -1583,6 +1743,10 @@
                         <rect x="2" y="7" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
                         <rect x="6.5" y="4" width="3" height="10" rx="0.5" fill="currentColor" stroke="none" />
                         <rect x="11" y="2" width="3" height="12" rx="0.5" fill="currentColor" stroke="none" />
+                      </>)}
+                      {tab.icon === 'suivi' && (<>
+                        <circle cx="8" cy="8" r="6.5" />
+                        <path d="M5 8.5l2 2 4-4.5" strokeWidth="2" />
                       </>)}
                     </svg>
                     {tab.label}
@@ -1653,6 +1817,7 @@
           {activeTab === 'structure' && <StructureGouvernance darkMode={darkMode} />}
           {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
           {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} analyseData={analyseData} chantiersMeta={chantiersMeta} />}
+          {!csvLoading && !csvError && activeTab === 'suivi' && <SuiviObjectifs darkMode={darkMode} actions={vueGlobaleData.actions} />}
         </div>
       );
     }
