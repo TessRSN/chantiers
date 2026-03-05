@@ -1278,6 +1278,35 @@
               )}
             </div>
 
+            {/* Progress bar */}
+            <div className="max-w-2xl mx-auto mb-5">
+              <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 10 }}>
+                {objectifs.length > 0 && [
+                  { key: 'terminé', count: groups['terminé'].length, color: '#22c55e' },
+                  { key: 'en cours', count: groups['en cours'].length, color: '#f59e0b' },
+                  { key: 'non démarré', count: groups['non démarré'].length, color: darkMode ? '#334155' : '#d1d5db' },
+                ].map(s => s.count > 0 && (
+                  <div key={s.key} style={{
+                    width: `${(s.count / objectifs.length) * 100}%`,
+                    backgroundColor: s.color,
+                    transition: 'width 0.3s ease',
+                  }} title={`${s.key}: ${s.count}`} />
+                ))}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 6 }}>
+                {[
+                  { label: 'Terminé', count: groups['terminé'].length, color: '#22c55e' },
+                  { label: 'En cours', count: groups['en cours'].length, color: '#f59e0b' },
+                  { label: 'Non démarré', count: groups['non démarré'].length, color: darkMode ? '#64748b' : '#9ca3af' },
+                ].map(s => (
+                  <span key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: s.color, fontWeight: 500 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: s.color, display: 'inline-block' }} />
+                    {s.count} {s.label.toLowerCase()}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             {/* Sections by status */}
             {['en cours', 'terminé', 'non démarré'].map(statut => {
               const items = groups[statut];
@@ -1294,11 +1323,13 @@
                     {items.map(obj => (
                       <div key={obj.id} style={{
                         backgroundColor: theme.cardBg,
-                        border: `1px solid ${theme.cardBorder}`,
+                        borderTop: `1px solid ${theme.cardBorder}`,
+                        borderRight: `1px solid ${theme.cardBorder}`,
+                        borderBottom: `1px solid ${theme.cardBorder}`,
+                        borderLeft: `4px solid ${obj.axeColor}`,
                         borderRadius: 14,
                         padding: '14px 16px',
                         display: 'flex', flexDirection: 'column', gap: 8,
-                        borderLeft: `4px solid ${obj.axeColor}`,
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <span style={{ fontSize: 11, fontWeight: 700, color: obj.axeColor, fontFamily: 'monospace' }}>{obj.id}</span>
