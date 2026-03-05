@@ -964,7 +964,7 @@
                           textAnchor={labelX > centerX ? "start" : "end"} dominantBaseline="middle">{axe.name}</text>
                         <text x={labelX} y={labelY + 12} fill={theme.svgLabelTertiary} fontSize="8"
                           textAnchor={labelX > centerX ? "start" : "end"}>
-                          {axe.type === 'axe' ? 'Axe' : axe.type === 'champ' ? "Champ d'action" : 'Principe'}
+                          {axe.type === 'axe' ? `Axe ${axe.id.replace('A', '')}` : axe.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
                         </text>
                       </g>
                     );
