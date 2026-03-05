@@ -1128,12 +1128,298 @@
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // STRUCTURE & GOUVERNANCE
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    const GOUVERNANCE_DATA = {
+      direction: [
+        { name: 'Sara Ahmed', role: 'Directrice', initials: 'SA' },
+        { name: 'Philippe Després', role: 'Codirecteur', initials: 'PD' },
+        { name: 'Aude Motulsky', role: 'Codirectrice', initials: 'AM' },
+        { name: 'Bouchra Nasri', role: 'Codirectrice', initials: 'BN' },
+        { name: 'Martin Vallières', role: 'Codirecteur', initials: 'MV' },
+      ],
+      axes: [
+        { id: 'A1', shortName: 'Axe 1', name: 'Plateformes numériques et gouvernance informationnelle', description: 'Générer et gérer des données de qualité et de confiance', color: '#2563EB', flowLabel: 'Données', responsables: [{ name: 'Jean Nikiema', initials: 'JN' }, { name: 'Robert Platt', initials: 'RP' }] },
+        { id: 'A2', shortName: 'Axe 2', name: 'Modélisation et méthodes numériques', description: "Création et validation d'algorithmes, incluant la modélisation mathématique, les méthodes statistiques et l'IA", color: '#8B5CF6', flowLabel: 'Connaissances', responsables: [{ name: 'Morgan Craig', initials: 'MC' }, { name: 'Audrey Durand', initials: 'AD' }, { name: 'Denis Talbot', initials: 'DT' }] },
+        { id: 'A3', shortName: 'Axe 3', name: 'Interventions numériques', description: "Cycle de vie des interventions numériques, synthèses des évidences, de la conception à l'implantation, incluant l'adoption et la mise à l'échelle", color: '#EC4899', flowLabel: 'Décisions', responsables: [{ name: 'Alexander Baldwin', initials: 'AB' }, { name: 'Louis Valiquette', initials: 'LV' }, { name: 'Anmar Khadra', initials: 'AK' }] },
+        { id: 'A4', shortName: 'Axe 4', name: 'Transformation numérique', description: 'Transformation des organisations, du système et des politiques soutenant le cycle de vie des interventions numériques', color: '#F59E0B', flowLabel: '', responsables: [{ name: 'Pierre-Luc Déziel', initials: 'PLD' }, { name: 'Samer Faraj', initials: 'SF' }, { name: 'Nitika Pai', initials: 'NP' }] },
+      ],
+      champs: [
+        { id: 'CA-RENF', name: 'Renforcement des capacités', color: '#059669', responsables: [{ name: 'Bessam Abdulrazak', initials: 'BA' }, { name: 'Sylvie Lambert', initials: 'SL' }] },
+        { id: 'CA-FORM', name: 'Formation interdisciplinaire', color: '#059669', responsables: [{ name: 'Celia Greenwood', initials: 'CG' }, { name: 'Nitika Pai', initials: 'NP' }] },
+        { id: 'CA-MOB', name: 'Mobilisation des connaissances', color: '#059669', responsables: [{ name: 'Aliki Thomas', initials: 'AT' }, { name: 'Tatiana Ogourtsova', initials: 'TO' }] },
+      ],
+      principes: [
+        { id: 'PD-EDIA', name: 'Équité, Diversité, Inclusion, Accessibilité', shortName: 'EDIA', color: '#D4A017', responsables: [{ name: 'Amédé Gogovor', initials: 'AG' }] },
+        { id: 'PD-CONF', name: 'Numérique de confiance', shortName: 'Num. de confiance', color: '#D4A017', responsables: [{ name: 'Annabelle Cumyn', initials: 'AC' }, { name: 'Vanessa Nabelsi', initials: 'VN' }] },
+        { id: 'PD-ENG', name: 'Engagement citoyen', shortName: 'Engagement citoyen', color: '#D4A017', responsables: [{ name: 'Susan Bartlett', initials: 'SB' }, { name: 'Marie-Pascale Pomey', initials: 'MPP' }] },
+        { id: 'PD-DUR', name: 'Santé durable', shortName: 'Santé durable', color: '#D4A017', responsables: [{ name: 'Holly Witteman', initials: 'HW' }, { name: 'Patrick Archambault', initials: 'PA' }] },
+        { id: 'PD-SCI', name: 'Science ouverte', shortName: 'Science ouverte', color: '#D4A017', responsables: [{ name: 'Louis Archambault', initials: 'LA' }, { name: 'Toby Hocking', initials: 'TH' }] },
+      ],
+    };
+
+    function PersonBadge({ person, size = 40, darkMode }) {
+      const bg = darkMode ? '#334155' : '#e2e8f0';
+      const fg = darkMode ? '#e2e8f0' : '#334155';
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{
+            width: size, height: size, borderRadius: '50%', backgroundColor: bg, color: fg,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: size * 0.32, fontWeight: 600, letterSpacing: '-0.02em',
+          }}>
+            {person.initials}
+          </div>
+          <span style={{ fontSize: 11, color: darkMode ? '#94a3b8' : '#6b7280', textAlign: 'center', maxWidth: 80, lineHeight: 1.2 }}>{person.name}</span>
+        </div>
+      );
+    }
+
+    function StructureGouvernance({ darkMode }) {
+      const [selected, setSelected] = useState(null); // { type: 'axe'|'champ'|'principe', id }
+      const [hovered, setHovered] = useState(null);
+
+      const bg = darkMode ? '#0f172a' : '#f3f4f6';
+      const cardBg = darkMode ? '#1e293b' : '#ffffff';
+      const cardBorder = darkMode ? '#334155' : '#e5e7eb';
+      const textPrimary = darkMode ? '#e2e8f0' : '#111827';
+      const textSecondary = darkMode ? '#94a3b8' : '#6b7280';
+      const textMuted = darkMode ? '#64748b' : '#9ca3af';
+
+      const activeItem = selected || hovered;
+
+      const getActiveData = () => {
+        if (!activeItem) return null;
+        if (activeItem.type === 'axe') return GOUVERNANCE_DATA.axes.find(a => a.id === activeItem.id);
+        if (activeItem.type === 'champ') return GOUVERNANCE_DATA.champs.find(c => c.id === activeItem.id);
+        if (activeItem.type === 'principe') return GOUVERNANCE_DATA.principes.find(p => p.id === activeItem.id);
+        return null;
+      };
+      const activeData = getActiveData();
+
+      const flowLabels = ['Données', 'Connaissances', 'Décisions'];
+
+      return (
+        <div style={{ padding: '32px 24px', maxWidth: 1200, margin: '0 auto' }}>
+          {/* ── Direction ── */}
+          <div style={{ marginBottom: 32, textAlign: 'center' }}>
+            <h2 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: textMuted, marginBottom: 16 }}>Direction</h2>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+              {GOUVERNANCE_DATA.direction.map(p => (
+                <div key={p.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                  <div style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    backgroundColor: darkMode ? '#1e40af' : '#3b82f6',
+                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, fontWeight: 700,
+                  }}>
+                    {p.initials}
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: textPrimary }}>{p.name}</span>
+                  <span style={{ fontSize: 10, color: textSecondary, marginTop: -4 }}>{p.role}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
+            {/* ── Gauche : Visualisation concentrique ── */}
+            <div style={{ backgroundColor: cardBg, borderRadius: 16, border: `1px solid ${cardBorder}`, padding: 24, position: 'relative' }}>
+              <h2 style={{ fontSize: 15, fontWeight: 700, color: textPrimary, marginBottom: 4, textAlign: 'center' }}>Structure scientifique du réseau</h2>
+              <p style={{ fontSize: 11, color: textMuted, textAlign: 'center', marginBottom: 20 }}>Cliquez sur un élément pour voir ses responsables</p>
+
+              {/* SVG concentric visualization */}
+              <svg viewBox="0 0 700 520" style={{ width: '100%', height: 'auto' }}>
+                {/* ── Principes directeurs (anneau extérieur) ── */}
+                {GOUVERNANCE_DATA.principes.map((p, i) => {
+                  const total = GOUVERNANCE_DATA.principes.length;
+                  const angleSpan = Math.PI / (total + 1);
+                  const angle = -Math.PI / 2 + (i + 1) * angleSpan * 2 / total * (total) / (total) + angleSpan * (i - (total - 1) / 2);
+                  // Position in an arc at the bottom
+                  const cx = 350;
+                  const cy = 260;
+                  const rx = 320;
+                  const ry = 220;
+                  const a = Math.PI * 0.15 + (i / (total - 1)) * Math.PI * 0.7;
+                  const px = cx - rx * Math.cos(a);
+                  const py = cy + ry * Math.sin(a) - 30;
+
+                  const isActive = activeItem?.type === 'principe' && activeItem?.id === p.id;
+                  const w = 120, h = 44;
+                  return (
+                    <g key={p.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelected(isActive ? null : { type: 'principe', id: p.id })}
+                      onMouseEnter={() => setHovered({ type: 'principe', id: p.id })}
+                      onMouseLeave={() => setHovered(null)}
+                    >
+                      <rect x={px - w/2} y={py - h/2} width={w} height={h} rx={h/2}
+                        fill={isActive ? p.color : (darkMode ? '#433600' : '#fef3c7')}
+                        stroke={p.color} strokeWidth={isActive ? 2.5 : 1}
+                        opacity={activeItem && !isActive ? 0.5 : 1}
+                      />
+                      <text x={px} y={py} textAnchor="middle" dominantBaseline="central"
+                        fill={isActive ? '#fff' : (darkMode ? '#fbbf24' : '#92400e')}
+                        fontSize={10} fontWeight={600}
+                      >
+                        {p.shortName || p.name}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* ── Champs d'action (anneau intermédiaire) ── */}
+                {GOUVERNANCE_DATA.champs.map((c, i) => {
+                  const positions = [{ x: 560, y: 120 }, { x: 560, y: 200 }, { x: 560, y: 280 }];
+                  const pos = positions[i];
+                  const isActive = activeItem?.type === 'champ' && activeItem?.id === c.id;
+                  const w = 155, h = 36;
+                  return (
+                    <g key={c.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelected(isActive ? null : { type: 'champ', id: c.id })}
+                      onMouseEnter={() => setHovered({ type: 'champ', id: c.id })}
+                      onMouseLeave={() => setHovered(null)}
+                    >
+                      <rect x={pos.x - w/2} y={pos.y - h/2} width={w} height={h} rx={8}
+                        fill={isActive ? c.color : (darkMode ? '#064e3b' : '#d1fae5')}
+                        stroke={c.color} strokeWidth={isActive ? 2.5 : 1}
+                        opacity={activeItem && !isActive ? 0.5 : 1}
+                      />
+                      <text x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="central"
+                        fill={isActive ? '#fff' : (darkMode ? '#34d399' : '#065f46')}
+                        fontSize={10.5} fontWeight={600}
+                      >
+                        {c.name}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* ── Labels "Champs d'actions" et "Principes fondateurs" ── */}
+                <text x={560} y={78} textAnchor="middle" fill={darkMode ? '#34d399' : '#059669'} fontSize={11} fontWeight={700} fontStyle="italic">Champs d'actions</text>
+                <text x={350} y={390} textAnchor="middle" fill={darkMode ? '#fbbf24' : '#d97706'} fontSize={11} fontWeight={700} fontStyle="italic">Principes fondateurs</text>
+
+                {/* ── Axes (centre) ── */}
+                {GOUVERNANCE_DATA.axes.map((ax, i) => {
+                  const yPositions = [110, 185, 260, 335];
+                  const py = yPositions[i];
+                  const px = 220;
+                  const isActive = activeItem?.type === 'axe' && activeItem?.id === ax.id;
+                  const w = 280, h = 52;
+
+                  return (
+                    <g key={ax.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setSelected(isActive ? null : { type: 'axe', id: ax.id })}
+                      onMouseEnter={() => setHovered({ type: 'axe', id: ax.id })}
+                      onMouseLeave={() => setHovered(null)}
+                    >
+                      <rect x={px - w/2} y={py - h/2} width={w} height={h} rx={10}
+                        fill={isActive ? ax.color : (darkMode ? '#1e293b' : '#eff6ff')}
+                        stroke={ax.color} strokeWidth={isActive ? 2.5 : 1.5}
+                        opacity={activeItem && !isActive ? 0.5 : 1}
+                      />
+                      <text x={px} y={py - 8} textAnchor="middle" dominantBaseline="central"
+                        fill={isActive ? '#fff' : ax.color}
+                        fontSize={11} fontWeight={700}
+                      >
+                        {ax.shortName}
+                      </text>
+                      <text x={px} y={py + 10} textAnchor="middle" dominantBaseline="central"
+                        fill={isActive ? 'rgba(255,255,255,0.85)' : (darkMode ? '#94a3b8' : '#6b7280')}
+                        fontSize={9}
+                      >
+                        {ax.name.length > 40 ? ax.name.slice(0, 38) + '…' : ax.name}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* ── Flow arrows between axes ── */}
+                {[0, 1, 2].map(i => {
+                  const y1 = [110, 185, 260][i] + 26;
+                  const y2 = [185, 260, 335][i] - 26;
+                  const midY = (y1 + y2) / 2;
+                  return (
+                    <g key={`flow-${i}`}>
+                      <line x1={100} y1={y1} x2={100} y2={y2} stroke={darkMode ? '#475569' : '#cbd5e1'} strokeWidth={1.5} markerEnd="url(#arrowDown)" />
+                      <line x1={100} y1={y2} x2={100} y2={y1} stroke={darkMode ? '#475569' : '#cbd5e1'} strokeWidth={1.5} markerEnd="url(#arrowDown)" />
+                      <text x={42} y={midY} textAnchor="middle" dominantBaseline="central"
+                        fill={darkMode ? '#64748b' : '#9ca3af'}
+                        fontSize={9} fontWeight={500} transform={`rotate(-90, 42, ${midY})`}
+                      >
+                        {flowLabels[i]}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* Arrow marker */}
+                <defs>
+                  <marker id="arrowDown" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                    <path d="M1,1 L4,6 L7,1" fill="none" stroke={darkMode ? '#475569' : '#cbd5e1'} strokeWidth="1.5" />
+                  </marker>
+                </defs>
+
+                {/* ── "Axes" label ── */}
+                <text x={220} y={60} textAnchor="middle" fill={darkMode ? '#60a5fa' : '#2563eb'} fontSize={12} fontWeight={700}>Axes</text>
+              </svg>
+            </div>
+
+            {/* ── Droite : Panneau responsables ── */}
+            <div style={{ position: 'sticky', top: 73 }}>
+              <div style={{
+                backgroundColor: cardBg, borderRadius: 16, border: `1px solid ${cardBorder}`,
+                padding: 20, minHeight: 200,
+                transition: 'all 0.2s',
+              }}>
+                {!activeData ? (
+                  <div style={{ textAlign: 'center', padding: '40px 16px' }}>
+                    <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.4 }}>👤</div>
+                    <p style={{ fontSize: 13, color: textMuted }}>Survolez ou cliquez sur un axe, champ d'action ou principe directeur pour afficher ses responsables.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{
+                      display: 'inline-block', padding: '4px 12px', borderRadius: 20, marginBottom: 12,
+                      fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
+                      backgroundColor: activeItem.type === 'axe' ? (darkMode ? '#1e3a5f' : '#dbeafe') : activeItem.type === 'champ' ? (darkMode ? '#064e3b' : '#d1fae5') : (darkMode ? '#433600' : '#fef3c7'),
+                      color: activeItem.type === 'axe' ? (darkMode ? '#93c5fd' : '#1e40af') : activeItem.type === 'champ' ? (darkMode ? '#34d399' : '#065f46') : (darkMode ? '#fbbf24' : '#92400e'),
+                    }}>
+                      {activeItem.type === 'axe' ? 'Axe' : activeItem.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                    </div>
+                    <h3 style={{ fontSize: 15, fontWeight: 700, color: textPrimary, marginBottom: 4 }}>
+                      {activeData.shortName ? `${activeData.shortName} — ` : ''}{activeData.name}
+                    </h3>
+                    {activeData.description && (
+                      <p style={{ fontSize: 11, color: textSecondary, marginBottom: 16, lineHeight: 1.5 }}>{activeData.description}</p>
+                    )}
+                    <div style={{ fontSize: 11, fontWeight: 600, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
+                      Responsable{activeData.responsables.length > 1 ? 's' : ''}
+                    </div>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                      {activeData.responsables.map(p => (
+                        <PersonBadge key={p.name} person={p} darkMode={darkMode} />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // APP PRINCIPALE — ONGLETS
     // ═══════════════════════════════════════════════════════════════════════════
 
     function MainApp() {
       const [darkMode, setDarkMode] = useState(true);
-      const [activeTab, setActiveTab] = useState('vue-globale');
+      const [activeTab, setActiveTab] = useState('structure');
       const [csvLoading, setCsvLoading] = useState(true);
       const [csvError, setCsvError] = useState(null);
       const [analyseData, setAnalyseData] = useState({});
@@ -1160,6 +1446,7 @@
       }, []);
 
       const tabs = [
+        { id: 'structure',   label: 'Structure & Gouvernance', icon: '🏛️' },
         { id: 'vue-globale', label: 'Vue globale', icon: '🕸️' },
         { id: 'analyse',     label: 'Analyse des chantiers', icon: '🔍' },
       ];
@@ -1266,6 +1553,7 @@
               </div>
             </div>
           )}
+          {activeTab === 'structure' && <StructureGouvernance darkMode={darkMode} />}
           {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
           {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} analyseData={analyseData} chantiersMeta={chantiersMeta} />}
         </div>
