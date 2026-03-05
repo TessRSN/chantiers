@@ -118,6 +118,64 @@
       }));
     }
 
+    // ── Construire GOUVERNANCE_DATA depuis membres.csv ──
+    function buildGouvernanceFromCSV(rows) {
+      const result = {
+        direction: [],
+        comites: [
+          { id: 'comite-sci', name: 'Comité scientifique', responsables: [] },
+          { id: 'comite-avis', name: 'Comité aviseur', responsables: [] },
+          { id: 'comite-etud', name: 'Comité étudiants', responsables: [] },
+          { id: 'communaute-cit', name: 'Communauté citoyenne', responsables: [] },
+        ],
+        axes: [
+          { id: 'A1', shortName: 'Axe 1', name: 'Plateformes numériques et gouvernance informationnelle', label: 'Plateformes', description: 'Générer et gérer des données de qualité et de confiance', color: '#3B82F6', responsables: [] },
+          { id: 'A2', shortName: 'Axe 2', name: 'Modélisation et méthodes numériques', label: 'Modélisation', description: "Création et validation d'algorithmes, incluant la modélisation mathématique, les méthodes statistiques et l'IA", color: '#8B5CF6', responsables: [] },
+          { id: 'A3', shortName: 'Axe 3', name: 'Interventions numériques', label: 'Interventions', description: "Cycle de vie des interventions numériques, synthèses des évidences, de la conception à l'implantation, incluant l'adoption et la mise à l'échelle", color: '#EC4899', responsables: [] },
+          { id: 'A4', shortName: 'Axe 4', name: 'Transformation numérique', label: 'Transformation', description: 'Transformation des organisations, du système et des politiques soutenant le cycle de vie des interventions numériques', color: '#F59E0B', responsables: [] },
+        ],
+        champs: [
+          { id: 'CA-RENF', name: 'Renforcement', fullName: 'Renforcement des capacités', label: 'Renforcement', color: '#10B981', responsables: [] },
+          { id: 'CA-FORM', name: 'Formation', fullName: 'Formation interdisciplinaire', label: 'Formation', color: '#14B8A6', responsables: [] },
+          { id: 'CA-MOB', name: 'Mobilisation', fullName: 'Mobilisation des connaissances', label: 'Mobilisation', color: '#06B6D4', responsables: [] },
+        ],
+        principes: [
+          { id: 'PD-EDIA', name: 'EDIA', fullName: 'Équité, Diversité, Inclusion, Accessibilité', label: 'EDIA', color: '#EF4444', responsables: [] },
+          { id: 'PD-CONF', name: 'Num. confiance', fullName: 'Numérique de confiance', label: 'Confiance', color: '#A855F7', responsables: [] },
+          { id: 'PD-ENG', name: 'Engagement', fullName: 'Engagement citoyen', label: 'Engagement', color: '#6366F1', responsables: [] },
+          { id: 'PD-DUR', name: 'Santé durable', fullName: 'Santé durable', label: 'Santé durable', color: '#22C55E', responsables: [] },
+          { id: 'PD-SCI', name: 'Science ouverte', fullName: 'Science ouverte', label: 'Science ouv.', color: '#EAB308', responsables: [] },
+        ],
+      };
+
+      const comiteMap = {
+        'Comité scientifique': 'comite-sci',
+        'Comité aviseur': 'comite-avis',
+        'Comité étudiants': 'comite-etud',
+        'Communauté citoyenne': 'communaute-cit',
+      };
+
+      rows.forEach(row => {
+        const person = { name: row['Nom'], initials: row['Initiales'], affiliation: row['Affiliation'] || '' };
+        if (row['Role']) person.role = row['Role'];
+
+        const groupes = (row['Groupes'] || '').split(';').map(g => g.trim()).filter(Boolean);
+        groupes.forEach(g => {
+          if (g === 'Direction') { result.direction.push({ ...person }); return; }
+          const comiteId = comiteMap[g];
+          if (comiteId) { result.comites.find(c => c.id === comiteId).responsables.push({ ...person }); return; }
+          const axe = result.axes.find(a => a.id === g);
+          if (axe) { axe.responsables.push({ ...person }); return; }
+          const champ = result.champs.find(c => c.id === g);
+          if (champ) { champ.responsables.push({ ...person }); return; }
+          const principe = result.principes.find(p => p.id === g);
+          if (principe) { principe.responsables.push({ ...person }); return; }
+        });
+      });
+
+      return result;
+    }
+
     // ── Construire ANALYSE_DATA dynamiquement depuis les lignes CSV ──
     function buildAnalyseData(allRows) {
       const byChantier = {};
@@ -1280,49 +1338,7 @@
     // STRUCTURE & GOUVERNANCE
     // ═══════════════════════════════════════════════════════════════════════════
 
-    const GOUVERNANCE_DATA = {
-      direction: [
-        { name: 'Sara Ahmed', role: 'Directrice', initials: 'SA' },
-        { name: 'Philippe Després', role: 'Codirecteur', initials: 'PD' },
-        { name: 'Aude Motulsky', role: 'Codirectrice', initials: 'AM' },
-        { name: 'Bouchra Nasri', role: 'Codirectrice', initials: 'BN' },
-        { name: 'Martin Vallières', role: 'Codirecteur', initials: 'MV' },
-      ],
-      comites: [
-        { id: 'comite-sci', name: 'Comité scientifique', responsables: [] },
-        { id: 'comite-avis', name: 'Comité aviseur', responsables: [
-          { name: 'Jacques Bélair', initials: 'JB' },
-          { name: 'Franco Saliola', initials: 'FS' },
-          { name: 'Aurélie Labbé', initials: 'AL' },
-          { name: 'Robyn Tamblyn', initials: 'RT' },
-          { name: 'Laurette Dubé', initials: 'LD' },
-          { name: 'Alan Forster', initials: 'AF' },
-          { name: 'Yves Joannette', initials: 'YJ' },
-        ] },
-        { id: 'comite-etud', name: 'Comité étudiants', responsables: [] },
-        { id: 'communaute-cit', name: 'Communauté citoyenne', responsables: [] },
-      ],
-      axes: [
-        { id: 'A1', shortName: 'Axe 1', name: 'Plateformes numériques et gouvernance informationnelle', label: 'Plateformes', description: 'Générer et gérer des données de qualité et de confiance', color: '#3B82F6', responsables: [{ name: 'Jean Nikiema', initials: 'JN' }, { name: 'Robert Platt', initials: 'RP' }] },
-        { id: 'A2', shortName: 'Axe 2', name: 'Modélisation et méthodes numériques', label: 'Modélisation', description: "Création et validation d'algorithmes, incluant la modélisation mathématique, les méthodes statistiques et l'IA", color: '#8B5CF6', responsables: [{ name: 'Morgan Craig', initials: 'MC' }, { name: 'Audrey Durand', initials: 'AD' }, { name: 'Denis Talbot', initials: 'DT' }] },
-        { id: 'A3', shortName: 'Axe 3', name: 'Interventions numériques', label: 'Interventions', description: "Cycle de vie des interventions numériques, synthèses des évidences, de la conception à l'implantation, incluant l'adoption et la mise à l'échelle", color: '#EC4899', responsables: [{ name: 'Alexander Baldwin', initials: 'AB' }, { name: 'Louis Valiquette', initials: 'LV' }, { name: 'Anmar Khadra', initials: 'AK' }] },
-        { id: 'A4', shortName: 'Axe 4', name: 'Transformation numérique', label: 'Transformation', description: 'Transformation des organisations, du système et des politiques soutenant le cycle de vie des interventions numériques', color: '#F59E0B', responsables: [{ name: 'Pierre-Luc Déziel', initials: 'PLD' }, { name: 'Samer Faraj', initials: 'SF' }, { name: 'Nitika Pai', initials: 'NP' }] },
-      ],
-      champs: [
-        { id: 'CA-RENF', name: 'Renforcement', fullName: 'Renforcement des capacités', label: 'Renforcement', color: '#10B981', responsables: [{ name: 'Bessam Abdulrazak', initials: 'BA' }, { name: 'Sylvie Lambert', initials: 'SL' }] },
-        { id: 'CA-FORM', name: 'Formation', fullName: 'Formation interdisciplinaire', label: 'Formation', color: '#14B8A6', responsables: [{ name: 'Celia Greenwood', initials: 'CG' }, { name: 'Nitika Pai', initials: 'NP' }] },
-        { id: 'CA-MOB', name: 'Mobilisation', fullName: 'Mobilisation des connaissances', label: 'Mobilisation', color: '#06B6D4', responsables: [{ name: 'Aliki Thomas', initials: 'AT' }, { name: 'Tatiana Ogourtsova', initials: 'TO' }] },
-      ],
-      principes: [
-        { id: 'PD-EDIA', name: 'EDIA', fullName: 'Équité, Diversité, Inclusion, Accessibilité', label: 'EDIA', color: '#EF4444', responsables: [{ name: 'Amédé Gogovor', initials: 'AG' }] },
-        { id: 'PD-CONF', name: 'Num. confiance', fullName: 'Numérique de confiance', label: 'Confiance', color: '#A855F7', responsables: [{ name: 'Annabelle Cumyn', initials: 'AC' }, { name: 'Véronique Nabelsi', initials: 'VN' }] },
-        { id: 'PD-ENG', name: 'Engagement', fullName: 'Engagement citoyen', label: 'Engagement', color: '#6366F1', responsables: [{ name: 'Susan Bartlett', initials: 'SB' }, { name: 'Marie-Pascale Pomey', initials: 'MPP' }] },
-        { id: 'PD-DUR', name: 'Santé durable', fullName: 'Santé durable', label: 'Santé durable', color: '#22C55E', responsables: [{ name: 'Holly Witteman', initials: 'HW' }, { name: 'Patrick Archambault', initials: 'PA' }] },
-        { id: 'PD-SCI', name: 'Science ouverte', fullName: 'Science ouverte', label: 'Science ouv.', color: '#EAB308', responsables: [{ name: 'Louis Archambault', initials: 'LA' }, { name: 'Toby Hocking', initials: 'TH' }] },
-      ],
-    };
-
-    function StructureGouvernance({ darkMode }) {
+    function StructureGouvernance({ darkMode, gouvernanceData }) {
       const [selectedNode, setSelectedNode] = useState(null);
       const [expandedGov, setExpandedGov] = useState(null); // id of expanded gov box
       const panelRef = React.useRef(null);
@@ -1359,25 +1375,25 @@
       const axeNodeR = 42, champNodeR = 42, princNodeR = 42;
 
       const axePositions = useMemo(() => {
-        return GOUVERNANCE_DATA.axes.map((ax, i) => {
+        return gouvernanceData.axes.map((ax, i) => {
           const angle = (i / 4) * 2 * Math.PI - Math.PI / 2;
           return { ...ax, type: 'axe', x: cx + Math.cos(angle) * axeR, y: cy + Math.sin(angle) * axeR, angle };
         });
-      }, []);
+      }, [gouvernanceData]);
 
       const champPositions = useMemo(() => {
-        return GOUVERNANCE_DATA.champs.map((ch, i) => {
+        return gouvernanceData.champs.map((ch, i) => {
           const angle = (i / 3) * 2 * Math.PI - Math.PI / 2 + Math.PI / 6;
           return { ...ch, type: 'champ', x: cx + Math.cos(angle) * champR, y: cy + Math.sin(angle) * champR, angle };
         });
-      }, []);
+      }, [gouvernanceData]);
 
       const principePositions = useMemo(() => {
-        return GOUVERNANCE_DATA.principes.map((pr, i) => {
+        return gouvernanceData.principes.map((pr, i) => {
           const angle = (i / 5) * 2 * Math.PI - Math.PI / 2;
           return { ...pr, type: 'principe', x: cx + Math.cos(angle) * princR, y: cy + Math.sin(angle) * princR, angle };
         });
-      }, []);
+      }, [gouvernanceData]);
 
       const handleClick = (node) => {
         setSelectedNode(prev => prev?.id === node.id ? null : node);
@@ -1415,6 +1431,7 @@
             </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
+              {p.affiliation && <div style={{ fontSize: 11, color: darkMode ? '#94a3b8' : '#6b7280' }}>{p.affiliation}</div>}
               {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{p.role}</div>}
             </div>
           </div>
@@ -1499,8 +1516,8 @@
                 <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
                   Gouvernance
                 </div>
-                <GovBox id="direction" name="Direction" members={GOUVERNANCE_DATA.direction} color={govColor} />
-                {GOUVERNANCE_DATA.comites.map(c => (
+                <GovBox id="direction" name="Direction" members={gouvernanceData.direction} color={govColor} />
+                {gouvernanceData.comites.map(c => (
                   <GovBox key={c.id} id={c.id} name={c.name} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
                 ))}
               </div>
@@ -1654,12 +1671,14 @@
       const [csvError, setCsvError] = useState(null);
       const [analyseData, setAnalyseData] = useState({});
       const [chantiersMeta, setChantiersMeta] = useState([]);
+      const [gouvernanceData, setGouvernanceData] = useState(null);
 
       useEffect(() => {
-        fetch('data.csv')
-          .then(r => { if (!r.ok) throw new Error('CSV introuvable'); return r.text(); })
-          .then(text => {
-            const rows = parseCSV(text);
+        Promise.all([
+          fetch('data.csv').then(r => { if (!r.ok) throw new Error('data.csv introuvable'); return r.text(); }),
+          fetch('membres.csv').then(r => { if (!r.ok) throw new Error('membres.csv introuvable'); return r.text(); }),
+        ]).then(([dataText, membresText]) => {
+            const rows = parseCSV(dataText);
             const allRows = csvRowsToAllData(rows);
 
             // Vue globale : seulement les actions approuvées
@@ -1670,6 +1689,11 @@
             const ad = buildAnalyseData(allRows);
             setAnalyseData(ad);
             setChantiersMeta(buildChantiersMeta(allRows, ad));
+
+            // Gouvernance : depuis membres.csv
+            const membresRows = parseCSV(membresText);
+            setGouvernanceData(buildGouvernanceFromCSV(membresRows));
+
             setCsvLoading(false);
           })
           .catch(err => { setCsvError(err.message); setCsvLoading(false); });
@@ -1809,11 +1833,11 @@
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
                 <p>Erreur : {csvError}</p>
-                <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>Vérifiez que data.csv est présent à côté de index.html</p>
+                <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>Vérifiez que data.csv et membres.csv sont présents à côté de index.html</p>
               </div>
             </div>
           )}
-          {activeTab === 'structure' && <StructureGouvernance darkMode={darkMode} />}
+          {!csvLoading && !csvError && activeTab === 'structure' && gouvernanceData && <StructureGouvernance darkMode={darkMode} gouvernanceData={gouvernanceData} />}
           {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
           {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} analyseData={analyseData} chantiersMeta={chantiersMeta} />}
           {!csvLoading && !csvError && activeTab === 'suivi' && <SuiviObjectifs darkMode={darkMode} actions={vueGlobaleData.actions} />}
