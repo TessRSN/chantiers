@@ -533,7 +533,7 @@
       const mainBg = darkMode ? '#0f172a' : '#f3f4f6';
 
       return (
-        <div style={{ display: "flex", height: "calc(100vh - 49px)", fontFamily: "system-ui, sans-serif", backgroundColor: mainBg }}>
+        <div style={{ display: "flex", height: "calc(100vh - 70px)", fontFamily: "system-ui, sans-serif", backgroundColor: mainBg }}>
           {/* ── SIDEBAR ── */}
           <div style={{ width: 256, backgroundColor: sidebarBg, borderRight: `1px solid ${sidebarBorder}`, display: "flex", flexDirection: "column", overflowY: "auto", flexShrink: 0 }}>
             <div style={{ padding: "16px", borderBottom: `1px solid ${headerBorder}` }}>
@@ -845,7 +845,7 @@
       }, [selectedNode]);
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-1 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-1 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-1">
               <h1 className={`text-2xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
@@ -1187,7 +1187,7 @@
       };
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-2 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-2 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-3">
               <h1 className={`text-2xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
@@ -1483,7 +1483,7 @@
       };
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflowY: 'auto' }}>
           <div className="max-w-7xl mx-auto">
             {/* ── Header ── */}
             <div className="text-center mb-3">
@@ -1694,8 +1694,13 @@
       return (
         <div style={{ minHeight: '100vh', backgroundColor: darkMode ? '#0f172a' : '#f3f4f6' }}>
           {/* ── TAB BAR ── */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 49, backgroundColor: tabBarBg, borderBottom: `1px solid ${tabBarBorder}`, position: 'sticky', top: 0, zIndex: 100 }}>
-            {/* Tabs */}
+          <div style={{ backgroundColor: tabBarBg, borderBottom: `1px solid ${tabBarBorder}`, position: 'sticky', top: 0, zIndex: 100 }}>
+            {/* Title row */}
+            <div style={{ textAlign: 'center', padding: '8px 16px 2px', fontSize: 13, fontWeight: 600, color: darkMode ? '#94a3b8' : '#6b7280', letterSpacing: '0.02em' }}>
+              RSN — Tableau de bord
+            </div>
+            {/* Tabs + toggle row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 40 }}>
             <div style={{ display: 'flex', gap: 4 }}>
               {tabs.map(tab => {
                 const active = activeTab === tab.id;
@@ -1755,11 +1760,6 @@
               })}
             </div>
 
-            {/* Title */}
-            <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 13, fontWeight: 600, color: darkMode ? '#94a3b8' : '#6b7280', letterSpacing: '0.02em', pointerEvents: 'none' }}>
-              RSN — Tableau de bord
-            </div>
-
             {/* Dark mode toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -1794,11 +1794,12 @@
                 </>
               )}
             </button>
+            </div>
           </div>
 
           {/* ── CONTENT ── */}
           {csvLoading && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 49px)', color: darkMode ? '#94a3b8' : '#6b7280' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 70px)', color: darkMode ? '#94a3b8' : '#6b7280' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
                 <p>Chargement des données...</p>
@@ -1806,7 +1807,7 @@
             </div>
           )}
           {csvError && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 49px)', color: '#ef4444' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 70px)', color: '#ef4444' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
                 <p>Erreur : {csvError}</p>
