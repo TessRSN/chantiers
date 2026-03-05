@@ -8,9 +8,13 @@ Application web interactive pour le **Réseau en santé numérique (RSN)** — v
 
 ## Fonctionnalités
 
+### Structure & Gouvernance
+
+Visualisation SVG interactive de la structure scientifique du RSN : axes, champs d'action, principes directeurs. Panneaux dépliants pour la direction, les comités et les responsables par entité.
+
 ### Vue globale (graphe radial)
 
-Visualisation SVG interactive des connexions entre axes, chantiers et effets stratégiques. Recherche par mot-clé, sélection de nœuds avec panneau de détail contextuel.
+Graphe radial SVG des connexions entre axes, chantiers et effets stratégiques. Recherche par mot-clé, sélection de nœuds avec panneau de détail contextuel.
 
 ### Analyse des chantiers
 
@@ -25,37 +29,60 @@ Outil d'analyse chantier par chantier permettant d'évaluer chaque action du fic
 
 Chaque chantier regroupe ses actions en **projets thématiques** avec un **parking lot** pour les actions à rediriger.
 
-#### Progression de l'analyse
+### Suivi des objectifs
 
-| # | Chantier | Verbe | Actions | Statut |
-|---|----------|-------|---------|--------|
-| 1 | Guides & Outils | PRODUIRE | 22 | ✅ Complété |
-| 2 | Répertoires & Cartographie | RECENSER | 20 | ○ En attente |
-| 3 | Concertation & Maillage | CONNECTER | 20 | ○ En attente |
-| 4 | Formation & Relève | FORMER | 2 | ○ En attente |
-| 5 | Consultation & Écoute | ÉCOUTER | 16 | ○ En attente |
-| 6 | Influence & Représentation | CONVAINCRE | 6 | ○ En attente |
-| 7 | Événements & Rayonnement | ANIMER | 11 | ○ En attente |
+Vue par statut de progression (terminé / en cours / non démarré) avec barre de progression et recherche.
 
 ## Stack technique
 
-Fichier HTML unique, sans build ni bundler :
+Sans build ni bundler — tout tourne dans le navigateur :
 
 - **React 18** (CDN) + **Babel standalone** pour JSX en navigateur
 - **Tailwind CSS** (CDN) pour le styling utilitaire
-- **SVG natif** pour le graphe radial
+- **SVG natif** pour les graphes radiaux
 - Dark mode intégré (défaut : sombre)
+- Loader dans `index.html` : fetch des fichiers JS/JSX, concaténation, Babel transform, eval
 
-## Déploiement
+## Données
 
-Le site est servi automatiquement via **GitHub Pages** depuis la branche `main`. Tout push sur `main` met à jour le site en ligne.
+- **`data.csv`** — Actions stratégiques (ID, axe, objectif, chantier, statut, projet, progression...)
+- **`membres.csv`** — Membres du réseau (nom, initiales, affiliation, rôle, groupes)
+
+Les données sont chargées dynamiquement au démarrage via `fetch()`.
 
 ## Structure
 
 ```
-index.html    ← Application complète (React + données + styles)
-README.md     ← Ce fichier
+index.html              ← Loader (~40 lignes : HTML + fetch-concat-transform)
+js/
+├── config.js           ← Constantes, configs axes/chantiers, hooks React
+├── data.js             ← Parsing CSV, builders de données
+├── components/
+│   ├── shared.jsx      ← ProgressBadge, StatusBadge, ActionDetail
+│   ├── analyse.jsx     ← ActionRow, ProjectCard, ParkingLot, AnalyseChantiers
+│   ├── vue-globale.jsx ← RSNRadialGraph
+│   ├── suivi.jsx       ← SuiviObjectifs
+│   └── structure.jsx   ← StructureGouvernance, MemberCard, GovBox
+└── app.jsx             ← MainApp (tabs, dark mode, CSV loading) + render
+data.csv                ← Données des actions stratégiques
+membres.csv             ← Données des membres du réseau
+photos/                 ← Photos des membres (initiales.jpg ou .png)
 ```
+
+## Développement
+
+Pour tester localement (fetch ne marche pas en `file://`) :
+
+```bash
+python3 -m http.server 8000
+# puis ouvrir http://localhost:8000
+```
+
+Pour ajouter un composant : créer le fichier `.jsx` dans `js/components/`, puis l'ajouter au tableau `modules` dans `index.html`.
+
+## Déploiement
+
+Le site est servi automatiquement via **GitHub Pages** depuis la branche `main`. Tout push sur `main` met à jour le site en ligne.
 
 ---
 

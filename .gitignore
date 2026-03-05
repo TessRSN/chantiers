@@ -1,6 +1,5 @@
 # Fichiers de travail locaux (ne pas push sur GitHub)
 *.xlsx
 *.pptx
-*.jsx
 .DS_Store
 Thumbs.db
