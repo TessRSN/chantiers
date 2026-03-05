@@ -845,18 +845,18 @@
       }, [selectedNode]);
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} p-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-1 pb-4 transition-colors duration-300`} style={{ height: 'calc(100vh - 49px)', overflowY: 'auto' }}>
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-2">
-              <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-1`}>
+            <div className="text-center mb-1">
+              <h1 className={`text-2xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
                 Réseau des Actions RSN
               </h1>
-              <p className={`${theme.textMuted} text-sm`}>
+              <p className={`${theme.textMuted} text-xs`}>
                 Cliquez sur un nœud pour voir ses connexions • {vueGlobaleData.actions.length} actions • {vueGlobaleData.axes.length} axes • {vueGlobaleData.chantiers.length} chantiers
               </p>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex flex-col lg:flex-row gap-3">
               <div className="flex-1">
                 <svg ref={svgRef} width={width} height={height} className="max-w-full h-auto">
                   <defs>
