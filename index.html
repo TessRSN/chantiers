@@ -845,13 +845,13 @@
       }, [selectedNode]);
 
       return (
-        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-4 pt-0 pb-2 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflow: 'hidden' }}>
-          <div className="max-w-7xl mx-auto">
+        <div className={`${darkMode ? 'bg-slate-950' : 'bg-gray-100'} px-2 pt-2 pb-0 transition-colors duration-300`} style={{ height: 'calc(100vh - 70px)', overflow: 'hidden' }}>
+          <div className="mx-auto">
             <div className="text-center mb-0">
               <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-0`}>
                 Réseau des Actions RSN
               </h1>
-              <p className={`${theme.textMuted} text-sm`}>
+              <p className={`${theme.textMuted} text-sm mb-0`}>
                 Cliquez sur un nœud pour voir ses connexions • {vueGlobaleData.actions.length} actions • {vueGlobaleData.axes.length} axes • {vueGlobaleData.chantiers.length} chantiers
               </p>
             </div>
@@ -987,8 +987,8 @@
               </div>
 
               {/* ── SVG radial diagram — centered ── */}
-              <div className="flex justify-center" style={{ height: 'calc(100vh - 130px)' }}>
-                <svg ref={svgRef} viewBox={`-80 -30 ${width + 200} ${height + 10}`} width="100%" height="100%" preserveAspectRatio="xMidYMin meet">
+              <div className="flex justify-center" style={{ height: 'calc(100vh - 140px)' }}>
+                <svg ref={svgRef} viewBox="50 50 800 810" width="100%" height="100%" preserveAspectRatio="xMidYMin meet">
                   <defs>
                     <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
                       <stop offset="0%" stopColor="#6366F1" stopOpacity="0.3" />
