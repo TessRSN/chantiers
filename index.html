@@ -1475,7 +1475,23 @@
 
     function MainApp() {
       const [darkMode, setDarkMode] = useState(true);
-      const [activeTab, setActiveTab] = useState('structure');
+      const validTabs = ['structure', 'vue-globale', 'analyse'];
+      const tabFromHash = window.location.hash.slice(1);
+      const [activeTab, setActiveTab] = useState(
+        validTabs.includes(tabFromHash) ? tabFromHash : 'structure'
+      );
+
+      useEffect(() => { window.location.hash = activeTab; }, [activeTab]);
+
+      useEffect(() => {
+        const onHash = () => {
+          const t = window.location.hash.slice(1);
+          if (validTabs.includes(t)) setActiveTab(t);
+        };
+        window.addEventListener('hashchange', onHash);
+        return () => window.removeEventListener('hashchange', onHash);
+      }, []);
+
       const [csvLoading, setCsvLoading] = useState(true);
       const [csvError, setCsvError] = useState(null);
       const [analyseData, setAnalyseData] = useState({});
