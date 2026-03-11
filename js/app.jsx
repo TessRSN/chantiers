@@ -25,8 +25,8 @@ function MainApp() {
 
   useEffect(() => {
     Promise.all([
-      fetch('data.csv').then(r => { if (!r.ok) throw new Error('data.csv introuvable'); return r.text(); }),
-      fetch('membres.csv').then(r => { if (!r.ok) throw new Error('membres.csv introuvable'); return r.text(); }),
+      fetch('data.csv?v=' + VERSION).then(r => { if (!r.ok) throw new Error('data.csv introuvable'); return r.text(); }),
+      fetch('membres.csv?v=' + VERSION).then(r => { if (!r.ok) throw new Error('membres.csv introuvable'); return r.text(); }),
     ]).then(([dataText, membresText]) => {
         const rows = parseCSV(dataText);
         const allRows = csvRowsToAllData(rows);
