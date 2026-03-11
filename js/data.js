@@ -123,7 +123,7 @@ function buildAnalyseData(allRows) {
 
   allRows.forEach(row => {
     const chantierId = row.chantier;
-    if (!byChantier[chantierId]) byChantier[chantierId] = { projets: {}, parking: [] };
+    if (!byChantier[chantierId]) byChantier[chantierId] = { projets: {}, parking: [], orphans: [] };
 
     // Parking lot : actions avec une destination (status = move)
     if (row.destination) {
@@ -149,6 +149,14 @@ function buildAnalyseData(allRows) {
         notes: row.notesAnalyse,
         statutObjectif: row.statutObjectif,
       });
+    } else {
+      // Actions sans projet ni destination (ex: à réécrire)
+      byChantier[chantierId].orphans.push({
+        id: row.id, axe: row.axeFullName, objectif: row.objectif,
+        action: row.action, status: row.statusAnalyse || 'keep',
+        notes: row.notesAnalyse,
+        statutObjectif: row.statutObjectif,
+      });
     }
   });
 
@@ -159,8 +167,8 @@ function buildAnalyseData(allRows) {
     const num = chantierIdToNum[cId];
     if (!num) return;
     const projects = Object.values(data.projets);
-    if (projects.length === 0 && data.parking.length === 0) return;
-    result[num] = { projects, parkingLot: data.parking };
+    if (projects.length === 0 && data.parking.length === 0 && data.orphans.length === 0) return;
+    result[num] = { projects, parkingLot: data.parking, orphans: data.orphans };
   });
 
   return result;

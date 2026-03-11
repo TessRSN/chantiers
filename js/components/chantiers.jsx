@@ -175,9 +175,68 @@ function ParkingLot({ items, darkMode }) {
   );
 }
 
-function StatsBar({ projects, parkingLot, darkMode }) {
+function OrphanActions({ items, darkMode }) {
+  const [open, setOpen] = useState(false);
+  if (!items || items.length === 0) return null;
+
+  const containerBg     = darkMode ? 'bg-amber-950'   : 'bg-amber-50';
+  const containerBorder = darkMode ? 'border-amber-800' : 'border-amber-200';
+  const hoverBg         = darkMode ? 'hover:bg-amber-900' : 'hover:bg-amber-100';
+  const titleColor      = darkMode ? 'text-amber-200'  : 'text-amber-900';
+  const subtitleColor   = darkMode ? 'text-amber-400'  : 'text-amber-600';
+  const chevronColor    = darkMode ? 'text-amber-600'  : 'text-amber-400';
+  const itemBg          = darkMode ? 'bg-slate-800'    : 'bg-white';
+  const itemBorder      = darkMode ? 'border-amber-800' : 'border-amber-200';
+  const idColor         = darkMode ? 'text-slate-400'  : 'text-gray-500';
+  const objColor        = darkMode ? 'text-slate-400'  : 'text-gray-500';
+  const objBold         = darkMode ? 'text-slate-300'  : '';
+  const actionColor     = darkMode ? 'text-slate-200'  : 'text-gray-800';
+  const noteColor       = darkMode ? 'text-amber-400'  : 'text-amber-700';
+
+  return (
+    <div className={`mt-6 rounded-xl border ${containerBorder} ${containerBg} overflow-hidden`}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={`w-full flex items-center justify-between p-4 text-left ${hoverBg} transition-colors`}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xl">✏️</span>
+          <div>
+            <h3 className={`font-semibold ${titleColor}`}>Actions à réécrire</h3>
+            <p className={`text-xs ${subtitleColor} mt-0.5`}>
+              {items.length} action{items.length > 1 ? "s" : ""} nécessitant une reformulation avant assignation à un projet
+            </p>
+          </div>
+        </div>
+        <span className={`${chevronColor} text-sm`}>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 space-y-2">
+          {items.map((item) => (
+            <div key={item.id} className={`${itemBg} rounded-lg border ${itemBorder} p-3`}>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className={`font-mono text-xs font-bold ${idColor}`}>{item.id}</span>
+                <span className="text-xs bg-amber-600 text-white px-2 py-0.5 rounded-full font-medium shrink-0">À réécrire</span>
+              </div>
+              <p className={`text-xs ${objColor} italic mb-1`}>
+                <span className={`font-medium ${objBold}`}>Objectif :</span> {item.objectif}
+              </p>
+              <p className={`text-sm ${actionColor} mb-1.5 font-medium`}>{item.action}</p>
+              {item.notes && (
+                <p className={`text-xs ${noteColor} italic leading-relaxed`}>💬 {item.notes}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatsBar({ projects, parkingLot, orphans, darkMode }) {
   const counts = { keep: 0, rewrite: 0, gap: 0, move: 0 };
   projects.forEach((p) => p.actions.forEach((a) => { counts[a.status]++; }));
+  if (orphans) orphans.forEach((a) => { counts[a.status] = (counts[a.status] || 0) + 1; });
   const sourceTotal = counts.keep + counts.rewrite + counts.move;
   const gapTotal = counts.gap;
 
@@ -365,7 +424,7 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
             <>
               {/* Progress bar */}
               {(() => {
-                const allActions = chantierData.projects.flatMap(p => p.actions);
+                const allActions = chantierData.projects.flatMap(p => p.actions).concat(chantierData.orphans || []);
                 const progressCounts = {};
                 Object.keys(PROGRESS).forEach(k => { progressCounts[k] = 0; });
                 allActions.forEach(a => { const s = a.statutObjectif || 'non démarré'; progressCounts[s] = (progressCounts[s] || 0) + 1; });
@@ -392,10 +451,11 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
                   </div>
                 );
               })()}
-              <StatsBar projects={chantierData.projects} parkingLot={chantierData.parkingLot} darkMode={darkMode} />
+              <StatsBar projects={chantierData.projects} parkingLot={chantierData.parkingLot} orphans={chantierData.orphans} darkMode={darkMode} />
               {chantierData.projects.map((p) => (
                 <ProjectCard key={p.id} project={p} darkMode={darkMode} />
               ))}
+              <OrphanActions items={chantierData.orphans} darkMode={darkMode} />
               <ParkingLot items={chantierData.parkingLot} darkMode={darkMode} />
             </>
           ) : (
