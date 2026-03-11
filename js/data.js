@@ -65,7 +65,8 @@ function buildGouvernanceFromCSV(rows) {
       { id: 'comite-sci', name: 'Comité scientifique', responsables: [] },
       { id: 'comite-avis', name: 'Comité aviseur', responsables: [] },
       { id: 'comite-etud', name: 'Comité étudiants', responsables: [] },
-      { id: 'communaute-cit', name: 'Communauté citoyenne', responsables: [] },
+      { id: 'comite-cit', name: 'Comité citoyen', responsables: [] },
+      { id: 'patients-part', name: 'Patients partenaires', responsables: [] },
     ],
     axes: [
       { id: 'A1', shortName: 'Axe 1', name: 'Plateformes numériques et gouvernance informationnelle', label: 'Plateformes', description: 'Générer et gérer des données de qualité et de confiance', color: '#3B82F6', responsables: [] },
@@ -91,7 +92,8 @@ function buildGouvernanceFromCSV(rows) {
     'Comité scientifique': 'comite-sci',
     'Comité aviseur': 'comite-avis',
     'Comité étudiants': 'comite-etud',
-    'Communauté citoyenne': 'communaute-cit',
+    'Comité citoyen': 'comite-cit',
+    'Patients partenaires': 'patients-part',
   };
 
   rows.forEach(row => {

@@ -170,7 +170,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
 
         <div className="relative">
           {/* ── Gouvernance boxes — top left, expand inline ── */}
-          <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110 }}>
+          <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110, maxHeight: 'calc(100vh - 130px)', overflowY: 'auto' }}>
             <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
               Gouvernance
             </div>
