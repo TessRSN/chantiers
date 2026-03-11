@@ -136,7 +136,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
           <div style={{ fontSize: 14, color: darkMode ? '#64748b' : '#9ca3af', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}>▾</div>
         </div>
         {isExpanded && (
-          <div style={{ padding: '4px 14px 24px', borderTop: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
+          <div style={{ padding: '4px 14px 24px', borderTop: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
             {count > 0 ? (
               <div>
                 <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 6, marginTop: 6 }}>
