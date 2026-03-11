@@ -2,8 +2,8 @@ Nom,Initiales,Affiliation,Role,Groupes
 Sara Ahmed,SA,McGill University,Directrice,Direction;A3;PD-EDIA;PD-ENG;Comité scientifique;Comité citoyen
 Philippe Després,PD,Université Laval,Codirecteur,Direction;A1;PD-DUR
 Aude Motulsky,AM,Université de Montréal,Codirectrice,Direction;A4;PD-CONF
-Bouchra Nasri,BN,Université de Montréal,Codirectrice,Direction;A2;CA-FORM;CA-MOB
-Martin Vallières,MV,McGill University,Codirecteur,Direction;A1;A2;CA-RENF;PD-SCI;Comité scientifique
+Bouchra Nasri,BN,Université de Montréal,Codirectrice,Direction;A2;CA-FORM;CA-MOB;Comité scientifique
+Martin Vallières,MV,McGill University,Codirecteur,Direction;A1;A2;CA-RENF;PD-SCI
 Jacques Bélair,JB,Université de Montréal,,Comité aviseur
 Franco Saliola,FS,UQAM,,Comité aviseur
 Aurélie Labbé,AL,HEC Montréal,,Comité aviseur
@@ -36,7 +36,7 @@ Holly Witteman,HW,Université Laval,Colead PD-DUR,PD-DUR
 Patrick Archambault,PA,Université Laval,Colead PD-DUR,PD-DUR;Comité scientifique
 Louis Archambault,LA,Université Laval,Colead PD-SCI,PD-SCI;Comité scientifique
 Toby Hocking,TH,Université de Sherbrooke,Colead PD-SCI,PD-SCI
-Denis Cormier-Piché,DCP,,Patient-Partenaire,Comité citoyen;Comité scientifique
-Marie-Dominique Poirier,MDP,,Patient-Partenaire,Comité citoyen;Comité scientifique
+Denis Cormier-Piché,DCP,,Patient-Partenaire,Patients partenaires;Comité citoyen;Comité scientifique
+Marie-Dominique Poirier,MDP,,Patient-Partenaire,Patients partenaires;Comité citoyen;Comité scientifique
 Doriane Etienne,DE,,,Comité étudiants
 Hakima Laribi,HL,,,Comité étudiants
