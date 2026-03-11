@@ -170,7 +170,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
 
         <div className="relative">
           {/* ── Gouvernance boxes — top left, expand inline ── */}
-          <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110, maxHeight: 'calc(100vh - 130px)', overflowY: 'auto', paddingBottom: 16 }}>
+          <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110, maxHeight: 'calc(100vh - 130px)', overflowY: 'auto' }}>
             <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
               Gouvernance
             </div>
@@ -178,6 +178,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
             {gouvernanceData.comites.map(c => (
               <GovBox key={c.id} id={c.id} name={c.name} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
             ))}
+            <div style={{ minHeight: 20, flexShrink: 0 }} />
           </div>
 
           {/* ── SVG radial diagram ── */}
