@@ -1,9 +1,9 @@
 Nom,Initiales,Affiliation,Role,Groupes
-Sara Ahmed,SA,McGill University,Directrice,Direction
-Philippe Després,PD,Université Laval,Codirecteur,Direction
-Aude Motulsky,AM,Université de Montréal,Codirectrice,Direction
-Bouchra Nasri,BN,Université de Montréal,Codirectrice,Direction
-Martin Vallières,MV,McGill University,Codirecteur,Direction
+Sara Ahmed,SA,McGill University,Directrice,Direction;A3;PD-EDIA;PD-ENG;Comité scientifique;Comité citoyen
+Philippe Després,PD,Université Laval,Codirecteur,Direction;A1;PD-DUR
+Aude Motulsky,AM,Université de Montréal,Codirectrice,Direction;A4;PD-CONF
+Bouchra Nasri,BN,Université de Montréal,Codirectrice,Direction;A2;CA-FORM;CA-MOB
+Martin Vallières,MV,McGill University,Codirecteur,Direction;A1;A2;CA-RENF;PD-SCI;Comité scientifique
 Jacques Bélair,JB,Université de Montréal,,Comité aviseur
 Franco Saliola,FS,UQAM,,Comité aviseur
 Aurélie Labbé,AL,HEC Montréal,,Comité aviseur
@@ -11,28 +11,32 @@ Robyn Tamblyn,RT,McGill University,,Comité aviseur
 Laurette Dubé,LD,McGill University,,Comité aviseur
 Alan Forster,AF,McGill University,,Comité aviseur
 Yves Joannette,YJ,Université de Montréal,,Comité aviseur
-Jean Nikiema,JN,Université de Montréal,,A1
-Robert Platt,RP,McGill University,,A1
-Morgan Craig,MC,Université de Montréal,,A2
-Audrey Durand,AD,Université Laval,,A2
-Denis Talbot,DT,Université Laval,,A2
-Alexander Baldwin,AB,McGill University,,A3
-Louis Valiquette,LV,Université de Sherbrooke,,A3
-Anmar Khadra,AK,McGill University,,A3
-Pierre-Luc Déziel,PLD,Université Laval,,A4
-Samer Faraj,SF,McGill University,,A4
-Nitika Pai,NP,McGill University,,A4;CA-FORM
-Bessam Abdulrazak,BA,Université de Sherbrooke,,CA-RENF
-Sylvie Lambert,SL,McGill University,,CA-RENF
-Celia Greenwood,CG,McGill University,,CA-FORM
-Aliki Thomas,AT,McGill University,,CA-MOB
-Tatiana Ogourtsova,TO,McGill University,,CA-MOB
-Amédé Gogovor,AG,Université Laval,,PD-EDIA
-Annabelle Cumyn,AC,Université de Sherbrooke,,PD-CONF
-Véronique Nabelsi,VN,UQO,,PD-CONF
-Susan Bartlett,SB,McGill University,,PD-ENG
-Marie-Pascale Pomey,MPP,Université de Montréal,,PD-ENG
-Holly Witteman,HW,Université Laval,,PD-DUR
-Patrick Archambault,PA,Université Laval,,PD-DUR
-Louis Archambault,LA,Université Laval,,PD-SCI
-Toby Hocking,TH,Université de Sherbrooke,,PD-SCI
+Jean Nikiema,JN,Université de Montréal,Colead A1,A1
+Robert Platt,RP,McGill University,Colead A1,A1;Comité scientifique
+Morgan Craig,MC,Université de Montréal,Colead A2,A2
+Audrey Durand,AD,Université Laval,Colead A2,A2
+Denis Talbot,DT,Université Laval,Colead A2,A2;Comité scientifique
+Alexander Baldwin,AB,McGill University,Colead A3,A3;Comité scientifique
+Louis Valiquette,LV,Université de Sherbrooke,Colead A3,A3
+Anmar Khadra,AK,McGill University,Colead A3,A3
+Pierre-Luc Déziel,PLD,Université Laval,Colead A4,A4
+Samer Faraj,SF,McGill University,Colead A4,A4
+Nitika Pai,NP,McGill University,Colead A4,A4;CA-FORM;Comité scientifique
+Bessam Abdulrazak,BA,Université de Sherbrooke,Colead CA-RENF,CA-RENF
+Sylvie Lambert,SL,McGill University,Colead PD-ENG,PD-ENG;Comité scientifique;Comité citoyen
+Celia Greenwood,CG,McGill University,Colead CA-FORM,CA-FORM;Comité scientifique
+Aliki Thomas,AT,McGill University,Colead CA-MOB,CA-MOB;Comité scientifique
+Tatiana Ogourtsova,TO,McGill University,Colead CA-MOB,CA-MOB
+Amédé Gogovor,AG,Université Laval,Colead PD-EDIA,PD-EDIA;Comité scientifique
+Karina Prévost,KP,,Colead PD-EDIA,PD-EDIA
+Annabelle Cumyn,AC,Université de Sherbrooke,Colead PD-CONF,PD-CONF
+Véronique Nabelsi,VN,UQO,Colead PD-CONF,PD-CONF;Comité scientifique
+Marie-Pascale Pomey,MPP,Université de Montréal,Colead PD-ENG,PD-ENG;Comité citoyen
+Holly Witteman,HW,Université Laval,Colead PD-DUR,PD-DUR
+Patrick Archambault,PA,Université Laval,Colead PD-DUR,PD-DUR;Comité scientifique
+Louis Archambault,LA,Université Laval,Colead PD-SCI,PD-SCI;Comité scientifique
+Toby Hocking,TH,Université de Sherbrooke,Colead PD-SCI,PD-SCI
+Denis Cormier-Piché,DCP,,Patient-Partenaire,Comité citoyen;Comité scientifique
+Marie-Dominique Poirier,MDP,,Patient-Partenaire,Comité citoyen;Comité scientifique
+Doriane Etienne,DE,,,Comité étudiants
+Hakima Laribi,HL,,,Comité étudiants
