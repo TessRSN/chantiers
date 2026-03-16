@@ -320,7 +320,9 @@ function AnalyseLegend({ darkMode }) {
 }
 
 function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
-  const [selectedId, setSelectedId] = useState(1);
+  const savedChantier = parseInt(localStorage.getItem('rsn-selected-chantier')) || 1;
+  const [selectedId, _setSelectedId] = useState(savedChantier);
+  const setSelectedId = (id) => { localStorage.setItem('rsn-selected-chantier', id); _setSelectedId(id); };
   const meta = chantiersMeta.find((c) => c.id === selectedId) || { id: selectedId, name: '...', verb: '...', totalActions: 0, analyzed: false };
   const chantierData = analyseData[selectedId];
 
