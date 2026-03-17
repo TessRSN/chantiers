@@ -28,7 +28,7 @@ function StatusBadge({ status, darkMode }) {
 function getProgressStats(analyseData, chantierId) {
   const data = analyseData[chantierId];
   if (!data) return null;
-  const allActions = data.projects.flatMap(p => p.actions).concat(data.orphans || []);
+  const allActions = data.projects.flatMap(p => p.actions);
   const counts = {};
   Object.keys(PROGRESS).forEach(k => { counts[k] = 0; });
   allActions.forEach(a => { const s = a.statutObjectif || 'non démarré'; counts[s] = (counts[s] || 0) + 1; });

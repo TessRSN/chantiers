@@ -233,10 +233,9 @@ function OrphanActions({ items, darkMode }) {
   );
 }
 
-function StatsBar({ projects, parkingLot, orphans, darkMode }) {
+function StatsBar({ projects, parkingLot, darkMode }) {
   const counts = { keep: 0, rewrite: 0, gap: 0, move: 0 };
   projects.forEach((p) => p.actions.forEach((a) => { counts[a.status]++; }));
-  if (orphans) orphans.forEach((a) => { counts[a.status] = (counts[a.status] || 0) + 1; });
   const sourceTotal = counts.keep + counts.rewrite + counts.move;
   const gapTotal = counts.gap;
 
@@ -507,7 +506,7 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
             <>
               {/* Progress bar */}
               {(() => {
-                const allActions = chantierData.projects.flatMap(p => p.actions).concat(chantierData.orphans || []);
+                const allActions = chantierData.projects.flatMap(p => p.actions);
                 const progressCounts = {};
                 Object.keys(PROGRESS).forEach(k => { progressCounts[k] = 0; });
                 allActions.forEach(a => { const s = a.statutObjectif || 'non démarré'; progressCounts[s] = (progressCounts[s] || 0) + 1; });
@@ -534,11 +533,10 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
                   </div>
                 );
               })()}
-              <StatsBar projects={chantierData.projects} parkingLot={chantierData.parkingLot} orphans={chantierData.orphans} darkMode={darkMode} />
+              <StatsBar projects={chantierData.projects} parkingLot={chantierData.parkingLot} darkMode={darkMode} />
               {chantierData.projects.map((p) => (
                 <ProjectCard key={p.id} project={p} darkMode={darkMode} />
               ))}
-              <OrphanActions items={chantierData.orphans} darkMode={darkMode} />
               <ParkingLot items={chantierData.parkingLot} darkMode={darkMode} />
             </>
           ) : (
