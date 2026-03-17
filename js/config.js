@@ -49,14 +49,14 @@ const vueGlobaleData = {
 
 // ── Statuts d'analyse ──
 const STATUS = {
-  keep:    { label: "Action source",  bg: "bg-gray-50",     border: "border-gray-200",    text: "text-gray-600",    dot: "bg-gray-400",    icon: "·",  hidden: true },
+  keep:    { label: "Action source",  bg: "bg-indigo-50",   border: "border-indigo-200",  text: "text-indigo-600",  dot: "bg-indigo-400",  icon: "·",  hidden: true },
   rewrite: { label: "À réécrire",     bg: "bg-amber-50",    border: "border-amber-300",   text: "text-amber-800",   dot: "bg-amber-500",   icon: "✏️", hidden: false },
   gap:     { label: "Gap — À créer",  bg: "bg-red-50",      border: "border-red-300",     text: "text-red-800",     dot: "bg-red-500",     icon: "🔴", hidden: false },
   move:    { label: "À déplacer",     bg: "bg-sky-50",      border: "border-sky-300",     text: "text-sky-800",     dot: "bg-sky-500",     icon: "🔀", hidden: false },
 };
 
 const STATUS_DARK = {
-  keep:    { label: "Action source",  bg: "bg-slate-800",   border: "border-slate-700",   text: "text-slate-400",   dot: "bg-slate-500",   icon: "·",  hidden: true },
+  keep:    { label: "Action source",  bg: "bg-slate-700",   border: "border-slate-600",   text: "text-slate-300",   dot: "bg-slate-400",   icon: "·",  hidden: true },
   rewrite: { label: "À réécrire",     bg: "bg-amber-950",   border: "border-amber-700",   text: "text-amber-300",  dot: "bg-amber-400",   icon: "✏️", hidden: false },
   gap:     { label: "Gap — À créer",  bg: "bg-red-950",     border: "border-red-800",     text: "text-red-300",    dot: "bg-red-400",     icon: "🔴", hidden: false },
   move:    { label: "À déplacer",     bg: "bg-sky-950",     border: "border-sky-700",     text: "text-sky-300",    dot: "bg-sky-400",     icon: "🔀", hidden: false },
