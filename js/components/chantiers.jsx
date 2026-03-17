@@ -320,11 +320,27 @@ function AnalyseLegend({ darkMode }) {
 }
 
 function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
-  const savedChantier = parseInt(localStorage.getItem('rsn-selected-chantier')) || 1;
-  const [selectedId, _setSelectedId] = useState(savedChantier);
+  const saved = localStorage.getItem('rsn-selected-chantier');
+  const [selectedId, _setSelectedId] = useState(saved === 'orphans' ? 'orphans' : (parseInt(saved) || 1));
   const setSelectedId = (id) => { localStorage.setItem('rsn-selected-chantier', id); _setSelectedId(id); };
-  const meta = chantiersMeta.find((c) => c.id === selectedId) || { id: selectedId, name: '...', verb: '...', totalActions: 0, analyzed: false };
-  const chantierData = analyseData[selectedId];
+
+  // Collect all orphans from analyzed chantiers
+  const allOrphans = useMemo(() => {
+    const result = [];
+    chantiersMeta.forEach(c => {
+      const data = analyseData[c.id];
+      if (data && data.orphans && data.orphans.length > 0) {
+        result.push({ chantierId: c.id, chantierName: c.name, orphans: data.orphans });
+      }
+    });
+    return result;
+  }, [analyseData, chantiersMeta]);
+  const totalOrphans = allOrphans.reduce((s, g) => s + g.orphans.length, 0);
+
+  const meta = selectedId === 'orphans'
+    ? { id: '✏️', name: 'Actions sans projet', verb: 'À CLARIFIER', totalActions: totalOrphans, analyzed: true }
+    : (chantiersMeta.find((c) => c.id === selectedId) || { id: selectedId, name: '...', verb: '...', totalActions: 0, analyzed: false });
+  const chantierData = selectedId === 'orphans' ? null : analyseData[selectedId];
 
   const sidebarBg = darkMode ? '#1e293b' : 'white';
   const sidebarBorder = darkMode ? '#334155' : '#e5e7eb';
@@ -397,6 +413,38 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
               </button>
             );
           })}
+          {totalOrphans > 0 && (
+            <div style={{ borderTop: `1px solid ${headerBorder}`, marginTop: 4, paddingTop: 8 }}>
+              <button
+                onClick={() => setSelectedId('orphans')}
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  marginBottom: 4,
+                  border: selectedId === 'orphans' ? "1px solid #fbbf24" : "1px solid transparent",
+                  backgroundColor: selectedId === 'orphans' ? (darkMode ? '#451a03' : '#fffbeb') : 'transparent',
+                  cursor: "pointer",
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={(e) => { if (selectedId !== 'orphans') e.currentTarget.style.backgroundColor = darkMode ? '#334155' : '#f9fafb'; }}
+                onMouseLeave={(e) => { if (selectedId !== 'orphans') e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: selectedId === 'orphans' ? '#f59e0b' : (darkMode ? '#cbd5e1' : '#374151') }}>
+                    ✏️ Actions sans projet
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#f59e0b', backgroundColor: darkMode ? '#451a03' : '#fef3c7', padding: '1px 8px', borderRadius: 10 }}>
+                    {totalOrphans}
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 4 }}>
+                  À réécrire ou réassigner
+                </div>
+              </button>
+            </div>
+          )}
         </nav>
 
         <AnalyseLegend darkMode={darkMode} />
@@ -422,7 +470,40 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
           </div>
 
           {/* Content */}
-          {chantierData ? (
+          {selectedId === 'orphans' ? (
+            <>
+              <p style={{ fontSize: 13, color: darkMode ? '#94a3b8' : '#6b7280', marginBottom: 24 }}>
+                Actions nécessitant une reformulation ou une réassignation à un projet, regroupées par chantier d'origine.
+              </p>
+              {allOrphans.map(group => (
+                <div key={group.chantierId} style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, color: darkMode ? '#f59e0b' : '#d97706', marginBottom: 8 }}>
+                    {group.chantierId}. {group.chantierName}
+                    <span style={{ fontWeight: 400, fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginLeft: 8 }}>
+                      {group.orphans.length} action{group.orphans.length > 1 ? 's' : ''}
+                    </span>
+                  </h3>
+                  {group.orphans.map(item => (
+                    <div key={item.id} className={`${darkMode ? 'bg-slate-800 border-amber-800' : 'bg-white border-amber-200'} rounded-lg border p-3 mb-2`}>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className={`font-mono text-xs font-bold ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>{item.id}</span>
+                        <StatusBadge status={item.status} darkMode={darkMode} />
+                      </div>
+                      {item.objectif !== "—" && (
+                        <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-gray-500'} italic mb-1`}>
+                          <span className={`font-medium ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>Objectif :</span> {item.objectif}
+                        </p>
+                      )}
+                      <p className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'} mb-1`}>{item.action}</p>
+                      {item.notes && (
+                        <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-700'} italic leading-relaxed`}>💬 {item.notes}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </>
+          ) : chantierData ? (
             <>
               {/* Progress bar */}
               {(() => {
