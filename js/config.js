@@ -49,17 +49,17 @@ const vueGlobaleData = {
 
 // ── Statuts d'analyse ──
 const STATUS = {
-  keep:    { label: "À garder",      bg: "bg-emerald-50",  border: "border-emerald-300", text: "text-emerald-800",  dot: "bg-emerald-500",  icon: "✅" },
-  rewrite: { label: "À réécrire",    bg: "bg-amber-50",    border: "border-amber-300",   text: "text-amber-800",   dot: "bg-amber-500",    icon: "✏️" },
-  gap:     { label: "Gap — À créer", bg: "bg-red-50",      border: "border-red-300",     text: "text-red-800",     dot: "bg-red-500",      icon: "🔴" },
-  move:    { label: "À déplacer",    bg: "bg-sky-50",      border: "border-sky-300",     text: "text-sky-800",     dot: "bg-sky-500",      icon: "🔀" },
+  keep:    { label: "Action source",  bg: "bg-gray-50",     border: "border-gray-200",    text: "text-gray-600",    dot: "bg-gray-400",    icon: "·",  hidden: true },
+  rewrite: { label: "À réécrire",     bg: "bg-amber-50",    border: "border-amber-300",   text: "text-amber-800",   dot: "bg-amber-500",   icon: "✏️", hidden: false },
+  gap:     { label: "Gap — À créer",  bg: "bg-red-50",      border: "border-red-300",     text: "text-red-800",     dot: "bg-red-500",     icon: "🔴", hidden: false },
+  move:    { label: "À déplacer",     bg: "bg-sky-50",      border: "border-sky-300",     text: "text-sky-800",     dot: "bg-sky-500",     icon: "🔀", hidden: false },
 };
 
 const STATUS_DARK = {
-  keep:    { label: "À garder",      bg: "bg-emerald-950", border: "border-emerald-700", text: "text-emerald-300", dot: "bg-emerald-400", icon: "✅" },
-  rewrite: { label: "À réécrire",    bg: "bg-amber-950",   border: "border-amber-700",   text: "text-amber-300",  dot: "bg-amber-400",   icon: "✏️" },
-  gap:     { label: "Gap — À créer", bg: "bg-red-950",     border: "border-red-800",     text: "text-red-300",    dot: "bg-red-400",     icon: "🔴" },
-  move:    { label: "À déplacer",    bg: "bg-sky-950",     border: "border-sky-700",     text: "text-sky-300",    dot: "bg-sky-400",     icon: "🔀" },
+  keep:    { label: "Action source",  bg: "bg-slate-800",   border: "border-slate-700",   text: "text-slate-400",   dot: "bg-slate-500",   icon: "·",  hidden: true },
+  rewrite: { label: "À réécrire",     bg: "bg-amber-950",   border: "border-amber-700",   text: "text-amber-300",  dot: "bg-amber-400",   icon: "✏️", hidden: false },
+  gap:     { label: "Gap — À créer",  bg: "bg-red-950",     border: "border-red-800",     text: "text-red-300",    dot: "bg-red-400",     icon: "🔴", hidden: false },
+  move:    { label: "À déplacer",     bg: "bg-sky-950",     border: "border-sky-700",     text: "text-sky-300",    dot: "bg-sky-400",     icon: "🔀", hidden: false },
 };
 
 const getS = (status, darkMode) => darkMode ? STATUS_DARK[status] : STATUS[status];

@@ -73,7 +73,7 @@ function ProjectCard({ project, darkMode }) {
               <p className={`text-xs ${descColor} mt-1 leading-relaxed pr-4`}>{project.description}</p>
             )}
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {Object.entries(counts).map(([status, count]) => {
+              {Object.entries(counts).filter(([status]) => !getS(status, darkMode).hidden).map(([status, count]) => {
                 const s = getS(status, darkMode);
                 return (
                   <span key={status} className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${s.bg} ${s.border} ${s.text}`}>
@@ -255,7 +255,7 @@ function StatsBar({ projects, parkingLot, darkMode }) {
 
   return (
     <div className="flex flex-wrap gap-2 mb-6">
-      {["keep", "rewrite", "move"].map((status) => {
+      {["rewrite", "move"].map((status) => {
         const s = getS(status, darkMode);
         return (
           <div key={status} className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${s.bg} ${s.border}`}>
@@ -294,7 +294,7 @@ function AnalyseLegend({ darkMode }) {
     <div style={{ padding: "12px 16px", borderTop: `1px solid ${borderColor}` }}>
       <p style={{ fontSize: 11, fontWeight: 600, color: textColor, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: '0 0 8px 0' }}>Analyse</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {Object.values(STATUS).map((s) => (
+        {Object.values(STATUS).filter(s => !s.hidden).map((s) => (
           <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 10 }}>{s.icon}</span>
             <span style={{ fontSize: 12, color: labelColor }}>{s.label}</span>
