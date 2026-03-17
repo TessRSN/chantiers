@@ -56,7 +56,7 @@ const STATUS = {
 };
 
 const STATUS_DARK = {
-  keep:    { label: "Action source",  bg: "bg-slate-700",   border: "border-slate-600",   text: "text-slate-300",   dot: "bg-slate-400",   icon: "·",  hidden: true },
+  keep:    { label: "Action source",  bg: "bg-slate-700",   border: "border-slate-600",   text: "text-slate-100",   dot: "bg-slate-400",   icon: "·",  hidden: true },
   rewrite: { label: "À réécrire",     bg: "bg-amber-950",   border: "border-amber-700",   text: "text-amber-300",  dot: "bg-amber-400",   icon: "✏️", hidden: false },
   gap:     { label: "Gap — À créer",  bg: "bg-red-950",     border: "border-red-800",     text: "text-red-300",    dot: "bg-red-400",     icon: "🔴", hidden: false },
   move:    { label: "À déplacer",     bg: "bg-sky-950",     border: "border-sky-700",     text: "text-sky-300",    dot: "bg-sky-400",     icon: "🔀", hidden: false },
