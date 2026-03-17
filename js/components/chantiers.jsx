@@ -472,33 +472,23 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
           {selectedId === 'orphans' ? (
             <>
               <p style={{ fontSize: 13, color: darkMode ? '#94a3b8' : '#6b7280', marginBottom: 24 }}>
-                Actions nécessitant une reformulation ou une réassignation à un projet, regroupées par chantier d'origine.
+                Actions nécessitant une reformulation ou une réassignation à un projet.
               </p>
-              {allOrphans.map(group => (
-                <div key={group.chantierId} style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, color: darkMode ? '#f59e0b' : '#d97706', marginBottom: 8 }}>
-                    {group.chantierId}. {group.chantierName}
-                    <span style={{ fontWeight: 400, fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginLeft: 8 }}>
-                      {group.orphans.length} action{group.orphans.length > 1 ? 's' : ''}
-                    </span>
-                  </h3>
-                  {group.orphans.map(item => (
-                    <div key={item.id} className={`${darkMode ? 'bg-slate-800 border-amber-800' : 'bg-white border-amber-200'} rounded-lg border p-3 mb-2`}>
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className={`font-mono text-xs font-bold ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>{item.id}</span>
-                        <StatusBadge status={item.status} darkMode={darkMode} />
-                      </div>
-                      {item.objectif !== "—" && (
-                        <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-gray-500'} italic mb-1`}>
-                          <span className={`font-medium ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>Objectif :</span> {item.objectif}
-                        </p>
-                      )}
-                      <p className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'} mb-1`}>{item.action}</p>
-                      {item.notes && (
-                        <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-700'} italic leading-relaxed`}>💬 {item.notes}</p>
-                      )}
-                    </div>
-                  ))}
+              {allOrphans.flatMap(g => g.orphans).map(item => (
+                <div key={item.id} className={`${darkMode ? 'bg-slate-800 border-amber-800' : 'bg-white border-amber-200'} rounded-lg border p-3 mb-2`}>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className={`font-mono text-xs font-bold ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>{item.id}</span>
+                    <StatusBadge status={item.status} darkMode={darkMode} />
+                  </div>
+                  {item.objectif !== "—" && (
+                    <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-gray-500'} italic mb-1`}>
+                      <span className={`font-medium ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>Objectif :</span> {item.objectif}
+                    </p>
+                  )}
+                  <p className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-gray-800'} mb-1`}>{item.action}</p>
+                  {item.notes && (
+                    <p className={`text-xs ${darkMode ? 'text-amber-400' : 'text-amber-700'} italic leading-relaxed`}>💬 {item.notes}</p>
+                  )}
                 </div>
               ))}
             </>
