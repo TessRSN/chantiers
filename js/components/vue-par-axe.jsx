@@ -875,12 +875,14 @@ function VueParAxe({ darkMode, allActions, selectedEntityId, onEntityChange }) {
     }}>
       <div style={{ maxWidth: 1320, margin: '0 auto' }}>
 
-        {/* En-tête + sélecteur */}
+        {/* En-tête + sélecteur + barre de progression */}
         <div style={{
           background: cardBg, border: `1px solid ${cardBorder}`,
           borderRadius: 10, padding: 16, marginBottom: 20,
-          display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+          display: 'flex', flexDirection: 'column', gap: 14,
         }}>
+          {/* Ligne 1 : ID + nom + sélecteur */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <div style={{
             minWidth: 44, height: 44, borderRadius: 8,
             padding: '0 14px',
@@ -936,6 +938,55 @@ function VueParAxe({ darkMode, allActions, selectedEntityId, onEntityChange }) {
               </optgroup>
             </select>
           </div>
+          </div>
+          {/* Ligne 2 : barre de progression des actions de l'entité */}
+          {(() => {
+            const allEntityActions = [...((data && data.sousObjList) || []), ...((data && data.extActions) || [])];
+            const counts = { 'terminé': 0, 'en cours': 0, 'non démarré': 0 };
+            allEntityActions.forEach(a => {
+              const s = (a.statut || a.statutObjectif || 'non démarré');
+              if (counts[s] !== undefined) counts[s] += 1;
+            });
+            const total = allEntityActions.length;
+            if (total === 0) return null;
+            const segments = [
+              { key: 'terminé',     label: 'terminé',     count: counts['terminé'],     color: '#22c55e' },
+              { key: 'en cours',    label: 'en cours',    count: counts['en cours'],    color: '#f59e0b' },
+              { key: 'non démarré', label: 'non démarré', count: counts['non démarré'], color: darkMode ? '#334155' : '#d1d5db' },
+            ];
+            return (
+              <div>
+                <div style={{
+                  display: 'flex', borderRadius: 8, overflow: 'hidden', height: 10,
+                  background: darkMode ? '#1e293b' : '#f3f4f6',
+                }}>
+                  {segments.map(s => s.count > 0 && (
+                    <div key={s.key} style={{
+                      width: `${(s.count / total) * 100}%`,
+                      backgroundColor: s.color,
+                      transition: 'width 0.3s ease',
+                    }} title={`${s.label} : ${s.count}`} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 18, marginTop: 8, flexWrap: 'wrap' }}>
+                  {segments.map(s => (
+                    <span key={s.key} style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      fontSize: 12, color: s.count > 0 ? s.color : (darkMode ? '#64748b' : '#9ca3af'),
+                      fontWeight: 600,
+                    }}>
+                      <span style={{
+                        width: 9, height: 9, borderRadius: '50%',
+                        backgroundColor: s.color, display: 'inline-block',
+                        opacity: s.count > 0 ? 1 : 0.5,
+                      }} />
+                      {s.count} {s.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Diagramme Sankey */}
