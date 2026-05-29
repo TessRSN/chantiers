@@ -1,17 +1,75 @@
+// Hash routing avec sous-mode et query params
+//   #structure  →  { tab: 'structure' }
+//   #vue-globale  →  { tab: 'vue-globale', subMode: null, params: {} }
+//   #vue-globale/par-axe  →  { tab: 'vue-globale', subMode: 'par-axe', params: {} }
+//   #vue-globale/par-axe?entite=A2  →  { tab: 'vue-globale', subMode: 'par-axe', params: {entite: 'A2'} }
+function parseHash(rawHash) {
+  const cleaned = (rawHash || '').replace(/^#/, '');
+  const [pathPart, queryPart] = cleaned.split('?');
+  const segments = pathPart.split('/').filter(Boolean);
+  const params = {};
+  if (queryPart) {
+    queryPart.split('&').forEach(kv => {
+      const [k, ...rest] = kv.split('=');
+      if (k) params[k] = decodeURIComponent(rest.join('=') || '');
+    });
+  }
+  return { tab: segments[0] || '', subMode: segments[1] || null, params };
+}
+
+function buildHash(tab, subMode, params) {
+  let hash = tab;
+  if (subMode) hash += '/' + subMode;
+  if (params) {
+    const qs = Object.entries(params)
+      .filter(([_, v]) => v != null && v !== '')
+      .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+      .join('&');
+    if (qs) hash += '?' + qs;
+  }
+  return hash;
+}
+
 function MainApp() {
   const [darkMode, setDarkMode] = useState(true);
   const validTabs = ['structure', 'vue-globale', 'analyse', 'suivi'];
-  const tabFromHash = window.location.hash.slice(1);
+
+  const initial = parseHash(window.location.hash);
   const [activeTab, setActiveTab] = useState(
-    validTabs.includes(tabFromHash) ? tabFromHash : 'structure'
+    validTabs.includes(initial.tab) ? initial.tab : 'structure'
   );
+  // État sous-mode de "Vue globale" : 'ensemble' (radial) ou 'par-axe'
+  const [vueMode, setVueMode] = useState(
+    initial.tab === 'vue-globale' && initial.subMode === 'par-axe' ? 'par-axe' : 'ensemble'
+  );
+  // Entité sélectionnée en mode "Par axe"
+  const [vueEntityId, setVueEntityId] = useState(initial.params.entite || 'A1');
 
-  useEffect(() => { window.location.hash = activeTab; }, [activeTab]);
+  // Sync state → URL hash
+  useEffect(() => {
+    let subMode = null;
+    let params = {};
+    if (activeTab === 'vue-globale') {
+      if (vueMode === 'par-axe') {
+        subMode = 'par-axe';
+        params = { entite: vueEntityId };
+      }
+    }
+    const newHash = buildHash(activeTab, subMode, params);
+    if (newHash !== window.location.hash.replace(/^#/, '')) {
+      window.location.hash = newHash;
+    }
+  }, [activeTab, vueMode, vueEntityId]);
 
+  // Sync URL hash → state (back/forward navigation)
   useEffect(() => {
     const onHash = () => {
-      const t = window.location.hash.slice(1);
-      if (validTabs.includes(t)) setActiveTab(t);
+      const p = parseHash(window.location.hash);
+      if (validTabs.includes(p.tab)) setActiveTab(p.tab);
+      if (p.tab === 'vue-globale') {
+        setVueMode(p.subMode === 'par-axe' ? 'par-axe' : 'ensemble');
+        if (p.params.entite) setVueEntityId(p.params.entite);
+      }
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
@@ -22,6 +80,8 @@ function MainApp() {
   const [analyseData, setAnalyseData] = useState({});
   const [chantiersMeta, setChantiersMeta] = useState([]);
   const [gouvernanceData, setGouvernanceData] = useState(null);
+  // Toutes les lignes brutes (incluant EXT-* et GAP-* non approuvées) — pour le mode "Par axe"
+  const [allActions, setAllActions] = useState([]);
 
   useEffect(() => {
     Promise.all([
@@ -31,9 +91,12 @@ function MainApp() {
         const rows = parseCSV(dataText);
         const allRows = csvRowsToAllData(rows);
 
-        // Vue globale : seulement les actions approuvées
+        // Vue globale (radial) : seulement les actions approuvées
         const approvedActions = allRows.filter(r => r.approuve !== 'non');
         vueGlobaleData.actions = approvedActions;
+
+        // Vue "Par axe" : on garde toutes les lignes pour pouvoir afficher EXT-*
+        setAllActions(allRows);
 
         // Analyse : toutes les lignes (y compris GAPs non approuvés)
         const ad = buildAnalyseData(allRows);
@@ -188,7 +251,16 @@ function MainApp() {
         </div>
       )}
       {!csvLoading && !csvError && activeTab === 'structure' && gouvernanceData && <StructureGouvernance darkMode={darkMode} gouvernanceData={gouvernanceData} />}
-      {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
+      {!csvLoading && !csvError && activeTab === 'vue-globale' && (
+        <VueGlobaleTab
+          darkMode={darkMode}
+          allActions={allActions}
+          vueMode={vueMode}
+          vueEntityId={vueEntityId}
+          onModeChange={setVueMode}
+          onEntityChange={setVueEntityId}
+        />
+      )}
       {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} analyseData={analyseData} chantiersMeta={chantiersMeta} />}
       {!csvLoading && !csvError && activeTab === 'suivi' && <SuiviObjectifs darkMode={darkMode} actions={vueGlobaleData.actions} />}
     </div>

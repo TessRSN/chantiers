@@ -1,3 +1,66 @@
+// ── Wrapper : tab "Vue globale" avec sélecteur de mode (Vue d'ensemble / Par axe) ──
+function VueGlobaleTab({ darkMode, allActions, vueMode, vueEntityId, onModeChange, onEntityChange }) {
+  const tabBg = darkMode ? '#0f172a' : '#f8fafc';
+  const buttonGroupBg = darkMode ? '#1e293b' : '#ffffff';
+  const buttonGroupBorder = darkMode ? '#334155' : '#e5e7eb';
+  const activeText = darkMode ? '#e2e8f0' : '#111827';
+  const inactiveText = darkMode ? '#94a3b8' : '#6b7280';
+  const activeBg = darkMode ? '#334155' : '#f3f4f6';
+
+  const modes = [
+    { id: 'ensemble', label: "Vue d'ensemble", icon: '◯' },
+    { id: 'par-axe',  label: 'Par axe / PD / champ', icon: '→' },
+  ];
+
+  return (
+    <div style={{ background: tabBg, minHeight: 'calc(100vh - 60px)', position: 'relative' }}>
+      {/* Bouton mode — flottant en haut à droite, ne rogne rien */}
+      <div style={{
+        position: 'absolute', top: 10, right: 16, zIndex: 50,
+        display: 'inline-flex', alignItems: 'center',
+        background: buttonGroupBg, border: `1px solid ${buttonGroupBorder}`,
+        borderRadius: 20, padding: 3, gap: 2,
+        boxShadow: darkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.08)',
+      }}>
+        {modes.map(m => {
+          const active = vueMode === m.id;
+          return (
+            <button
+              key={m.id}
+              onClick={() => onModeChange && onModeChange(m.id)}
+              title={m.label}
+              style={{
+                padding: '4px 12px', borderRadius: 16, border: 'none',
+                background: active ? activeBg : 'transparent',
+                color: active ? activeText : inactiveText,
+                fontSize: 11.5, fontWeight: active ? 600 : 500,
+                cursor: 'pointer', transition: 'all 0.15s',
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span style={{ opacity: 0.75, fontSize: 12 }}>{m.icon}</span>
+              {m.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Contenu selon le mode */}
+      {vueMode === 'par-axe' ? (
+        <VueParAxe
+          darkMode={darkMode}
+          allActions={allActions}
+          selectedEntityId={vueEntityId}
+          onEntityChange={onEntityChange}
+        />
+      ) : (
+        <RSNRadialGraph darkMode={darkMode} />
+      )}
+    </div>
+  );
+}
+
 function RSNRadialGraph({ darkMode }) {
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredConnection, setHoveredConnection] = useState(null);
