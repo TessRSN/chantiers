@@ -727,8 +727,11 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                 <div
                   key={a.id}
                   style={{
-                    background: cardBg, border: `1px solid ${hl ? entity.color : cardBorder}`,
-                    borderLeftWidth: 3, borderLeftColor: statusObj.color,
+                    background: cardBg,
+                    borderTop:    `1px solid ${hl ? entity.color : cardBorder}`,
+                    borderRight:  `1px solid ${hl ? entity.color : cardBorder}`,
+                    borderBottom: `1px solid ${hl ? entity.color : cardBorder}`,
+                    borderLeft:   `3px solid ${statusObj.color}`,
                     borderRadius: 6, padding: '8px 12px',
                     display: 'flex', alignItems: 'flex-start', gap: 10,
                     transition: 'border-color 0.2s, transform 0.15s',
@@ -782,8 +785,11 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
               const statusObj = PROGRESS[a.statutObjectif || 'non démarré'];
               return (
                 <div key={a.id} style={{
-                  background: cardBg, border: `1px solid ${cardBorder}`,
-                  borderLeftWidth: 3, borderLeftColor: statusObj.color,
+                  background: cardBg,
+                  borderTop:    `1px solid ${cardBorder}`,
+                  borderRight:  `1px solid ${cardBorder}`,
+                  borderBottom: `1px solid ${cardBorder}`,
+                  borderLeft:   `3px solid ${statusObj.color}`,
                   borderRadius: 6, padding: '8px 12px',
                   display: 'flex', alignItems: 'flex-start', gap: 10,
                 }}>
@@ -893,26 +899,43 @@ function VueParAxe({ darkMode, allActions, selectedEntityId, onEntityChange }) {
               {entity.type === 'axe' ? 'Axe thématique' : entity.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
             </div>
           </div>
-          <select
-            value={entity.id}
-            onChange={(e) => onEntityChange && onEntityChange(e.target.value)}
-            style={{
-              padding: '8px 12px', borderRadius: 6,
-              background: darkMode ? '#0f172a' : '#ffffff',
-              color: textPrimary, border: `1px solid ${cardBorder}`,
-              fontSize: 13, cursor: 'pointer', minWidth: 220,
-            }}
-          >
-            <optgroup label="Axes thématiques">
-              {axes.map(a => <option key={a.id} value={a.id}>{a.fullName || a.name}</option>)}
-            </optgroup>
-            <optgroup label="Principes directeurs">
-              {principes.map(p => <option key={p.id} value={p.id}>{p.fullName || p.name}</option>)}
-            </optgroup>
-            <optgroup label="Champs d'action">
-              {champs.map(c => <option key={c.id} value={c.id}>{c.fullName || c.name}</option>)}
-            </optgroup>
-          </select>
+          <div style={{
+            display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-start',
+          }}>
+            <label htmlFor="entity-select" style={{
+              fontSize: 10, fontWeight: 700, color: '#6366f1',
+              textTransform: 'uppercase', letterSpacing: '0.08em',
+              display: 'flex', alignItems: 'center', gap: 4,
+            }}>
+              <span style={{ fontSize: 13, lineHeight: 1 }}>▾</span> Changer d'entité
+            </label>
+            <select
+              id="entity-select"
+              value={entity.id}
+              onChange={(e) => onEntityChange && onEntityChange(e.target.value)}
+              style={{
+                padding: '10px 14px', borderRadius: 8,
+                background: darkMode ? '#1e1b4b' : '#eef2ff',
+                color: textPrimary,
+                border: `2px solid ${darkMode ? '#6366f1' : '#818cf8'}`,
+                fontSize: 13.5, fontWeight: 600,
+                cursor: 'pointer', minWidth: 240,
+                boxShadow: darkMode ? '0 0 0 1px rgba(99,102,241,0.3)' : '0 1px 3px rgba(99,102,241,0.18)',
+                outline: 'none',
+                appearance: 'menulist',
+              }}
+            >
+              <optgroup label="Axes thématiques">
+                {axes.map(a => <option key={a.id} value={a.id}>{a.fullName || a.name}</option>)}
+              </optgroup>
+              <optgroup label="Principes directeurs">
+                {principes.map(p => <option key={p.id} value={p.id}>{p.fullName || p.name}</option>)}
+              </optgroup>
+              <optgroup label="Champs d'action">
+                {champs.map(c => <option key={c.id} value={c.id}>{c.fullName || c.name}</option>)}
+              </optgroup>
+            </select>
+          </div>
         </div>
 
         {/* Diagramme Sankey */}

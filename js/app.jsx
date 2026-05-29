@@ -1,8 +1,8 @@
-// Hash routing avec sous-mode et query params
-//   #structure  →  { tab: 'structure' }
-//   #vue-globale  →  { tab: 'vue-globale', subMode: null, params: {} }
-//   #vue-globale/par-axe  →  { tab: 'vue-globale', subMode: 'par-axe', params: {} }
-//   #vue-globale/par-axe?entite=A2  →  { tab: 'vue-globale', subMode: 'par-axe', params: {entite: 'A2'} }
+// Hash routing avec sous-mode (legacy) et query params
+//   #structure                           →  { tab: 'structure' }
+//   #vue-globale                         →  { tab: 'vue-globale' }
+//   #par-axe?entite=A2                   →  { tab: 'par-axe', params: {entite: 'A2'} }
+//   #vue-globale/par-axe?entite=A2 (legacy) →  migré vers #par-axe?entite=A2
 function parseHash(rawHash) {
   const cleaned = (rawHash || '').replace(/^#/, '');
   const [pathPart, queryPart] = cleaned.split('?');
@@ -17,9 +17,8 @@ function parseHash(rawHash) {
   return { tab: segments[0] || '', subMode: segments[1] || null, params };
 }
 
-function buildHash(tab, subMode, params) {
+function buildHash(tab, params) {
   let hash = tab;
-  if (subMode) hash += '/' + subMode;
   if (params) {
     const qs = Object.entries(params)
       .filter(([_, v]) => v != null && v !== '')
@@ -30,46 +29,44 @@ function buildHash(tab, subMode, params) {
   return hash;
 }
 
+// Backward compat : ancien lien #vue-globale/par-axe?entite=X → nouveau #par-axe?entite=X
+function migrateLegacyHash(p) {
+  if (p.tab === 'vue-globale' && p.subMode === 'par-axe') {
+    return { tab: 'par-axe', subMode: null, params: p.params };
+  }
+  return p;
+}
+
 function MainApp() {
   const [darkMode, setDarkMode] = useState(true);
-  const validTabs = ['structure', 'vue-globale', 'analyse', 'suivi'];
+  const validTabs = ['structure', 'vue-globale', 'par-axe', 'analyse', 'suivi'];
 
-  const initial = parseHash(window.location.hash);
+  const initialRaw = parseHash(window.location.hash);
+  const initial = migrateLegacyHash(initialRaw);
   const [activeTab, setActiveTab] = useState(
     validTabs.includes(initial.tab) ? initial.tab : 'structure'
   );
-  // État sous-mode de "Vue globale" : 'ensemble' (radial) ou 'par-axe'
-  const [vueMode, setVueMode] = useState(
-    initial.tab === 'vue-globale' && initial.subMode === 'par-axe' ? 'par-axe' : 'ensemble'
-  );
-  // Entité sélectionnée en mode "Par axe"
+  // Entité sélectionnée pour l'onglet « Par axe »
   const [vueEntityId, setVueEntityId] = useState(initial.params.entite || 'A1');
 
   // Sync state → URL hash
   useEffect(() => {
-    let subMode = null;
     let params = {};
-    if (activeTab === 'vue-globale') {
-      if (vueMode === 'par-axe') {
-        subMode = 'par-axe';
-        params = { entite: vueEntityId };
-      }
+    if (activeTab === 'par-axe') {
+      params = { entite: vueEntityId };
     }
-    const newHash = buildHash(activeTab, subMode, params);
+    const newHash = buildHash(activeTab, params);
     if (newHash !== window.location.hash.replace(/^#/, '')) {
       window.location.hash = newHash;
     }
-  }, [activeTab, vueMode, vueEntityId]);
+  }, [activeTab, vueEntityId]);
 
-  // Sync URL hash → state (back/forward navigation)
+  // Sync URL hash → state (back/forward navigation + ancien lien migré)
   useEffect(() => {
     const onHash = () => {
-      const p = parseHash(window.location.hash);
+      const p = migrateLegacyHash(parseHash(window.location.hash));
       if (validTabs.includes(p.tab)) setActiveTab(p.tab);
-      if (p.tab === 'vue-globale') {
-        setVueMode(p.subMode === 'par-axe' ? 'par-axe' : 'ensemble');
-        if (p.params.entite) setVueEntityId(p.params.entite);
-      }
+      if (p.tab === 'par-axe' && p.params.entite) setVueEntityId(p.params.entite);
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
@@ -115,6 +112,7 @@ function MainApp() {
   const tabs = [
     { id: 'structure',   label: 'Structure & Gouvernance', icon: 'structure' },
     { id: 'vue-globale', label: 'Vue globale', icon: 'vue-globale' },
+    { id: 'par-axe',     label: 'Vue par axe', icon: 'par-axe' },
     { id: 'analyse',     label: 'Analyse des chantiers', icon: 'analyse' },
     { id: 'suivi',       label: 'Suivi des objectifs', icon: 'suivi' },
   ];
@@ -178,6 +176,16 @@ function MainApp() {
                     <line x1="8" y1="8" x2="8" y2="2" /><line x1="8" y1="8" x2="13" y2="5.5" />
                     <line x1="8" y1="8" x2="13" y2="11" /><line x1="8" y1="8" x2="8" y2="14" />
                     <line x1="8" y1="8" x2="3" y2="11" /><line x1="8" y1="8" x2="3" y2="5.5" />
+                  </>)}
+                  {tab.icon === 'par-axe' && (<>
+                    {/* Sankey-ish : noeud à gauche → 3 blocs à droite */}
+                    <circle cx="2.5" cy="8" r="1.6" fill="currentColor" stroke="none" />
+                    <rect x="10" y="2"  width="4.5" height="3" rx="0.5" fill="currentColor" stroke="none" />
+                    <rect x="10" y="6.5" width="4.5" height="3" rx="0.5" fill="currentColor" stroke="none" />
+                    <rect x="10" y="11"  width="4.5" height="3" rx="0.5" fill="currentColor" stroke="none" />
+                    <path d="M4 8 Q 7 3.5, 10 3.5" />
+                    <path d="M4 8 L 10 8" />
+                    <path d="M4 8 Q 7 12.5, 10 12.5" />
                   </>)}
                   {tab.icon === 'analyse' && (<>
                     <rect x="2" y="7" width="3" height="7" rx="0.5" fill="currentColor" stroke="none" />
@@ -251,13 +259,12 @@ function MainApp() {
         </div>
       )}
       {!csvLoading && !csvError && activeTab === 'structure' && gouvernanceData && <StructureGouvernance darkMode={darkMode} gouvernanceData={gouvernanceData} />}
-      {!csvLoading && !csvError && activeTab === 'vue-globale' && (
-        <VueGlobaleTab
+      {!csvLoading && !csvError && activeTab === 'vue-globale' && <RSNRadialGraph darkMode={darkMode} />}
+      {!csvLoading && !csvError && activeTab === 'par-axe' && (
+        <VueParAxe
           darkMode={darkMode}
           allActions={allActions}
-          vueMode={vueMode}
-          vueEntityId={vueEntityId}
-          onModeChange={setVueMode}
+          selectedEntityId={vueEntityId}
           onEntityChange={setVueEntityId}
         />
       )}
