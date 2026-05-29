@@ -3,3 +3,9 @@
 *.pptx
 .DS_Store
 Thumbs.db
+
+# Workspace de brainstorming visuel (mockups, sessions)
+.superpowers/
+
+# Workspace local Claude Code (worktrees, état de session)
+.claude/
