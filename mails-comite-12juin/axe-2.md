@@ -1,68 +1,70 @@
-# Email — Axe 2 (Modélisation et méthodes numériques)
+# Email — Axe 2 (Modélisation et méthodes numériques) — v6
 
 **Destinataires** : équipe coresponsable de l'Axe 2
-**Objet** : Axe 2 — bilan court terme & préparation du comité scientifique du 12 juin (avant le 9 juin)
+**Objet** : Axe 2 — bilan court terme & comité du 12 juin
 
 ---
 
 Bonjour à toute l'équipe coresponsable de l'Axe 2,
 
-À l'approche du **comité scientifique du 12 juin**, je prends contact avec chaque axe, champ d'action et principe directeur. **Nous arrivons en effet à la fin de la période court terme (ans 1-2) de la feuille de route**, et c'est le bon moment pour faire un point ensemble avant de basculer vers les actions à moyen terme. Cet email a donc trois objectifs :
+Pour le **comité scientifique du 12 juin**, **Bouchra Nasri** représentera l'Axe 2 et présentera vos avancées récentes.
 
-- prendre des nouvelles de l'avancement de votre feuille de route court terme,
-- vous partager comment nous voyons vos actions s'articuler avec les **chantiers transversaux** structurés à l'échelle du RSN,
-- préparer ensemble votre intervention au comité du 12 juin.
+Nous arrivons à la fin de la période court terme (ans 1-2) de la feuille de route, c'est donc le bon moment pour prendre des nouvelles avant la bascule vers le moyen terme.
 
-Petit rappel : les chantiers transversaux sont des **regroupements de livrables** qui mutualisent les actions venant de plusieurs axes et principes directeurs, pour éviter les doublons et donner plus d'impact (par exemple : un seul répertoire des expertises pour tout le RSN, un seul cadre de bonnes pratiques méthodologiques en français…).
+> **À garder en tête** : la manière dont nous avons regroupé les actions par chantier et projet est **encore préliminaire**. Votre retour critique est essentiel pour la consolider avant le moyen terme.
+
+Voici comment nous voyons vos actions s'articuler avec les chantiers transversaux du RSN :
+
+> 📸 *[Insérer ici la capture d'écran du Sankey Axe 2 — voir `axe-2.png` à côté]*
+
+🌐 **Vue interactive complète** (avec descriptions des chantiers, détails par action et regroupements proposés) :
+**https://tessrsn.github.io/chantiers/#vue-globale/par-axe?entite=A2**
+
+> *Astuce* : sur la vue interactive, cliquez sur chaque chantier pour voir ce que les autres axes y déposent — utile pour repérer les convergences possibles **et nous dire si vous trouvez un regroupement mal pensé**.
 
 ---
 
-## Ce qu'on voit avancer du côté de l'Axe 2
+## Réalisations associées portées par l'Axe 2 (hors feuille de route officielle)
 
-Corrigez-moi si je rate quelque chose. J'ai repris les 3 objectifs stratégiques de votre feuille de route court terme :
-
-### OS1 — Faciliter le maillage entre les méthodologistes et la formation de la relève
-
-- 🟡 **Cartographie des différents champs d'expertise** → alimente le chantier transversal **« Répertoire des expertises, actifs et infrastructures RSN »** : un bottin unifié des personnes, expertises, plateformes et infrastructures du réseau, avec vue géographique.
-- ⚪ **Lancer une communauté de pratique des méthodologistes** (ex. midi-conférences) → rejoindrait le chantier transversal **« Communautés de pratique et réseaux collaboratifs »** : maillage entre chercheurs et apprentissage entre pairs via des communautés thématiques.
-
-### OS2 — Colliger et harmoniser les bonnes pratiques et les rendre accessibles
-
-- ⚪ **Guide/template d'harmonisation des bonnes pratiques + identification des bonnes pratiques à formaliser + offre en français** (vos 3 actions a/b/c) → formeraient le cœur du chantier transversal **« Harmonisation des bonnes pratiques méthodologiques »** : produire un cadre commun de bonnes pratiques pour la communauté de recherche, accessible en français. **Nous proposons que ces 3 actions fusionnent en un seul livrable de projet** — elles partagent déjà le même objectif stratégique, et un livrable unique nous semble plus lisible et plus opérationnel.
-
-### OS3 — Connecter les méthodologistes aux utilisateurs de connaissances
-
-- ✅ **Activités avec partenaires (IVADO, axe Santé)** — terminé
-- ⚪ **Organiser des journal clubs** → rejoindrait le chantier transversal **« Événements organisés par le RSN »** : colloques, journées thématiques et ateliers produits ou co-produits par le réseau.
-
-### Réalisations associées portées par l'Axe 2 (hors feuille de route officielle)
+Nous avons aussi recensé ces projets externes auxquels l'Axe 2 contribue activement :
 
 - ✅ Colloque sur les méthodes quantitatives en santé
 - ✅ Hackathon santé numérique 2025
 - 🟡 Participation au semestre thématique mathématiques et santé
 - 🟡 Participation au programme FONCER-Biostat
 
+*Si nous en avons oublié ou mal qualifié, dites-le nous.*
+
 ---
 
-## Trois questions sur lesquelles votre avis nous serait précieux
+## Quatre questions — une réponse par mail suffit
 
-Une simple réponse par mail suffit, pas besoin de produire un document :
+1. **Feuille de route & regroupement préliminaire** : sur la vue interactive, les actions OS1/OS2/OS3 sont-elles encore les bonnes ? Et notre proposition de **regroupement par chantier et par projet** vous paraît-elle pertinente, ou des actions sont-elles mal placées selon vous ?
 
-1. **Bilan court terme & transition vers le moyen terme** : les actions des OS1/OS2/OS3 sont-elles encore les bonnes ? Y a-t-il des éléments à ajuster, retirer ou ajouter avant qu'on construise ensemble la suite (ans 3-5) ?
+2. **Articulation des actions OS2** : nous proposons de fusionner vos 3 actions de l'OS2 (guide/template + identification des bonnes pratiques + offre en français) en un seul livrable d'harmonisation. Êtes-vous d'accord ?
 
-2. **Articulation avec les chantiers transversaux** : la façon dont nous proposons de rattacher vos actions aux chantiers transversaux vous convient-elle ? En particulier la fusion des 3 actions de l'OS2 dans un seul livrable d'harmonisation des bonnes pratiques ?
+3. **Type de sollicitation souhaité pour la suite** : quand un sujet touche votre périmètre méthodologique, comment voulez-vous être impliqués ?
+   - [ ] **Participer à des comités de construction** (ex. cartographie R1, harmonisation G1…)
+   - [ ] **Être consultés pour avis** sur les changements importants seulement
+   - [ ] **Recevoir uniquement les communications de suivi** (pas d'engagement actif)
+   - [ ] Autre : *préciser*
 
-3. **Consultations futures** : souhaitez-vous être sollicités à chaque fois qu'une nouvelle source, un nouveau projet ou un nouvel arrimage touchent votre périmètre méthodologique ? L'idée est de garder votre regard sur ce qui se construit, sans vous surcharger — un simple « oui, mais juste un avis par mail » nous suffit comme cadre.
+4. **Ressources internes** : avez-vous des personnes (étudiant·e·s, postdocs, professionnel·le·s de recherche) financées par les **fonds de Max ou autres fonds RSN** qui travaillent déjà sur certaines de ces actions / certains de ces chantiers ? Si oui, lesquelles ? L'idée est de les intégrer au mieux dans la coordination des projets transversaux pour éviter doublons et déperdition.
+
+---
+
+✅ **Bonne nouvelle** : notre analyse n'a identifié **aucune action manquante** (gap) pour votre axe — la couverture des bonnes pratiques méthodologiques est complète.
 
 ---
 
 ## Pour le comité du 12 juin
 
-Pourriez-vous ajouter **1 à 2 slides** sur ce que l'Axe 2 a avancé récemment ?
-La présentation collaborative est ici : **[LIEN À INSÉRER]**.
+Pourriez-vous préparer **1 à 2 slides** sur ce que l'Axe 2 a avancé récemment ? **La présentation sera courte (3 minutes par axe)** — l'objectif est simplement de se tenir mutuellement au courant des avancées de chacun et chacune.
+
+Présentation collaborative ici : **[LIEN À INSÉRER]**.
 Idéalement avant le **9 juin**.
 
-Si un échange de 20 minutes est plus simple que d'écrire, n'hésitez pas — je m'adapte.
+Échange de 20 minutes possible si vous préférez en discuter à l'oral.
 
 Merci à toutes et tous,
 [Votre signature]

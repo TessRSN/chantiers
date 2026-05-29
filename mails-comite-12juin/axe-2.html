@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Mail Axe 2 — comité scientifique 12 juin</title>
+<title>Mail Axe 2 — v5 (avec Sankey, EXT, et 4 questions) — comité scientifique 12 juin</title>
 <style>
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -37,98 +37,168 @@
     margin: 32px 0;
   }
   h2 {
-    font-size: 17px;
+    font-size: 16px;
     color: #111827;
     margin-top: 28px;
     margin-bottom: 12px;
     padding-bottom: 4px;
     border-bottom: 1px solid #e5e7eb;
   }
-  h3 {
-    font-size: 15px;
-    color: #1f2937;
-    margin-top: 22px;
-    margin-bottom: 8px;
+  ol li { margin-bottom: 16px; }
+  ol li ul { margin-top: 8px; list-style: none; padding-left: 0; }
+  ol li ul li { margin-bottom: 4px; padding-left: 2px; }
+  .checkbox { display: inline-block; width: 14px; height: 14px; border: 1px solid #6b7280; border-radius: 3px; margin-right: 8px; vertical-align: middle; }
+  .cta {
+    display: inline-block;
+    background: #2563eb;
+    color: white !important;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 8px 0;
   }
-  ul { padding-left: 22px; margin: 8px 0; }
-  li { margin-bottom: 8px; }
-  .emoji { font-size: 15px; }
-  ol li { margin-bottom: 14px; }
+  .sankey-wrap {
+    margin: 20px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    background: #f9fafb;
+    text-align: center;
+  }
+  .sankey-wrap img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+  }
+  .sankey-caption {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 8px;
+    font-style: italic;
+  }
+  .good-news {
+    background: #d1fae5;
+    border-left: 3px solid #10b981;
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 4px;
+    font-size: 13.5px;
+  }
+  .note-preliminaire {
+    background: #fef3c7;
+    border-left: 3px solid #f59e0b;
+    padding: 10px 14px;
+    margin: 16px 0;
+    border-radius: 4px;
+    font-size: 13.5px;
+  }
+  .ext-block {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+  .ext-block ul { margin: 6px 0; padding-left: 22px; }
+  .ext-block li { margin-bottom: 4px; }
   .signature { margin-top: 32px; color: #6b7280; }
+  .tip { font-size: 13px; color: #6b7280; font-style: italic; }
 </style>
 </head>
 <body>
 
 <div class="meta">
   <strong>Destinataires</strong> : équipe coresponsable de l'Axe 2<br>
-  <strong>Objet</strong> : Axe 2 — bilan court terme &amp; préparation du comité scientifique du 12 juin (avant le 9 juin)
+  <strong>Objet</strong> : Axe 2 — bilan court terme &amp; comité du 12 juin
 </div>
 
 <div class="copy-hint">
   📋 <strong>Pour coller dans Gmail / Outlook / Apple Mail</strong> :
-  sélectionne tout le contenu sous cette ligne (Cmd+A, puis désélectionne cet encadré si besoin), copie (Cmd+C), colle dans ton client mail (Cmd+V). Le formatage est conservé.
+  vérifie que <code>axe-2.png</code> est à côté de ce fichier HTML, puis ouvre ce HTML dans Chrome/Safari,
+  sélectionne tout (Cmd+A) et copie (Cmd+C). L'image se collera correctement avec le texte.
 </div>
 
 <hr class="start">
 
 <p>Bonjour à toute l'équipe coresponsable de l'Axe 2,</p>
 
-<p>À l'approche du <strong>comité scientifique du 12 juin</strong>, je prends contact avec chaque axe, champ d'action et principe directeur. <strong>Nous arrivons en effet à la fin de la période court terme (ans 1-2) de la feuille de route</strong>, et c'est le bon moment pour faire un point ensemble avant de basculer vers les actions à moyen terme. Cet email a donc trois objectifs :</p>
+<p>Pour le <strong>comité scientifique du 12 juin</strong>, <strong>Bouchra Nasri</strong> représentera l'Axe 2 et présentera vos avancées récentes.</p>
 
-<ul>
-  <li>prendre des nouvelles de l'avancement de votre feuille de route court terme,</li>
-  <li>vous partager comment nous voyons vos actions s'articuler avec les <strong>chantiers transversaux</strong> structurés à l'échelle du RSN,</li>
-  <li>préparer ensemble votre intervention au comité du 12 juin.</li>
-</ul>
+<p>Nous arrivons à la fin de la période court terme (ans 1-2) de la feuille de route, c'est donc le bon moment pour prendre des nouvelles avant la bascule vers le moyen terme.</p>
 
-<p>Petit rappel : les chantiers transversaux sont des <strong>regroupements de livrables</strong> qui mutualisent les actions venant de plusieurs axes et principes directeurs, pour éviter les doublons et donner plus d'impact (par exemple : un seul répertoire des expertises pour tout le RSN, un seul cadre de bonnes pratiques méthodologiques en français…).</p>
+<div class="note-preliminaire">
+  ⚠️ <strong>À garder en tête</strong> : la manière dont nous avons regroupé les actions par chantier et projet est <strong>encore préliminaire</strong>. Votre retour critique est essentiel pour la consolider avant le moyen terme.
+</div>
 
-<h2>Ce qu'on voit avancer du côté de l'Axe 2</h2>
+<p>Voici comment nous voyons vos actions s'articuler avec les chantiers transversaux du RSN :</p>
 
-<p>Corrigez-moi si je rate quelque chose. J'ai repris les 3 objectifs stratégiques de votre feuille de route court terme :</p>
+<div class="sankey-wrap">
+  <img src="axe-2.png" alt="Diagramme Sankey de l'Axe 2 : Entité → Objectifs stratégiques → Sous-objectifs (actions) → Chantiers transversaux">
+  <div class="sankey-caption">
+    Axe 2 → 3 objectifs stratégiques → 7 sous-objectifs (actions) → 5 chantiers transversaux du RSN
+  </div>
+</div>
 
-<h3>OS1 — Faciliter le maillage entre les méthodologistes et la formation de la relève</h3>
-<ul>
-  <li><span class="emoji">🟡</span> <strong>Cartographie des différents champs d'expertise</strong> → alimente le chantier transversal <strong>« Répertoire des expertises, actifs et infrastructures RSN »</strong> : un bottin unifié des personnes, expertises, plateformes et infrastructures du réseau, avec vue géographique.</li>
-  <li><span class="emoji">⚪</span> <strong>Lancer une communauté de pratique des méthodologistes</strong> (ex. midi-conférences) → rejoindrait le chantier transversal <strong>« Communautés de pratique et réseaux collaboratifs »</strong> : maillage entre chercheurs et apprentissage entre pairs via des communautés thématiques.</li>
-</ul>
+<p>
+  <a class="cta" href="https://tessrsn.github.io/chantiers/#vue-globale/par-axe?entite=A2">🌐 Vue interactive complète</a>
+</p>
 
-<h3>OS2 — Colliger et harmoniser les bonnes pratiques et les rendre accessibles</h3>
-<ul>
-  <li><span class="emoji">⚪</span> <strong>Guide/template d'harmonisation des bonnes pratiques + identification des bonnes pratiques à formaliser + offre en français</strong> (vos 3 actions a/b/c) → formeraient le cœur du chantier transversal <strong>« Harmonisation des bonnes pratiques méthodologiques »</strong> : produire un cadre commun de bonnes pratiques pour la communauté de recherche, accessible en français. <strong>Nous proposons que ces 3 actions fusionnent en un seul livrable de projet</strong> — elles partagent déjà le même objectif stratégique, et un livrable unique nous semble plus lisible et plus opérationnel.</li>
-</ul>
+<p class="tip">
+  <strong>Astuce</strong> : sur la vue interactive, cliquez sur chaque chantier pour voir ce que les autres axes y déposent — utile pour repérer les convergences possibles <strong>et nous dire si vous trouvez un regroupement mal pensé</strong>.
+</p>
 
-<h3>OS3 — Connecter les méthodologistes aux utilisateurs de connaissances</h3>
-<ul>
-  <li><span class="emoji">✅</span> <strong>Activités avec partenaires (IVADO, axe Santé)</strong> — terminé</li>
-  <li><span class="emoji">⚪</span> <strong>Organiser des journal clubs</strong> → rejoindrait le chantier transversal <strong>« Événements organisés par le RSN »</strong> : colloques, journées thématiques et ateliers produits ou co-produits par le réseau.</li>
-</ul>
+<div class="ext-block">
+  <strong>Réalisations associées portées par l'Axe 2 (hors feuille de route officielle)</strong> — nous avons recensé ces projets externes auxquels l'Axe 2 contribue activement :
+  <ul>
+    <li>✅ Colloque sur les méthodes quantitatives en santé</li>
+    <li>✅ Hackathon santé numérique 2025</li>
+    <li>🟡 Participation au semestre thématique mathématiques et santé</li>
+    <li>🟡 Participation au programme FONCER-Biostat</li>
+  </ul>
+  <em>Si nous en avons oublié ou mal qualifié, dites-le nous.</em>
+</div>
 
-<h3>Réalisations associées portées par l'Axe 2 (hors feuille de route officielle)</h3>
-<ul>
-  <li><span class="emoji">✅</span> Colloque sur les méthodes quantitatives en santé</li>
-  <li><span class="emoji">✅</span> Hackathon santé numérique 2025</li>
-  <li><span class="emoji">🟡</span> Participation au semestre thématique mathématiques et santé</li>
-  <li><span class="emoji">🟡</span> Participation au programme FONCER-Biostat</li>
-</ul>
+<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
 
-<h2>Trois questions sur lesquelles votre avis nous serait précieux</h2>
-
-<p>Une simple réponse par mail suffit, pas besoin de produire un document :</p>
+<h2>Quatre questions — une réponse par mail suffit</h2>
 
 <ol>
-  <li><strong>Bilan court terme &amp; transition vers le moyen terme</strong> : les actions des OS1/OS2/OS3 sont-elles encore les bonnes ? Y a-t-il des éléments à ajuster, retirer ou ajouter avant qu'on construise ensemble la suite (ans 3-5) ?</li>
-  <li><strong>Articulation avec les chantiers transversaux</strong> : la façon dont nous proposons de rattacher vos actions aux chantiers transversaux vous convient-elle ? En particulier la fusion des 3 actions de l'OS2 dans un seul livrable d'harmonisation des bonnes pratiques ?</li>
-  <li><strong>Consultations futures</strong> : souhaitez-vous être sollicités à chaque fois qu'une nouvelle source, un nouveau projet ou un nouvel arrimage touchent votre périmètre méthodologique ? L'idée est de garder votre regard sur ce qui se construit, sans vous surcharger — un simple « oui, mais juste un avis par mail » nous suffit comme cadre.</li>
+  <li>
+    <strong>Feuille de route &amp; regroupement préliminaire</strong> : sur la vue interactive, les actions OS1/OS2/OS3 sont-elles encore les bonnes ? Et notre proposition de <strong>regroupement par chantier et par projet</strong> vous paraît-elle pertinente, ou des actions sont-elles mal placées selon vous ?
+  </li>
+  <li>
+    <strong>Articulation des actions OS2</strong> : nous proposons de fusionner vos 3 actions de l'OS2 (guide/template + identification des bonnes pratiques + offre en français) en un seul livrable d'harmonisation. Êtes-vous d'accord ?
+  </li>
+  <li>
+    <strong>Type de sollicitation souhaité pour la suite</strong> : quand un sujet touche votre périmètre méthodologique, comment voulez-vous être impliqués ?
+    <ul>
+      <li><span class="checkbox"></span><strong>Participer à des comités de construction</strong> (ex. cartographie R1, harmonisation G1…)</li>
+      <li><span class="checkbox"></span><strong>Être consultés pour avis</strong> sur les changements importants seulement</li>
+      <li><span class="checkbox"></span><strong>Recevoir uniquement les communications de suivi</strong> (pas d'engagement actif)</li>
+      <li><span class="checkbox"></span>Autre : <em>préciser</em></li>
+    </ul>
+  </li>
+  <li>
+    <strong>Ressources internes</strong> : avez-vous des personnes (étudiant·e·s, postdocs, professionnel·le·s de recherche) financées par les <strong>fonds de Max ou autres fonds RSN</strong> qui travaillent déjà sur certaines de ces actions / certains de ces chantiers ? Si oui, lesquelles ? L'idée est de les intégrer au mieux dans la coordination des projets transversaux pour éviter doublons et déperdition.
+  </li>
 </ol>
+
+<div class="good-news">
+  ✅ <strong>Bonne nouvelle</strong> : notre analyse n'a identifié <strong>aucune action manquante</strong> (gap) pour votre axe — la couverture des bonnes pratiques méthodologiques est complète.
+</div>
 
 <h2>Pour le comité du 12 juin</h2>
 
-<p>Pourriez-vous ajouter <strong>1 à 2 slides</strong> sur ce que l'Axe 2 a avancé récemment ?<br>
-La présentation collaborative est ici : <strong>[LIEN À INSÉRER]</strong>.<br>
+<p>Pourriez-vous préparer <strong>1 à 2 slides</strong> sur ce que l'Axe 2 a avancé récemment ? <strong>La présentation sera courte (3 minutes par axe)</strong> — l'objectif est simplement de se tenir mutuellement au courant des avancées de chacun et chacune.</p>
+
+<p>Présentation collaborative ici : <strong>[LIEN À INSÉRER]</strong>.<br>
 Idéalement avant le <strong>9 juin</strong>.</p>
 
-<p>Si un échange de 20 minutes est plus simple que d'écrire, n'hésitez pas — je m'adapte.</p>
+<p>Échange de 20 minutes possible si vous préférez en discuter à l'oral.</p>
 
 <p class="signature">Merci à toutes et tous,<br>
 [Votre signature]</p>
