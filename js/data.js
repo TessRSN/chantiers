@@ -177,7 +177,7 @@ function buildAnalyseData(allRows) {
 // ── Construire CHANTIERS_META dynamiquement ──
 function buildChantiersMeta(allRows, analyseData) {
   const verbMap = { C1: 'PRODUIRE', C2: 'RECENSER', C3: 'CONNECTER', C4: 'FORMER', C5: 'ÉCOUTER', C6: 'CONVAINCRE', C7: 'ANIMER' };
-  const nameMap = { C1: 'Guides & Outils', C2: 'Répertoires & Cartographie', C3: 'Concertation & Maillage', C4: 'Formation & Relève', C5: 'Consultation & Écoute', C6: 'Influence & Représentation', C7: 'Événements & Rayonnement' };
+  const nameMap = { C1: 'Guides & Outils', C2: 'Répertoires & Cartographie', C3: 'Maillage et Concertation', C4: 'Formation & Relève', C5: 'Écoute et Consultation', C6: 'Influence & Représentation', C7: 'Événements & Rayonnement' };
   const chantierIdToNum = { C1: 1, C2: 2, C3: 3, C4: 4, C5: 5, C6: 6, C7: 7 };
 
   return CHANTIERS_CONFIG.map(c => {

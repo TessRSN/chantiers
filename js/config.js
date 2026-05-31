@@ -17,13 +17,13 @@ const AXES_CONFIG = [
 ];
 
 const CHANTIERS_CONFIG = [
-  { id: 'C1', name: 'Guides & Outils', verb: 'PRODUIRE', color: '#2563EB', icon: '📘' },
-  { id: 'C2', name: 'Répertoires', verb: 'RECENSER', color: '#7C3AED', icon: '🗺️' },
-  { id: 'C3', name: 'Concertation', verb: 'CONNECTER', color: '#DB2777', icon: '🤝' },
-  { id: 'C4', name: 'Formation', verb: 'FORMER', color: '#059669', icon: '🎓' },
-  { id: 'C5', name: 'Consultation', verb: 'ÉCOUTER', color: '#0891B2', icon: '👂' },
-  { id: 'C6', name: 'Influence', verb: 'CONVAINCRE', color: '#DC2626', icon: '📢' },
-  { id: 'C7', name: 'Événements', verb: 'ANIMER', color: '#D97706', icon: '🎪' },
+  { id: 'C1', name: 'Guides & Outils',           verb: 'PRODUIRE',   color: '#2563EB', icon: '📘' },
+  { id: 'C2', name: 'Répertoires',               verb: 'RECENSER',   color: '#7C3AED', icon: '🗺️' },
+  { id: 'C3', name: 'Maillage et Concertation',  verb: 'CONNECTER',  color: '#DB2777', icon: '🤝' },
+  { id: 'C4', name: 'Formation',                 verb: 'FORMER',     color: '#059669', icon: '🎓' },
+  { id: 'C5', name: 'Écoute et Consultation',    verb: 'ÉCOUTER',    color: '#0891B2', icon: '👂' },
+  { id: 'C6', name: 'Influence',                 verb: 'CONVAINCRE', color: '#DC2626', icon: '📢' },
+  { id: 'C7', name: 'Événements',                verb: 'ANIMER',     color: '#D97706', icon: '🎪' },
 ];
 
 // ── Tables de correspondance CSV → IDs internes ──
@@ -33,9 +33,11 @@ AXES_CONFIG.forEach(a => { AXE_NAME_TO_ID[a.fullName] = a.id; });
 const CHANTIER_NAME_TO_ID = {
   'Guides & Outils': 'C1',
   'Répertoires & Cartographie': 'C2',
-  'Concertation & Maillage': 'C3',
+  'Maillage et Concertation': 'C3',
+  'Concertation & Maillage': 'C3',  // backward compat
   'Formation & Relève': 'C4',
-  'Consultation & Écoute': 'C5',
+  'Écoute et Consultation': 'C5',
+  'Consultation & Écoute': 'C5',  // backward compat
   'Influence & Représentation': 'C6',
   'Événements & Rayonnement': 'C7',
 };
