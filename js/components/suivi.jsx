@@ -10,6 +10,13 @@ function SuiviObjectifs({ darkMode, actions }) {
     sectionBg: darkMode ? '#0f172a' : '#f9fafb',
   };
 
+  // Helper : extraire l'OS d'un ID action (ex: "A2-OS1-a" → "OS1")
+  const extractOSLocal = (id) => {
+    if (!id) return null;
+    const m = id.match(/-OS(\d+)/);
+    return m ? `OS${m[1]}` : null;
+  };
+
   // One card per action
   const objectifs = useMemo(() => {
     return actions.map(a => {
@@ -17,13 +24,18 @@ function SuiviObjectifs({ darkMode, actions }) {
       const chantierConfig = vueGlobaleData.chantiers.find(ch => ch.id === a.chantier);
       return {
         id: a.id,
+        os: extractOSLocal(a.id),
         texte: a.action,
         objectif: a.objectif,
         statut: a.statutObjectif || 'non démarré',
+        axeId: axeConfig?.id || a.axe,
         axe: axeConfig?.name || a.axe,
         axeColor: axeConfig?.color || '#6b7280',
         chantier: chantierConfig?.name || a.chantier,
         chantierIcon: chantierConfig?.icon || '',
+        chantierColor: chantierConfig?.color || '#6b7280',
+        projet: a.projet || '',
+        nomProjet: a.nomProjet || '',
       };
     });
   }, [actions]);
@@ -37,7 +49,9 @@ function SuiviObjectifs({ darkMode, actions }) {
       o.objectif.toLowerCase().includes(term) ||
       o.id.toLowerCase().includes(term) ||
       o.axe.toLowerCase().includes(term) ||
-      o.chantier.toLowerCase().includes(term)
+      o.chantier.toLowerCase().includes(term) ||
+      o.projet.toLowerCase().includes(term) ||
+      o.nomProjet.toLowerCase().includes(term)
     );
   }, [objectifs, searchTerm]);
 
@@ -143,28 +157,86 @@ function SuiviObjectifs({ darkMode, actions }) {
                     padding: '14px 16px',
                     display: 'flex', flexDirection: 'column', gap: 8,
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: obj.axeColor, fontFamily: 'monospace' }}>{obj.id}</span>
+                    {/* Top row : ID + OS + status */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: obj.axeColor, fontFamily: 'monospace' }}>{obj.id}</span>
+                        {obj.os && (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700,
+                            padding: '1px 6px', borderRadius: 3,
+                            background: obj.axeColor + '25', color: obj.axeColor,
+                            letterSpacing: '0.04em',
+                          }}>{obj.os}</span>
+                        )}
+                      </div>
                       <ProgressBadge statut={obj.statut} darkMode={darkMode} size="xs" />
                     </div>
+                    {/* Texte de l'action */}
                     <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937', lineHeight: 1.4 }}>
                       {obj.texte}
                     </div>
                     {obj.objectif && (
-                      <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1.3, fontStyle: 'italic' }}>
+                      <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1.35, fontStyle: 'italic' }}>
                         {obj.objectif}
                       </div>
                     )}
+                    {/* Pastilles : entité (axe/PD/CA), projet (avec chantier) */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 'auto' }}>
-                      <span style={{
-                        fontSize: 10, padding: '2px 8px', borderRadius: 10,
-                        backgroundColor: obj.axeColor + '20', color: obj.axeColor, fontWeight: 600,
-                      }}>{obj.axe}</span>
-                      <span style={{
-                        fontSize: 10, padding: '2px 8px', borderRadius: 10,
-                        backgroundColor: darkMode ? '#334155' : '#f3f4f6',
-                        color: darkMode ? '#94a3b8' : '#6b7280', fontWeight: 500,
-                      }}>{obj.chantierIcon} {obj.chantier}</span>
+                      {/* Entité */}
+                      <a
+                        href={`#par-axe?entite=${obj.axeId}`}
+                        style={{
+                          fontSize: 10, padding: '3px 9px', borderRadius: 10,
+                          backgroundColor: obj.axeColor + '20', color: obj.axeColor,
+                          fontWeight: 600, textDecoration: 'none',
+                          display: 'inline-flex', alignItems: 'center', gap: 4,
+                        }}
+                        title={`Voir la vue par axe : ${obj.axe}`}
+                      >
+                        <span style={{
+                          background: obj.axeColor, color: 'white',
+                          padding: '1px 5px', borderRadius: 6,
+                          fontSize: 9, fontWeight: 700,
+                        }}>{obj.axeId}</span>
+                        <span>{obj.axe}</span>
+                      </a>
+                      {/* Projet (avec icône chantier) — cliquable vers vue par chantier */}
+                      {obj.projet && (
+                        <a
+                          href={`#analyse?project=${encodeURIComponent(obj.projet)}`}
+                          title={obj.nomProjet ? `Aller au projet ${obj.projet} — ${obj.nomProjet}` : `Aller au projet ${obj.projet}`}
+                          style={{
+                            fontSize: 10, padding: '3px 9px', borderRadius: 10,
+                            backgroundColor: obj.chantierColor + '18',
+                            color: obj.chantierColor,
+                            fontWeight: 600, textDecoration: 'none',
+                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            border: `1px solid ${obj.chantierColor}40`,
+                            cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s',
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = `0 2px 6px ${obj.chantierColor}40`;
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.transform = 'none';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <span style={{ fontSize: 11 }}>{obj.chantierIcon}</span>
+                          <span style={{
+                            background: obj.chantierColor, color: 'white',
+                            padding: '1px 6px', borderRadius: 5,
+                            fontSize: 9, fontWeight: 700,
+                          }}>{obj.projet}</span>
+                          {obj.nomProjet && (
+                            <span style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {obj.nomProjet}
+                            </span>
+                          )}
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}

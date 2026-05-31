@@ -48,18 +48,22 @@ function MainApp() {
   );
   // Entité sélectionnée pour l'onglet « Par axe »
   const [vueEntityId, setVueEntityId] = useState(initial.params.entite || 'A1');
+  // Projet ciblé pour l'onglet « Analyse » (depuis un lien externe)
+  const [targetProject, setTargetProject] = useState(initial.params.project || null);
 
   // Sync state → URL hash
   useEffect(() => {
     let params = {};
     if (activeTab === 'par-axe') {
       params = { entite: vueEntityId };
+    } else if (activeTab === 'analyse' && targetProject) {
+      params = { project: targetProject };
     }
     const newHash = buildHash(activeTab, params);
     if (newHash !== window.location.hash.replace(/^#/, '')) {
       window.location.hash = newHash;
     }
-  }, [activeTab, vueEntityId]);
+  }, [activeTab, vueEntityId, targetProject]);
 
   // Sync URL hash → state (back/forward navigation + ancien lien migré)
   useEffect(() => {
@@ -67,6 +71,7 @@ function MainApp() {
       const p = migrateLegacyHash(parseHash(window.location.hash));
       if (validTabs.includes(p.tab)) setActiveTab(p.tab);
       if (p.tab === 'par-axe' && p.params.entite) setVueEntityId(p.params.entite);
+      if (p.tab === 'analyse') setTargetProject(p.params.project || null);
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
@@ -113,7 +118,7 @@ function MainApp() {
     { id: 'structure',   label: 'Structure & Gouvernance', icon: 'structure' },
     { id: 'vue-globale', label: 'Vue globale', icon: 'vue-globale' },
     { id: 'par-axe',     label: 'Vue par axe', icon: 'par-axe' },
-    { id: 'analyse',     label: 'Analyse des chantiers', icon: 'analyse' },
+    { id: 'analyse',     label: 'Vue par chantier', icon: 'analyse' },
     { id: 'suivi',       label: 'Suivi des objectifs', icon: 'suivi' },
   ];
 
@@ -269,7 +274,15 @@ function MainApp() {
           onEntityChange={setVueEntityId}
         />
       )}
-      {!csvLoading && !csvError && activeTab === 'analyse' && <AnalyseChantiers darkMode={darkMode} analyseData={analyseData} chantiersMeta={chantiersMeta} />}
+      {!csvLoading && !csvError && activeTab === 'analyse' && (
+        <AnalyseChantiers
+          darkMode={darkMode}
+          analyseData={analyseData}
+          chantiersMeta={chantiersMeta}
+          targetProject={targetProject}
+          onTargetProjectConsumed={() => setTargetProject(null)}
+        />
+      )}
       {!csvLoading && !csvError && activeTab === 'suivi' && <SuiviObjectifs darkMode={darkMode} actions={vueGlobaleData.actions} />}
     </div>
   );

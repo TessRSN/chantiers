@@ -199,8 +199,18 @@ function ActionRowAnalyse({ action, darkMode }) {
 }
 
 // ── Carte de sous-projet (collapsible) ──
-function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick }) {
+function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, forceOpen }) {
   const [open, setOpen] = useState(false);
+  // Auto-ouvre + scroll quand le projet est ciblé par URL
+  const rootRef = useRef(null);
+  useEffect(() => {
+    if (forceOpen) {
+      setOpen(true);
+      setTimeout(() => {
+        if (rootRef.current) rootRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }, [forceOpen]);
   const contributors = useMemo(() => getProjectContributors(project.actions), [project.actions]);
   const counts = useMemo(() => countProgressStatuses(project.actions), [project.actions]);
   const total = project.actions.length;
@@ -215,10 +225,12 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick })
   const chevronColor = darkMode ? '#64748b' : '#9ca3af';
 
   return (
-    <div style={{
-      background: cardBg, border: `1px solid ${cardBorder}`,
+    <div ref={rootRef} id={`projet-${project.id}`} style={{
+      background: cardBg, border: `1px solid ${forceOpen ? chantier.color : cardBorder}`,
       borderRadius: 10, marginBottom: 12, overflow: 'hidden',
       transition: 'border-color 0.15s',
+      scrollMarginTop: 100,
+      boxShadow: forceOpen ? `0 0 0 2px ${chantier.color}30` : 'none',
     }}>
       <button
         onClick={() => setOpen(!open)}
@@ -335,7 +347,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick })
 }
 
 // ── Section d'un chantier (carte avec contour, header + projets dedans) ──
-function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorClick }) {
+function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorClick, targetProject }) {
   const chantierConfig = CHANTIERS_CONFIG.find(c => c.id === `C${chantierMeta.id}`);
   if (!chantierConfig) return null;
 
@@ -455,6 +467,7 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
                 darkMode={darkMode}
                 chantier={chantierConfig}
                 onContributorClick={onContributorClick}
+                forceOpen={targetProject === project.id}
               />
             ))
         ) : (
@@ -471,7 +484,14 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
 }
 
 // ── Composant principal Analyse des chantiers ──
-function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
+function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject, onTargetProjectConsumed }) {
+  // Quand un projet est ciblé via URL, on consomme le paramètre après le scroll
+  useEffect(() => {
+    if (targetProject && onTargetProjectConsumed) {
+      const t = setTimeout(() => onTargetProjectConsumed(), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [targetProject, onTargetProjectConsumed]);
   // Filtrer les actions non-approuvées (EXT-*, GAP-*) pour cette vue opérationnelle
   const filteredData = useMemo(() => {
     const result = {};
@@ -593,23 +613,28 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
         </div>
       </div>
 
-      {/* ── Contenu : grille 2 colonnes ── */}
+      {/* ── Contenu : 2 colonnes en masonry (CSS columns évite les trous) ── */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{
           maxWidth: 1400, margin: '0 auto', padding: '20px 20px 60px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
-          gap: 16,
-          alignItems: 'start',
+          columnCount: 2,
+          columnGap: 16,
         }}>
           {chantiersMeta.map(c => (
-            <ChantierSection
-              key={c.id}
-              chantierMeta={c}
-              chantierData={filteredData[c.id]}
-              darkMode={darkMode}
-              onContributorClick={handleContributorClick}
-            />
+            <div key={c.id} style={{
+              breakInside: 'avoid',
+              WebkitColumnBreakInside: 'avoid',
+              pageBreakInside: 'avoid',
+              marginBottom: 16,
+            }}>
+              <ChantierSection
+                chantierMeta={c}
+                chantierData={filteredData[c.id]}
+                darkMode={darkMode}
+                onContributorClick={handleContributorClick}
+                targetProject={targetProject}
+              />
+            </div>
           ))}
         </div>
       </div>
