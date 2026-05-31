@@ -637,7 +637,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
                       background: darkMode ? '#0f172a80' : '#ffffff',
                       borderLeft: `3px solid ${statusObj.color}`,
                     }}>
-                      <div style={{ fontSize: 12, paddingTop: 1 }}>{statusObj.icon}</div>
+                      <div style={{ fontSize: 14, paddingTop: 1, color: statusObj.color, lineHeight: 1 }}>{statusObj.icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                           <code style={{ fontSize: 10, color: textTertiary, fontFamily: 'ui-monospace, monospace' }}>{a.id}</code>
@@ -738,7 +738,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                     transform: hl ? 'translateX(4px)' : 'none',
                   }}
                 >
-                  <div style={{ fontSize: 14, lineHeight: '1.2', paddingTop: 1 }}>{statusObj.icon}</div>
+                  <div style={{ fontSize: 16, lineHeight: 1, paddingTop: 1, color: statusObj.color }}>{statusObj.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3, flexWrap: 'wrap' }}>
                       <code style={{ fontSize: 10, color: textTertiary, fontFamily: 'ui-monospace, monospace' }}>{a.id}</code>
@@ -793,7 +793,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                   borderRadius: 6, padding: '8px 12px',
                   display: 'flex', alignItems: 'flex-start', gap: 10,
                 }}>
-                  <div style={{ fontSize: 14, paddingTop: 1 }}>{statusObj.icon}</div>
+                  <div style={{ fontSize: 16, lineHeight: 1, paddingTop: 1, color: statusObj.color }}>{statusObj.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 10, color: textTertiary, marginBottom: 3, fontFamily: 'ui-monospace, monospace' }}>{a.id}</div>
                     <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{a.action}</div>
