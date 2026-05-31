@@ -9,3 +9,7 @@ Thumbs.db
 
 # Workspace local Claude Code (worktrees, état de session)
 .claude/
+
+# Mails et communications (envois ciblés, pas de tracking sur le repo)
+mails-comite-12juin/
+mails-*/
