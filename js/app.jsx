@@ -264,6 +264,7 @@ function MainApp() {
         <VueParAxe
           darkMode={darkMode}
           allActions={allActions}
+          gouvernanceData={gouvernanceData}
           selectedEntityId={vueEntityId}
           onEntityChange={setVueEntityId}
         />

@@ -808,12 +808,71 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
   );
 }
 
+// ── Petit avatar de coresponsable (image circulaire avec fallback initiales) ──
+function CoResponsableAvatar({ person, color, darkMode }) {
+  const base = (person.initials || '').toLowerCase();
+  const [imgSrc, setImgSrc] = useState(`photos/${base}.jpg`);
+  const [imgOk, setImgOk] = useState(true);
+  const handleError = () => {
+    if (imgSrc.endsWith('.jpg')) setImgSrc(`photos/${base}.png`);
+    else setImgOk(false);
+  };
+  return (
+    <div
+      title={`${person.name}${person.affiliation ? ' — ' + person.affiliation : ''}${person.role ? ' (' + person.role + ')' : ''}`}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '4px 10px 4px 4px', borderRadius: 18,
+        background: darkMode ? '#1e293b' : '#f9fafb',
+        border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`,
+      }}
+    >
+      <div style={{
+        width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontWeight: 700, fontSize: 11, backgroundColor: color + '25', color: color,
+      }}>
+        {imgOk ? (
+          <img src={imgSrc} alt={person.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={handleError} />
+        ) : (person.initials || '?')}
+      </div>
+      <span style={{ fontSize: 12, color: darkMode ? '#e2e8f0' : '#1f2937', fontWeight: 500 }}>
+        {person.name}
+      </span>
+    </div>
+  );
+}
+
+// ── Récupère les coresponsables d'une entité dans gouvernanceData ──
+function getEntityResponsables(entity, gouvernanceData) {
+  if (!entity || !gouvernanceData) return [];
+  if (entity.type === 'axe') {
+    const a = (gouvernanceData.axes || []).find(x => x.id === entity.id);
+    return a ? a.responsables : [];
+  }
+  if (entity.type === 'champ') {
+    const c = (gouvernanceData.champs || []).find(x => x.id === entity.id);
+    return c ? c.responsables : [];
+  }
+  if (entity.type === 'principe') {
+    const p = (gouvernanceData.principes || []).find(x => x.id === entity.id);
+    return p ? p.responsables : [];
+  }
+  return [];
+}
+
 // ── Composant principal Vue Par Axe ──
-function VueParAxe({ darkMode, allActions, selectedEntityId, onEntityChange }) {
+function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, onEntityChange }) {
   const entities = useMemo(() => getEntities(), []);
   const entity = useMemo(
     () => entities.find(e => e.id === selectedEntityId) || entities[0],
     [entities, selectedEntityId]
+  );
+  const responsables = useMemo(
+    () => getEntityResponsables(entity, gouvernanceData),
+    [entity, gouvernanceData]
   );
 
   const data = useMemo(
@@ -939,7 +998,26 @@ function VueParAxe({ darkMode, allActions, selectedEntityId, onEntityChange }) {
             </select>
           </div>
           </div>
-          {/* Ligne 2 : barre de progression des actions de l'entité */}
+          {/* Ligne 2 : coresponsables de l'entité */}
+          {responsables && responsables.length > 0 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+              paddingTop: 12,
+              borderTop: `1px dashed ${cardBorder}`,
+            }}>
+              <span style={{
+                fontSize: 10, fontWeight: 700, color: textSecondary,
+                textTransform: 'uppercase', letterSpacing: '0.08em',
+                marginRight: 4,
+              }}>
+                Coresponsable{responsables.length > 1 ? 's' : ''} :
+              </span>
+              {responsables.map((p, i) => (
+                <CoResponsableAvatar key={p.name + i} person={p} color={entity.color} darkMode={darkMode} />
+              ))}
+            </div>
+          )}
+          {/* Ligne 3 : barre de progression des actions de l'entité */}
           {(() => {
             const allEntityActions = [...((data && data.sousObjList) || []), ...((data && data.extActions) || [])];
             const counts = { 'terminé': 0, 'en cours': 0, 'non démarré': 0 };
