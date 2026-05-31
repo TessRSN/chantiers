@@ -334,7 +334,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick })
   );
 }
 
-// ── Section d'un chantier (header + progression + sous-projets) ──
+// ── Section d'un chantier (carte avec contour, header + projets dedans) ──
 function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorClick }) {
   const chantierConfig = CHANTIERS_CONFIG.find(c => c.id === `C${chantierMeta.id}`);
   if (!chantierConfig) return null;
@@ -345,66 +345,70 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
   const total = allActions.length;
 
   const subtitleColor = darkMode ? '#94a3b8' : '#6b7280';
-  const titleColor = darkMode ? '#f1f5f9' : '#111827';
-  const cardBg = darkMode ? '#1e293b' : '#ffffff';
-  const cardBorder = darkMode ? '#334155' : '#e5e7eb';
+  const innerBg = darkMode ? '#0f172a' : '#f8fafc';
+  const color = chantierConfig.color;
 
   return (
     <section
       id={`chantier-${chantierConfig.id}`}
-      style={{ marginBottom: 40, scrollMarginTop: 90 }}
+      style={{
+        scrollMarginTop: 24,
+        border: `2px solid ${color}`,
+        borderRadius: 14,
+        background: darkMode ? '#1e293b' : '#ffffff',
+        overflow: 'hidden',
+      }}
     >
-      {/* Bandeau d'en-tête du chantier — avec barre de progression intégrée */}
+      {/* En-tête du chantier */}
       <div style={{
-        padding: '14px 18px', borderRadius: 12,
-        background: chantierConfig.color,
-        marginBottom: 16,
+        background: color, padding: '12px 16px',
+        color: 'white',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 10,
+            width: 42, height: 42, borderRadius: 8,
             background: 'rgba(255,255,255,0.18)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 26, flexShrink: 0,
+            fontSize: 22, flexShrink: 0,
           }}>
             {chantierConfig.icon}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
-              textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2,
+              fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+              textTransform: 'uppercase', letterSpacing: '0.1em',
               fontFamily: 'ui-monospace, monospace',
             }}>
               {chantierConfig.id} · {chantierConfig.verb}
             </div>
             <h2 style={{
-              fontSize: 20, fontWeight: 800, color: 'white',
-              margin: 0, lineHeight: 1.2,
+              fontSize: 17, fontWeight: 800,
+              margin: '2px 0 0 0', lineHeight: 1.2,
             }}>
               {chantierMeta.name}
             </h2>
-            <div style={{
-              display: 'flex', gap: 14, marginTop: 6,
-              fontSize: 12, color: 'rgba(255,255,255,0.85)', flexWrap: 'wrap',
-            }}>
-              <span><strong>{projects.length}</strong> sous-projet{projects.length > 1 ? 's' : ''}</span>
-              <span style={{ opacity: 0.5 }}>·</span>
-              <span><strong>{total}</strong> action{total > 1 ? 's' : ''}</span>
+          </div>
+          <div style={{ flexShrink: 0, textAlign: 'right' }}>
+            <div style={{ fontSize: 11, opacity: 0.9, fontWeight: 600 }}>
+              {projects.length} projet{projects.length > 1 ? 's' : ''}
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.7 }}>
+              {total} action{total > 1 ? 's' : ''}
             </div>
           </div>
         </div>
 
-        {/* Barre de progression du chantier */}
+        {/* Barre de progression compacte */}
         {total > 0 && (() => {
           const segments = [
-            { key: 'terminé',     color: '#ffffff',                       label: 'terminé',     opacity: 1 },
-            { key: 'en cours',    color: 'rgba(255,255,255,0.65)',        label: 'en cours',    opacity: 1 },
-            { key: 'non démarré', color: 'rgba(255,255,255,0.2)',         label: 'non démarré', opacity: 1 },
+            { key: 'terminé',     color: '#ffffff' },
+            { key: 'en cours',    color: 'rgba(255,255,255,0.65)' },
+            { key: 'non démarré', color: 'rgba(255,255,255,0.22)' },
           ];
           return (
-            <div style={{ marginTop: 12 }}>
+            <div style={{ marginTop: 10 }}>
               <div style={{
-                display: 'flex', borderRadius: 6, overflow: 'hidden', height: 8,
+                display: 'flex', borderRadius: 5, overflow: 'hidden', height: 6,
                 background: 'rgba(0,0,0,0.18)',
               }}>
                 {segments.map(s => counts[s.key] > 0 && (
@@ -412,24 +416,24 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
                     key={s.key}
                     style={{
                       width: `${(counts[s.key] / total) * 100}%`,
-                      background: s.color,
-                      transition: 'width 0.3s',
+                      background: s.color, transition: 'width 0.3s',
                     }}
                     title={`${s.key} : ${counts[s.key]}`}
                   />
                 ))}
               </div>
               <div style={{
-                display: 'flex', gap: 14, marginTop: 6,
-                fontSize: 11, color: 'rgba(255,255,255,0.92)', flexWrap: 'wrap', fontWeight: 600,
+                display: 'flex', gap: 10, marginTop: 5,
+                fontSize: 10, color: 'rgba(255,255,255,0.92)',
+                flexWrap: 'wrap', fontWeight: 600,
               }}>
                 {segments.map(s => counts[s.key] > 0 && (
-                  <span key={s.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <span key={s.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                     <span style={{
-                      width: 9, height: 9, borderRadius: '50%',
+                      width: 7, height: 7, borderRadius: '50%',
                       background: s.color, display: 'inline-block',
                     }} />
-                    {counts[s.key]} {s.label}
+                    {counts[s.key]}
                   </span>
                 ))}
               </div>
@@ -438,10 +442,10 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
         })()}
       </div>
 
-      {/* Liste des sous-projets */}
-      {projects.length > 0 ? (
-        <div>
-          {projects
+      {/* Liste des sous-projets — à l'intérieur du contour */}
+      <div style={{ padding: 12, background: innerBg }}>
+        {projects.length > 0 ? (
+          projects
             .slice()
             .sort((a, b) => a.id.localeCompare(b.id))
             .map(project => (
@@ -452,17 +456,16 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
                 chantier={chantierConfig}
                 onContributorClick={onContributorClick}
               />
-            ))}
-        </div>
-      ) : (
-        <div style={{
-          background: cardBg, border: `1px solid ${cardBorder}`,
-          borderRadius: 10, padding: '24px 20px', textAlign: 'center',
-          color: subtitleColor, fontSize: 13,
-        }}>
-          Aucun sous-projet dans ce chantier
-        </div>
-      )}
+            ))
+        ) : (
+          <div style={{
+            padding: '20px', textAlign: 'center',
+            color: subtitleColor, fontSize: 12,
+          }}>
+            Aucun sous-projet
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -508,29 +511,26 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
 
   return (
     <div style={{
+      display: 'flex',
       height: 'calc(100vh - 70px)',
-      overflowY: 'auto',
       fontFamily: 'system-ui, sans-serif',
       backgroundColor: mainBg,
     }}>
-      {/* ── Barre de navigation sticky en haut : raccourcis chantiers (avec noms) ── */}
+      {/* ── SIDEBAR gauche : « Aller à » vertical ── */}
       <div style={{
-        position: 'sticky', top: 0, zIndex: 30,
-        background: navBg, borderBottom: `1px solid ${navBorder}`,
-        padding: '10px 20px',
-        backdropFilter: 'blur(8px)',
+        width: 240, flexShrink: 0,
+        background: navBg, borderRight: `1px solid ${navBorder}`,
+        overflowY: 'auto',
+        padding: '16px 12px',
       }}>
         <div style={{
-          maxWidth: 1200, margin: '0 auto',
-          display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+          fontSize: 10, fontWeight: 700, color: navText,
+          textTransform: 'uppercase', letterSpacing: '0.08em',
+          padding: '0 8px', marginBottom: 10,
         }}>
-          <span style={{
-            fontSize: 10, fontWeight: 700, color: navText,
-            textTransform: 'uppercase', letterSpacing: '0.08em',
-            marginRight: 4,
-          }}>
-            Aller à :
-          </span>
+          Aller à
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {chantiersMeta.map(c => {
             const cfg = CHANTIERS_CONFIG.find(x => x.id === `C${c.id}`);
             if (!cfg) return null;
@@ -539,22 +539,23 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
             const actionCount = data && data.projects
               ? data.projects.reduce((s, p) => s + p.actions.length, 0)
               : 0;
+            const allActions = data && data.projects ? data.projects.flatMap(p => p.actions) : [];
+            const counts = countProgressStatuses(allActions);
             return (
               <button
                 key={c.id}
                 onClick={() => scrollToChantier(cfg.id)}
                 title={`${cfg.id} · ${c.name} — ${projCount} projets, ${actionCount} actions`}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '5px 12px', borderRadius: 16,
+                  display: 'flex', flexDirection: 'column', alignItems: 'stretch',
+                  padding: '8px 10px', borderRadius: 8,
                   background: darkMode ? cfg.color + '18' : cfg.color + '10',
                   border: `1px solid ${cfg.color}55`,
                   cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s',
-                  fontSize: 12, fontWeight: 600,
-                  color: cfg.color, font: 'inherit',
+                  font: 'inherit', textAlign: 'left',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateX(2px)';
                   e.currentTarget.style.boxShadow = `0 2px 8px ${cfg.color}30`;
                 }}
                 onMouseLeave={e => {
@@ -562,26 +563,55 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta }) {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <span style={{ fontSize: 13, lineHeight: 1 }}>{cfg.icon}</span>
-                <span>{c.name}</span>
-                <span style={{ opacity: 0.65, fontWeight: 500 }}>· {actionCount}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <span style={{ fontSize: 14, lineHeight: 1 }}>{cfg.icon}</span>
+                  <span style={{
+                    fontSize: 12, fontWeight: 600, color: cfg.color,
+                    flex: 1, minWidth: 0,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {c.name}
+                  </span>
+                </div>
+                <div style={{
+                  fontSize: 10, color: cfg.color, opacity: 0.75,
+                  marginBottom: 4,
+                }}>
+                  {projCount} projet{projCount > 1 ? 's' : ''} · {actionCount} action{actionCount > 1 ? 's' : ''}
+                </div>
+                {actionCount > 0 && (
+                  <MiniProgressBar
+                    counts={counts}
+                    total={actionCount}
+                    darkMode={darkMode}
+                    showLegend={false}
+                  />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* ── Contenu : toutes les sections empilées ── */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 24px 60px' }}>
-        {chantiersMeta.map(c => (
-          <ChantierSection
-            key={c.id}
-            chantierMeta={c}
-            chantierData={filteredData[c.id]}
-            darkMode={darkMode}
-            onContributorClick={handleContributorClick}
-          />
-        ))}
+      {/* ── Contenu : grille 2 colonnes ── */}
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div style={{
+          maxWidth: 1400, margin: '0 auto', padding: '20px 20px 60px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+          gap: 16,
+          alignItems: 'start',
+        }}>
+          {chantiersMeta.map(c => (
+            <ChantierSection
+              key={c.id}
+              chantierMeta={c}
+              chantierData={filteredData[c.id]}
+              darkMode={darkMode}
+              onContributorClick={handleContributorClick}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
