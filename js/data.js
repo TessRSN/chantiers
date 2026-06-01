@@ -78,6 +78,8 @@ const OS_LABEL_EN = {
   "Connecter les méthodologistes aux utilisateurs de connaissances":
     "Connect methodologists with knowledge users",
   // Axe 3
+  "Établir et diffuser les meilleures pratiques de gestion de projet en matière d'interventions numériques en santé":
+    "Establish and share best practices for managing digital health intervention projects",
   "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique":
     "Improve the accessibility and use of digital health research",
   "Favoriser le rapprochement entre les chercheurs et les milieux preneurs pour optimiser l'accompagnement et le transfert de connaissances":
