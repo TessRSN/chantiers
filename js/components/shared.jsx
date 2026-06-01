@@ -11,7 +11,7 @@ function ProgressBadge({ statut, darkMode, size = 'sm' }) {
       backgroundColor: bg, border: `1px solid ${border}`, color: p.color,
       fontWeight: 600, whiteSpace: 'nowrap',
     }}>
-      <span style={{ fontSize: fontSize + 2 }}>{p.icon}</span> {p.label}
+      <span style={{ fontSize: fontSize + 2 }}>{p.icon}</span> {tConfig(p, 'label')}
     </span>
   );
 }
@@ -49,7 +49,7 @@ function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
       {axe && (
         <div className="flex items-center gap-1 mb-1">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: axe.color }}></div>
-          <span className={`text-xs ${theme.textLight}`}>{axe.name}</span>
+          <span className={`text-xs ${theme.textLight}`}>{tConfig(axe, 'name')}</span>
         </div>
       )}
       <div className="flex items-start justify-between gap-1">
@@ -58,14 +58,14 @@ function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
             <span className={`font-mono ${theme.textLight}`} style={{ fontSize: 10 }}>{action.id}</span>
             <ProgressBadge statut={action.statutObjectif} darkMode={darkMode} size="xs" />
           </div>
-          <p className={`${darkMode ? 'text-slate-200' : 'text-gray-800'} mt-0.5 leading-relaxed`}>{action.action}</p>
+          <p className={`${darkMode ? 'text-slate-200' : 'text-gray-800'} mt-0.5 leading-relaxed`}>{tConfig(action, 'action')}</p>
         </div>
         {hasExtra && (
           <button
             onClick={() => setExpanded(!expanded)}
             className={`${theme.textLight} hover:${theme.text} shrink-0 mt-0.5`}
             style={{ fontSize: 10 }}
-            title="Détails"
+            title={t('shared.details')}
           >
             {expanded ? '▲' : '▼'}
           </button>
@@ -75,12 +75,12 @@ function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
         <div className={`mt-1.5 pt-1.5 space-y-1`} style={{ borderTop: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}` }}>
           {action.objectif && (
             <p className={theme.textLight} style={{ fontSize: 10, lineHeight: '1.4' }}>
-              <span className={`font-semibold ${theme.textMuted}`}>Objectif stratégique :</span> {action.objectif}
+              <span className={`font-semibold ${theme.textMuted}`}>{t('shared.os-label')}</span> {action.objectif}
             </p>
           )}
           {action.actionOriginale && action.actionOriginale !== action.action && (
             <p className={theme.textLight} style={{ fontSize: 10, lineHeight: '1.4', fontStyle: 'italic' }}>
-              <span className={`font-semibold ${theme.textMuted}`}>Action originale :</span> {action.actionOriginale}
+              <span className={`font-semibold ${theme.textMuted}`}>{t('shared.original-action')}</span> {tConfig(action, 'actionOriginale')}
             </p>
           )}
         </div>

@@ -3,7 +3,10 @@
 // Liste des entités (4 axes + 5 PD + 3 champs) issues de la config statique
 function getEntities() {
   return AXES_CONFIG.map(a => ({
-    id: a.id, name: a.name, fullName: a.fullName, type: a.type, color: a.color,
+    id: a.id,
+    name: a.name,         name_en: a.name_en,
+    fullName: a.fullName, fullName_en: a.fullName_en,
+    type: a.type, color: a.color,
   }));
 }
 
@@ -65,7 +68,7 @@ function buildEntityData(entity, allActions) {
   const osMap = {};
   fdrActions.forEach(a => {
     const os = extractOS(a.id);
-    if (!osMap[os]) osMap[os] = { id: os, label: a.objectif || '', actions: [] };
+    if (!osMap[os]) osMap[os] = { id: os, label: a.objectif || '', label_en: a.objectif_en || '', actions: [] };
     osMap[os].actions.push(a);
     // Si label vide jusqu'ici, prendre celui-ci
     if (!osMap[os].label && a.objectif) osMap[os].label = a.objectif;
@@ -91,8 +94,10 @@ function buildEntityData(entity, allActions) {
     if (!projectMap[pid]) {
       projectMap[pid] = {
         id: pid,
-        name: a.nomProjet || (pid === '—' ? 'Sans projet' : pid),
-        description: a.descriptionProjet || '',
+        name:    a.nomProjet    || (pid === '—' ? t('parax.sans-projet') : pid),
+        name_en: a.nomProjet_en || (pid === '—' ? t('parax.sans-projet') : pid),
+        description:    a.descriptionProjet    || '',
+        description_en: a.descriptionProjet_en || '',
         chantierId: a.chantier || '',
         actions: [],
         totalCount: (allByProject[pid] || []).length,   // total tous axes confondus
@@ -126,7 +131,8 @@ function buildEntityData(entity, allActions) {
   const sousObjList = fdrActions
     .map(a => ({
       id: a.id,
-      title: a.action,
+      title:    a.action,
+      title_en: a.action_en,
       os: extractOS(a.id),
       projet: a.projet || '—',
       chantierId: a.chantier || '',
@@ -281,7 +287,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
     return ch ? ch.icon : '';
   };
   // Nom court du chantier (sans le code), avec fallback
-  const chantierName = (p) => p.name || p.id;
+  const chantierName = (p) => tConfig(p, 'name') || p.id;
 
   const flowPath = (x1, y1, x2, y2) => {
     const cx = (x1 + x2) / 2;
@@ -301,16 +307,16 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
     <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} width="100%" height="auto" style={{ background: bg, borderRadius: 8 }}>
       {/* En-têtes de colonnes */}
       <text x={COL1_X + COL1_W / 2} y={20} fontSize={11} fontWeight={600} fill={textSecondary} textAnchor="middle">
-        {entity.type === 'axe' ? 'AXE' : entity.type === 'champ' ? 'CHAMP' : 'PRINCIPE'}
+        {entity.type === 'axe' ? t('parax.entity.col.AXE') : entity.type === 'champ' ? t('parax.entity.col.CHAMP') : t('parax.entity.col.PRINCIPE')}
       </text>
       <text x={COL2_X + COL2_W / 2} y={20} fontSize={11} fontWeight={600} fill={textSecondary} textAnchor="middle">
-        OBJECTIFS STRATÉGIQUES
+        {t('sankey.col.os')}
       </text>
       <text x={COL3_X + COL3_W / 2} y={20} fontSize={11} fontWeight={600} fill={textSecondary} textAnchor="middle">
-        SOUS-OBJECTIFS (ACTIONS)
+        {t('sankey.col.actions')}
       </text>
       <text x={COL4_X + COL4_W / 2} y={20} fontSize={11} fontWeight={600} fill={textSecondary} textAnchor="middle">
-        CHANTIERS TRANSVERSAUX
+        {t('sankey.col.chantiers')}
       </text>
 
       {/* Flux OS → SubObj — courbe fine du bord droit de l'OS vers le bord gauche du sous-obj */}
@@ -381,7 +387,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
         const dimmed = hoveredKey && !hoveredKey.startsWith(`os:${os.id}`)
           && !(hoveredKey.startsWith('sub:') && sousObjs.find(s => s.id === hoveredKey.slice(4))?.os === os.id);
         const maxNameLines = Math.max(1, Math.floor((os.h - 50) / 16));
-        const nameLines = wrapText(os.label, 28, maxNameLines);
+        const nameLines = wrapText(tConfig(os, 'label'), 28, maxNameLines);
         return (
           <g
             key={`os-${os.id}`}
@@ -409,7 +415,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
       {sousObjs.map(s => {
         const dimmed = hoveredKey && !hoveredKey.startsWith(`sub:${s.id}`)
           && hoveredKey !== `os:${s.os}` && hoveredKey !== `proj:${s.projet}`;
-        const titleLines = wrapText(s.title, 64, 2);
+        const titleLines = wrapText(tConfig(s, 'title'), 64, 2);
         return (
           <g
             key={`sub-${s.id}`}
@@ -454,12 +460,12 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
         const descStartY = 24 + nameHeight + 14;  // 14px de gap après le titre
         const descAvailH = p.h - descStartY - 36; // 36 = ratio bottom area
         const maxDescLines = Math.max(0, Math.floor(descAvailH / 14));
-        const descLines = maxDescLines > 0 && p.description
-          ? wrapText(p.description, 42, maxDescLines)
+        const descLines = maxDescLines > 0 && tConfig(p, 'description')
+          ? wrapText(tConfig(p, 'description'), 42, maxDescLines)
           : [];
         const ratioText = p.totalCount > p.actions.length
-          ? `${p.actions.length} de cet axe · ${p.totalCount} au total`
-          : `${p.actions.length} action${p.actions.length > 1 ? 's' : ''} (toutes de cet axe)`;
+          ? `${p.actions.length} ${t('parax.de-cet-axe')} · ${p.totalCount} ${t('parax.au-total')}`
+          : `${p.actions.length} ${p.actions.length > 1 ? t('parax.actions') : t('parax.action')} (${t('parax.toutes-de-cet-axe')})`;
         return (
           <g
             key={`proj-${p.id}`}
@@ -510,7 +516,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
               {ratioText}
             </text>
             <text x={COL4_X + COL4_W - 14} y={p.y + p.h - 22} fontSize={12} fill="white" opacity={0.7} textAnchor="end">
-              {isExpanded ? '▾ ouvert' : '▸ détail'}
+              {isExpanded ? t('sankey.ouvert') : t('sankey.detail')}
             </text>
           </g>
         );
@@ -568,19 +574,19 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
         }}>{chantierIcon}</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 11, color: textSecondary, fontWeight: 600, letterSpacing: '0.05em' }}>
-            CHANTIER TRANSVERSAL · {project.id}
+            {t('parax.chantier-transversal')} · {project.id}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: textPrimary, marginTop: 2 }}>
-            {project.name}
+            {tConfig(project, 'name')}
           </div>
-          {project.description && (
+          {tConfig(project, 'description') && (
             <div style={{ fontSize: 12, color: textSecondary, marginTop: 4, lineHeight: 1.4 }}>
-              {project.description}
+              {tConfig(project, 'description')}
             </div>
           )}
           <div style={{ fontSize: 12, color: textTertiary, marginTop: 6 }}>
-            <strong>{project.totalCount}</strong> action{project.totalCount > 1 ? 's' : ''} au total ·{' '}
-            <strong>{project.actions.length}</strong> portée{project.actions.length > 1 ? 's' : ''} par cet axe
+            <strong>{project.totalCount}</strong> {project.totalCount > 1 ? t('parax.actions') : t('parax.action')} {t('parax.au-total')} ·{' '}
+            <strong>{project.actions.length}</strong> {project.actions.length > 1 ? t('parax.portees') : t('parax.portee')} {t('parax.par-cet-axe')}
           </div>
         </div>
         <button
@@ -590,7 +596,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
             color: textSecondary, padding: '4px 10px', borderRadius: 6,
             cursor: 'pointer', fontSize: 14, lineHeight: 1,
           }}
-          title="Fermer"
+          title={t('parax.fermer')}
         >✕</button>
       </div>
 
@@ -641,10 +647,10 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                           <code style={{ fontSize: 10, color: textTertiary, fontFamily: 'ui-monospace, monospace' }}>{a.id}</code>
-                          <span style={{ fontSize: 10, color: statusObj.color, fontWeight: 600 }}>{statusObj.label}</span>
+                          <span style={{ fontSize: 10, color: statusObj.color, fontWeight: 600 }}>{tConfig(statusObj, 'label')}</span>
                         </div>
                         <div style={{ fontSize: 12, color: textPrimary, lineHeight: 1.45, marginTop: 2 }}>
-                          {a.action}
+                          {tConfig(a, 'action')}
                         </div>
                       </div>
                     </div>
@@ -672,7 +678,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
   if (!data || data.osList.length === 0) {
     return (
       <div style={{ color: darkMode ? '#94a3b8' : '#6b7280', textAlign: 'center', padding: 32, fontSize: 13 }}>
-        Aucune action de feuille de route pour cette entité.
+        {t('parax.aucune-action')}
       </div>
     );
   }
@@ -707,7 +713,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
               background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 4,
               fontSize: 11, fontWeight: 700,
             }}>{os.id}</span>
-            <span style={{ flex: 1 }}>{os.label || 'Sans intitulé'}</span>
+            <span style={{ flex: 1 }}>{tConfig(os, 'label') || t('parax.sans-intitule')}</span>
             <span style={{ fontSize: 11, opacity: 0.85 }}>{os.actions.length} action{os.actions.length > 1 ? 's' : ''}</span>
           </div>
 
@@ -721,7 +727,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
               // Récupérer le nom complet du projet pour la pastille
               const projectInfo = data.projectList.find(p => p.id === projet);
               const projectShortName = projectInfo
-                ? (projectInfo.name || projet)
+                ? (tConfig(projectInfo, 'name') || projet)
                 : projet;
               return (
                 <div
@@ -744,14 +750,14 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                       <code style={{ fontSize: 10, color: textTertiary, fontFamily: 'ui-monospace, monospace' }}>{a.id}</code>
                       <span style={{
                         fontSize: 10, color: statusObj.color, fontWeight: 600,
-                      }}>{statusObj.label}</span>
+                      }}>{tConfig(statusObj, 'label')}</span>
                     </div>
-                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{a.action}</div>
+                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{tConfig(a, 'action')}</div>
                   </div>
                   {chantier && projectInfo && (
                     <button
                       onClick={(e) => { e.stopPropagation(); onProjectClick && onProjectClick(projet); }}
-                      title={`Voir tout le chantier « ${projectShortName} »`}
+                      title={`${t('parax.voir-tout')} « ${projectShortName} »`}
                       style={{
                         background: chantier.color, color: 'white', fontSize: 11, fontWeight: 600,
                         padding: '6px 12px', borderRadius: 12, whiteSpace: 'normal',
@@ -778,7 +784,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
             fontSize: 11, fontWeight: 600, color: textSecondary,
             textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10,
           }}>
-            Réalisations associées (hors feuille de route officielle)
+            {t('parax.realisations-associees')}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {data.extActions.map(a => {
@@ -796,7 +802,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                   <div style={{ fontSize: 16, lineHeight: 1, paddingTop: 1, color: statusObj.color }}>{statusObj.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 10, color: textTertiary, marginBottom: 3, fontFamily: 'ui-monospace, monospace' }}>{a.id}</div>
-                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{a.action}</div>
+                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{tConfig(a, 'action')}</div>
                   </div>
                 </div>
               );
@@ -819,7 +825,7 @@ function CoResponsableAvatar({ person, color, darkMode }) {
   };
   return (
     <div
-      title={`${person.name}${person.affiliation ? ' — ' + person.affiliation : ''}${person.role ? ' (' + person.role + ')' : ''}`}
+      title={`${person.name}${person.affiliation ? ' — ' + person.affiliation : ''}${person.role ? ' (' + tConfig(person, 'role') + ')' : ''}`}
       style={{
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '4px 10px 4px 4px', borderRadius: 18,
@@ -954,10 +960,10 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ fontSize: 16, fontWeight: 600, color: textPrimary, lineHeight: 1.3 }}>
-              {entity.fullName || entity.name}
+              {tConfig(entity, 'fullName') || tConfig(entity, 'name')}
             </div>
             <div style={{ fontSize: 11, color: textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {entity.type === 'axe' ? 'Axe thématique' : entity.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+              {entity.type === 'axe' ? t('parax.entity.label.axe') : entity.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
             </div>
           </div>
           <div style={{
@@ -968,7 +974,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
               textTransform: 'uppercase', letterSpacing: '0.08em',
               display: 'flex', alignItems: 'center', gap: 4,
             }}>
-              <span style={{ fontSize: 13, lineHeight: 1 }}>▾</span> Changer d'entité
+              <span style={{ fontSize: 13, lineHeight: 1 }}>▾</span> {t('parax.change-entity')}
             </label>
             <select
               id="entity-select"
@@ -986,14 +992,14 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
                 appearance: 'menulist',
               }}
             >
-              <optgroup label="Axes thématiques">
-                {axes.map(a => <option key={a.id} value={a.id}>{a.fullName || a.name}</option>)}
+              <optgroup label={t('parax.optgroup.axes')}>
+                {axes.map(a => <option key={a.id} value={a.id}>{tConfig(a, 'fullName') || tConfig(a, 'name')}</option>)}
               </optgroup>
-              <optgroup label="Principes directeurs">
-                {principes.map(p => <option key={p.id} value={p.id}>{p.fullName || p.name}</option>)}
+              <optgroup label={t('parax.optgroup.principes')}>
+                {principes.map(p => <option key={p.id} value={p.id}>{tConfig(p, 'fullName') || tConfig(p, 'name')}</option>)}
               </optgroup>
-              <optgroup label="Champs d'action">
-                {champs.map(c => <option key={c.id} value={c.id}>{c.fullName || c.name}</option>)}
+              <optgroup label={t('parax.optgroup.champs')}>
+                {champs.map(c => <option key={c.id} value={c.id}>{tConfig(c, 'fullName') || tConfig(c, 'name')}</option>)}
               </optgroup>
             </select>
           </div>
@@ -1010,7 +1016,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
                 textTransform: 'uppercase', letterSpacing: '0.08em',
                 marginRight: 4,
               }}>
-                Coresponsable{responsables.length > 1 ? 's' : ''} :
+                {responsables.length > 1 ? t('parax.coresponsables') : t('parax.coresponsable')} :
               </span>
               {responsables.map((p, i) => (
                 <CoResponsableAvatar key={p.name + i} person={p} color={entity.color} darkMode={darkMode} />
@@ -1028,9 +1034,9 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
             const total = allEntityActions.length;
             if (total === 0) return null;
             const segments = [
-              { key: 'terminé',     label: 'terminé',     count: counts['terminé'],     color: '#22c55e' },
-              { key: 'en cours',    label: 'en cours',    count: counts['en cours'],    color: '#f59e0b' },
-              { key: 'non démarré', label: 'non démarré', count: counts['non démarré'], color: darkMode ? '#334155' : '#d1d5db' },
+              { key: 'terminé',     label: tConfig(PROGRESS['terminé'],    'label').toLowerCase(), count: counts['terminé'],     color: '#22c55e' },
+              { key: 'en cours',    label: tConfig(PROGRESS['en cours'],   'label').toLowerCase(), count: counts['en cours'],    color: '#f59e0b' },
+              { key: 'non démarré', label: tConfig(PROGRESS['non démarré'],'label').toLowerCase(), count: counts['non démarré'], color: darkMode ? '#334155' : '#d1d5db' },
             ];
             return (
               <div>
@@ -1073,7 +1079,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
           borderRadius: 10, padding: 16, marginBottom: 20,
         }}>
           <div style={{ fontSize: 11, color: textSecondary, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Diagramme — Survolez ou cliquez sur un chantier pour voir son contenu complet
+            {t('sankey.caption')}
           </div>
           <SankeyDiagram
             entity={entity}
@@ -1091,7 +1097,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
             paddingTop: 12, borderTop: `1px solid ${cardBorder}`,
           }}>
             <span style={{ textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: 4 }}>
-              Légende —
+              {t('sankey.legend.label')}
             </span>
             {['terminé', 'en cours', 'non démarré'].map(key => {
               const p = PROGRESS[key];
@@ -1100,7 +1106,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
                   <span style={{
                     fontSize: 14, lineHeight: 1, color: p.color, fontWeight: 700,
                   }}>{p.icon}</span>
-                  <span>{p.label.toLowerCase()}</span>
+                  <span>{tConfig(p, 'label').toLowerCase()}</span>
                 </span>
               );
             })}
@@ -1123,7 +1129,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
           borderRadius: 10, padding: 16,
         }}>
           <div style={{ fontSize: 11, color: textSecondary, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Détail des actions — groupées par objectif stratégique
+            {t('parax.detail-actions')}
           </div>
           <ActionsParOS
             entity={entity}

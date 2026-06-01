@@ -102,7 +102,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
         <div>
           <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
           {p.affiliation && <div style={{ fontSize: 11, color: darkMode ? '#94a3b8' : '#6b7280' }}>{p.affiliation}</div>}
-          {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{p.role}</div>}
+          {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{tConfig(p, 'role')}</div>}
         </div>
       </div>
     );
@@ -130,7 +130,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{name}</div>
             <div style={{ fontSize: 10, color: darkMode ? '#64748b' : '#9ca3af' }}>
-              {count > 0 ? `${count} membre${count > 1 ? 's' : ''}` : 'À venir'}
+              {count > 0 ? `${count} ${count > 1 ? t('structure.membres-count') : t('structure.membre')}` : t('structure.a-venir')}
             </div>
           </div>
           <div style={{ fontSize: 14, color: darkMode ? '#64748b' : '#9ca3af', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}>▾</div>
@@ -140,13 +140,13 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
             {count > 0 ? (
               <div>
                 <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 6, marginTop: 6 }}>
-                  Membres
+                  {t('structure.membres')}
                 </div>
                 {members.map(p => <MemberCard key={p.name} p={p} color={color} />)}
               </div>
             ) : (
               <div style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', fontStyle: 'italic', padding: '8px 0' }}>
-                Membres à venir
+                {t('structure.membres-a-venir')}
               </div>
             )}
           </div>
@@ -161,10 +161,10 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
         {/* ── Header ── */}
         <div className="text-center mb-3">
           <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-1`}>
-            Structure scientifique du RSN
+            {t('structure.title')}
           </h1>
           <p className={`${theme.textMuted} text-sm`}>
-            Cliquez sur un élément pour voir ses responsables
+            {t('structure.subtitle')}
           </p>
         </div>
 
@@ -172,11 +172,11 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
           {/* ── Gouvernance boxes — top left, expand inline ── */}
           <div className="fixed z-20 flex flex-col gap-2" style={{ width: 260, left: 12, top: 110, maxHeight: 'calc(100vh - 130px)', overflowY: 'auto' }}>
             <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: darkMode ? '#64748b' : '#9ca3af', marginBottom: 2, paddingLeft: 4 }}>
-              Gouvernance
+              {t('structure.gouvernance')}
             </div>
-            <GovBox id="direction" name="Direction" members={gouvernanceData.direction} color={govColor} />
+            <GovBox id="direction" name={t('structure.direction')} members={gouvernanceData.direction} color={govColor} />
             {gouvernanceData.comites.map(c => (
-              <GovBox key={c.id} id={c.id} name={c.name} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
+              <GovBox key={c.id} id={c.id} name={tConfig(c, 'name')} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
             ))}
             <div style={{ minHeight: 20, flexShrink: 0 }} />
           </div>
@@ -220,9 +220,9 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                     <circle cx={ax.x} cy={ax.y} r={isSel ? axeNodeR + 3 : axeNodeR}
                       fill={ax.color} opacity={0.9}
                       stroke={isSel ? 'white' : 'transparent'} strokeWidth={3} />
-                    <text x={ax.x} y={ax.y - 10} fill="white" fontSize="9" fontWeight="700" textAnchor="middle">{ax.shortName}</text>
-                    <text x={ax.x} y={ax.y + 3} fill="rgba(255,255,255,0.9)" fontSize="9.5" textAnchor="middle">{ax.label}</text>
-                    <text x={ax.x} y={ax.y + 16} fill="rgba(255,255,255,0.5)" fontSize="7.5" textAnchor="middle">{ax.responsables.length} resp.</text>
+                    <text x={ax.x} y={ax.y - 10} fill="white" fontSize="9" fontWeight="700" textAnchor="middle">{tConfig(ax, 'shortName')}</text>
+                    <text x={ax.x} y={ax.y + 3} fill="rgba(255,255,255,0.9)" fontSize="9.5" textAnchor="middle">{tConfig(ax, 'label')}</text>
+                    <text x={ax.x} y={ax.y + 16} fill="rgba(255,255,255,0.5)" fontSize="7.5" textAnchor="middle">{ax.responsables.length} {t('structure.resp-abbr')}</text>
                   </g>
                 );
               })}
@@ -236,8 +236,8 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                     opacity={dim ? 0.25 : 1} className="transition-opacity duration-300">
                     <circle cx={ch.x} cy={ch.y} r={isSel ? champNodeR + 3 : champNodeR}
                       fill={theme.svgNodeBg} stroke={ch.color} strokeWidth={isSel ? 3.5 : 2} />
-                    <text x={ch.x} y={ch.y - 5} fill={ch.color} fontSize="10" fontWeight="700" textAnchor="middle">{ch.label}</text>
-                    <text x={ch.x} y={ch.y + 10} fill={theme.svgLabelMuted} fontSize="8" textAnchor="middle">{ch.responsables.length} resp.</text>
+                    <text x={ch.x} y={ch.y - 5} fill={ch.color} fontSize="10" fontWeight="700" textAnchor="middle">{tConfig(ch, 'label')}</text>
+                    <text x={ch.x} y={ch.y + 10} fill={theme.svgLabelMuted} fontSize="8" textAnchor="middle">{ch.responsables.length} {t('structure.resp-abbr')}</text>
                   </g>
                 );
               })}
@@ -252,8 +252,8 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                     <circle cx={pr.x} cy={pr.y} r={isSel ? princNodeR + 3 : princNodeR}
                       fill={pr.color} opacity={0.9}
                       stroke={isSel ? 'white' : 'transparent'} strokeWidth={3} />
-                    <text x={pr.x} y={pr.y - 4} fill="white" fontSize="9.5" fontWeight="600" textAnchor="middle">{pr.label}</text>
-                    <text x={pr.x} y={pr.y + 10} fill="rgba(255,255,255,0.55)" fontSize="7.5" textAnchor="middle">{pr.responsables.length} resp.</text>
+                    <text x={pr.x} y={pr.y - 4} fill="white" fontSize="9.5" fontWeight="600" textAnchor="middle">{tConfig(pr, 'label')}</text>
+                    <text x={pr.x} y={pr.y + 10} fill="rgba(255,255,255,0.55)" fontSize="7.5" textAnchor="middle">{pr.responsables.length} {t('structure.resp-abbr')}</text>
                   </g>
                 );
               })}
@@ -275,19 +275,19 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                   {selectedNode.type === 'axe' ? selectedNode.shortName?.replace('Axe ', '') : selectedNode.responsables?.length || '—'}
                 </div>
                 <div>
-                  <h3 className={`font-bold ${theme.text} text-sm`}>{selectedNode.fullName || selectedNode.name}</h3>
+                  <h3 className={`font-bold ${theme.text} text-sm`}>{tConfig(selectedNode, 'fullName') || tConfig(selectedNode, 'name')}</h3>
                   <span className={`text-xs ${theme.textLight}`}>
-                    {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                    {selectedNode.type === 'axe' ? t('parax.entity.label.axe') : selectedNode.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                   </span>
                 </div>
               </div>
 
               {selectedNode.description && (
-                <p className={`text-xs ${theme.textMuted} mb-4 leading-relaxed`}>{selectedNode.description}</p>
+                <p className={`text-xs ${theme.textMuted} mb-4 leading-relaxed`}>{tConfig(selectedNode, 'description')}</p>
               )}
 
               <div className={`text-xs font-semibold ${theme.textLight} uppercase tracking-wider mb-3`}>
-                Responsable{selectedNode.responsables?.length > 1 ? 's' : ''}
+                {selectedNode.responsables?.length > 1 ? t('structure.responsables') : t('structure.responsable')}
               </div>
 
               <div className="space-y-2">

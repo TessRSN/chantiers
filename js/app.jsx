@@ -37,8 +37,38 @@ function migrateLegacyHash(p) {
   return p;
 }
 
+// Petit globe SVG monochrome (suit currentColor pour s'adapter aux thèmes).
+function GlobeIcon({ size = 14 }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a14 14 0 010 18" />
+      <path d="M12 3a14 14 0 000 18" />
+    </svg>
+  );
+}
+
+// Hook bilingue — synchronise window.LANG, localStorage.
+// L'URL hash sera mis à jour via le useEffect de routing principal (qui inclut lang dans les params).
+function useLang() {
+  const [lang, setLangState] = React.useState(window.LANG);
+
+  const setLang = React.useCallback((newLang) => {
+    if (newLang !== 'fr' && newLang !== 'en') return;
+    window.LANG = newLang;
+    setLangState(newLang);
+    try { localStorage.setItem('rsn-lang', newLang); } catch (_) {}
+  }, []);
+
+  return [lang, setLang];
+}
+
 function MainApp() {
   const [darkMode, setDarkMode] = useState(true);
+  const [lang, setLang] = useLang();
   const validTabs = ['structure', 'vue-globale', 'par-axe', 'analyse', 'suivi'];
 
   const initialRaw = parseHash(window.location.hash);
@@ -59,11 +89,13 @@ function MainApp() {
     } else if (activeTab === 'analyse' && targetProject) {
       params = { project: targetProject };
     }
+    // Préserver la langue dans l'URL si non-FR
+    if (lang === 'en') params.lang = 'en';
     const newHash = buildHash(activeTab, params);
     if (newHash !== window.location.hash.replace(/^#/, '')) {
       window.location.hash = newHash;
     }
-  }, [activeTab, vueEntityId, targetProject]);
+  }, [activeTab, vueEntityId, targetProject, lang]);
 
   // Sync URL hash → state (back/forward navigation + ancien lien migré)
   useEffect(() => {
@@ -72,10 +104,14 @@ function MainApp() {
       if (validTabs.includes(p.tab)) setActiveTab(p.tab);
       if (p.tab === 'par-axe' && p.params.entite) setVueEntityId(p.params.entite);
       if (p.tab === 'analyse') setTargetProject(p.params.project || null);
+      // Langue depuis URL — l'URL gagne sur le state local
+      if (p.params.lang === 'fr' || p.params.lang === 'en') {
+        if (p.params.lang !== lang) setLang(p.params.lang);
+      }
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
-  }, []);
+  }, [lang, setLang]);
 
   const [csvLoading, setCsvLoading] = useState(true);
   const [csvError, setCsvError] = useState(null);
@@ -115,11 +151,11 @@ function MainApp() {
   }, []);
 
   const tabs = [
-    { id: 'structure',   label: 'Structure & Gouvernance', icon: 'structure' },
-    { id: 'vue-globale', label: 'Vue globale', icon: 'vue-globale' },
-    { id: 'par-axe',     label: 'Vue par axe', icon: 'par-axe' },
-    { id: 'analyse',     label: 'Vue par chantier', icon: 'analyse' },
-    { id: 'suivi',       label: 'Suivi des objectifs', icon: 'suivi' },
+    { id: 'structure',   label: t('tab.structure'),   icon: 'structure' },
+    { id: 'vue-globale', label: t('tab.vue-globale'), icon: 'vue-globale' },
+    { id: 'par-axe',     label: t('tab.par-axe'),     icon: 'par-axe' },
+    { id: 'analyse',     label: t('tab.analyse'),     icon: 'analyse' },
+    { id: 'suivi',       label: t('tab.suivi'),       icon: 'suivi' },
   ];
 
   const tabBarBg = darkMode ? '#0f172a' : '#ffffff';
@@ -135,7 +171,7 @@ function MainApp() {
       <div style={{ backgroundColor: tabBarBg, borderBottom: `1px solid ${tabBarBorder}`, position: 'sticky', top: 0, zIndex: 100 }}>
         {/* Title row */}
         <div style={{ textAlign: 'center', padding: '8px 16px 2px', fontSize: 13, fontWeight: 600, color: darkMode ? '#94a3b8' : '#6b7280', letterSpacing: '0.02em' }}>
-          RSN — Tableau de bord
+          {t('app.header')}
         </div>
         {/* Tabs + toggle row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 40 }}>
@@ -208,6 +244,32 @@ function MainApp() {
           })}
         </div>
 
+        {/* Right-side toggles (langue + thème) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* Language toggle */}
+        <button
+          onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+          aria-label={lang === 'fr' ? 'Switch to English' : 'Passer au français'}
+          title={lang === 'fr' ? 'Switch to English' : 'Passer au français'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            borderRadius: 20,
+            border: `1px solid ${darkMode ? '#334155' : '#d1d5db'}`,
+            backgroundColor: darkMode ? '#1e293b' : '#f9fafb',
+            color: darkMode ? '#94a3b8' : '#6b7280',
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+            transition: 'all 0.15s',
+          }}
+        >
+          <GlobeIcon size={14} />
+          {lang.toUpperCase()}
+        </button>
+
         {/* Dark mode toggle */}
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -231,17 +293,18 @@ function MainApp() {
               <svg xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
-              Mode clair
+              {t('toggle.light')}
             </>
           ) : (
             <>
               <svg xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
-              Mode sombre
+              {t('toggle.dark')}
             </>
           )}
         </button>
+        </div>
         </div>
       </div>
 
@@ -250,7 +313,7 @@ function MainApp() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 70px)', color: darkMode ? '#94a3b8' : '#6b7280' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
-            <p>Chargement des données...</p>
+            <p>{t('app.loading')}</p>
           </div>
         </div>
       )}
@@ -258,8 +321,8 @@ function MainApp() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 70px)', color: '#ef4444' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
-            <p>Erreur : {csvError}</p>
-            <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>Vérifiez que data.csv et membres.csv sont présents à côté de index.html</p>
+            <p>{t('app.error')} : {csvError}</p>
+            <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>{t('app.error.help')}</p>
           </div>
         </div>
       )}

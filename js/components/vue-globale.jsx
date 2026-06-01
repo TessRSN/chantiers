@@ -21,10 +21,10 @@ function RSNRadialGraph({ darkMode }) {
     if (!searchTerm.trim()) return [];
     const term = searchTerm.toLowerCase();
     return vueGlobaleData.actions.filter(a =>
-      a.action.toLowerCase().includes(term) ||
+      tConfig(a, 'action').toLowerCase().includes(term) ||
       a.id.toLowerCase().includes(term)
     );
-  }, [searchTerm]);
+  }, [searchTerm, window.LANG]);
 
   const highlightedAxes = useMemo(() => [...new Set(searchResults.map(a => a.axe))], [searchResults]);
   const highlightedChantiers = useMemo(() => [...new Set(searchResults.map(a => a.chantier))], [searchResults]);
@@ -55,9 +55,9 @@ function RSNRadialGraph({ darkMode }) {
   const effetRadius = 70;
 
   const effetsStrategiques = [
-    { id: 'ES1', name: 'Consolidation écosystème', color: '#3B82F6', chantiers: ['C1', 'C2'] },
-    { id: 'ES2', name: 'Maillage environnement', color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
-    { id: 'ES3', name: 'Rapprochement preneurs/décideurs', color: '#F59E0B', chantiers: ['C5', 'C6'] },
+    { id: 'ES1', name: 'Consolidation écosystème',         name_en: 'Consolidation ecosystem',         color: '#3B82F6', chantiers: ['C1', 'C2'] },
+    { id: 'ES2', name: 'Maillage environnement',           name_en: 'Networking environment',          color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
+    { id: 'ES3', name: 'Rapprochement preneurs/décideurs', name_en: 'Engagement end-users/decision-makers', color: '#F59E0B', chantiers: ['C5', 'C6'] },
   ];
 
   const effetPositions = useMemo(() => {
@@ -111,10 +111,10 @@ function RSNRadialGraph({ darkMode }) {
       <div className="mx-auto">
         <div className="text-center mb-0">
           <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-0`}>
-            Réseau des Actions RSN
+            {t('vueglobale.title')}
           </h1>
           <p className={`${theme.textMuted} text-sm mb-0`}>
-            Cliquez sur un nœud pour voir ses connexions • {vueGlobaleData.actions.length} actions • {vueGlobaleData.axes.length} axes • {vueGlobaleData.chantiers.length} chantiers
+            {t('vueglobale.subtitle.intro')} • {vueGlobaleData.actions.length} {t('parax.actions')} • {vueGlobaleData.axes.length} {t('vueglobale.axes')} • {vueGlobaleData.chantiers.length} {t('vueglobale.chantiers')}
           </p>
         </div>
 
@@ -125,7 +125,7 @@ function RSNRadialGraph({ darkMode }) {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Rechercher une action..."
+                placeholder={t('vueglobale.search-placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full px-3 py-2 pl-9 rounded-full text-xs ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
@@ -139,7 +139,7 @@ function RSNRadialGraph({ darkMode }) {
             </div>
             {searchTerm && (
               <div className={`text-xs ${theme.textMuted} px-1`}>
-                {searchResults.length} action{searchResults.length !== 1 ? 's' : ''} trouvée{searchResults.length !== 1 ? 's' : ''}
+                {searchResults.length} {searchResults.length !== 1 ? t('parax.actions') : t('parax.action')} {searchResults.length !== 1 ? t('suivi.found.plural') : t('suivi.found')}
               </div>
             )}
 
@@ -150,7 +150,7 @@ function RSNRadialGraph({ darkMode }) {
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs bg-purple-500">{searchResults.length}</div>
                   <div>
                     <div className={`font-bold ${theme.text} text-xs`}>Résultats</div>
-                    <div className={`text-xs ${theme.textLight}`}>{searchResults.length} action{searchResults.length !== 1 ? 's' : ''}</div>
+                    <div className={`text-xs ${theme.textLight}`}>{searchResults.length} {searchResults.length !== 1 ? t('parax.actions') : t('parax.action')}</div>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -161,7 +161,7 @@ function RSNRadialGraph({ darkMode }) {
                       <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
                         <div className="flex items-center gap-1.5 mb-1.5">
                           <span className="text-sm">{chantier.icon}</span>
-                          <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                          <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{tConfig(chantier, 'name')}</span>
                           <span className={`text-xs ${theme.textLight}`}>({chantierResults.length})</span>
                         </div>
                         {chantierResults.map(action => {
@@ -188,8 +188,8 @@ function RSNRadialGraph({ darkMode }) {
                     <>
                       <span className="text-2xl">{selectedNode.icon}</span>
                       <div>
-                        <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
-                        <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color, fontSize: 10 }}>{selectedNode.verb}</span>
+                        <h3 className={`font-bold ${theme.text} text-xs`}>{tConfig(selectedNode, 'name')}</h3>
+                        <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color, fontSize: 10 }}>{tConfig(selectedNode, 'verb')}</span>
                       </div>
                     </>
                   ) : (
@@ -198,16 +198,16 @@ function RSNRadialGraph({ darkMode }) {
                         {vueGlobaleData.actions.filter(a => a.axe === selectedNode.id).length}
                       </div>
                       <div>
-                        <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
+                        <h3 className={`font-bold ${theme.text} text-xs`}>{tConfig(selectedNode, 'name')}</h3>
                         <span className={`text-xs ${theme.textLight}`} style={{ fontSize: 10 }}>
-                          {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                          {selectedNode.type === 'axe' ? t('parax.entity.label.axe') : selectedNode.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                         </span>
                       </div>
                     </>
                   )}
                 </div>
                 <div className="space-y-3">
-                  <div className={`text-xs ${theme.textMuted} mb-1`}>{selectedActions.length} action{selectedActions.length > 1 ? 's' : ''}</div>
+                  <div className={`text-xs ${theme.textMuted} mb-1`}>{selectedActions.length} {selectedActions.length > 1 ? t('parax.actions') : t('parax.action')}</div>
                   {selectedNode.type === 'chantier' ? (
                     vueGlobaleData.axes.map(axe => {
                       const axeActions = selectedActions.filter(a => a.axe === axe.id);
@@ -216,7 +216,7 @@ function RSNRadialGraph({ darkMode }) {
                         <div key={axe.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: axe.color }} />
-                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{axe.name}</span>
+                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{tConfig(axe, 'name')}</span>
                             <span className={`text-xs ${theme.textLight}`}>({axeActions.length})</span>
                           </div>
                           {axeActions.map(action => (
@@ -233,7 +233,7 @@ function RSNRadialGraph({ darkMode }) {
                         <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <span className="text-sm">{chantier.icon}</span>
-                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{tConfig(chantier, 'name')}</span>
                             <span className={`text-xs ${theme.textLight}`}>({chantierActions.length})</span>
                           </div>
                           {chantierActions.map(action => (
@@ -293,7 +293,7 @@ function RSNRadialGraph({ darkMode }) {
                       onMouseLeave={() => setHoveredConnection(null)} style={{ cursor: 'pointer' }} />
                     {isHovered && selectedNode?.type !== 'effet' && (
                       <text x={ctrlX} y={ctrlY} fill={theme.svgLabelPrimary} fontSize="12" textAnchor="middle" className="pointer-events-none">
-                        {conn.count} action{conn.count > 1 ? 's' : ''}
+                        {conn.count} {conn.count > 1 ? t('parax.actions') : t('parax.action')}
                       </text>
                     )}
                   </g>
@@ -322,10 +322,10 @@ function RSNRadialGraph({ darkMode }) {
                       {isSearchHighlighted ? searchCount : percentage + '%'}
                     </text>
                     <text x={chantier.x} y={chantier.y + 18} fill={theme.svgLabelSecondary} fontSize="7" textAnchor="middle">
-                      {isSearchHighlighted ? 'résultat' + (searchCount > 1 ? 's' : '') : chantier.verb}
+                      {isSearchHighlighted ? (searchCount > 1 ? t('vueglobale.results') : t('vueglobale.result')) : tConfig(chantier, 'verb')}
                     </text>
                     <text x={chantier.x} y={chantier.y + (chantier.y > centerY ? 58 : -48)}
-                      fill={theme.svgLabelPrimary} fontSize="11" fontWeight="500" textAnchor="middle">{chantier.name}</text>
+                      fill={theme.svgLabelPrimary} fontSize="11" fontWeight="500" textAnchor="middle">{tConfig(chantier, 'name')}</text>
                   </g>
                 );
               })}
@@ -353,10 +353,10 @@ function RSNRadialGraph({ darkMode }) {
                       {isSearchHighlighted ? searchCount : actionCount}
                     </text>
                     <text x={labelX} y={labelY} fill={theme.svgLabelPrimary} fontSize="10" fontWeight="500"
-                      textAnchor={labelX > centerX ? "start" : "end"} dominantBaseline="middle">{axe.name}</text>
+                      textAnchor={labelX > centerX ? "start" : "end"} dominantBaseline="middle">{tConfig(axe, 'name')}</text>
                     <text x={labelX} y={labelY + 12} fill={theme.svgLabelTertiary} fontSize="8"
                       textAnchor={labelX > centerX ? "start" : "end"}>
-                      {axe.type === 'axe' ? `Axe ${axe.id.replace('A', '')}` : axe.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                      {axe.type === 'axe' ? `${t('vueglobale.axe-prefix')}${axe.id.replace('A', '')}` : axe.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                     </text>
                   </g>
                 );
@@ -371,8 +371,8 @@ function RSNRadialGraph({ darkMode }) {
                     <circle cx={effet.x} cy={effet.y} r={isSelected ? 42 : 38}
                       fill={theme.svgBg} stroke={effet.color} strokeWidth={isSelected ? 4 : 3} />
                     <text x={effet.x} y={effet.y - 8} fill={effet.color} fontSize="12" fontWeight="bold" textAnchor="middle">{percentage}%</text>
-                    <text x={effet.x} y={effet.y + 5} fill={theme.svgLabelPrimary} fontSize="7" fontWeight="500" textAnchor="middle">{effet.name.split(' ')[0]}</text>
-                    <text x={effet.x} y={effet.y + 14} fill={theme.svgLabelSecondary} fontSize="6" textAnchor="middle">{effet.name.split(' ').slice(1).join(' ')}</text>
+                    <text x={effet.x} y={effet.y + 5} fill={theme.svgLabelPrimary} fontSize="7" fontWeight="500" textAnchor="middle">{tConfig(effet, 'name').split(' ')[0]}</text>
+                    <text x={effet.x} y={effet.y + 14} fill={theme.svgLabelSecondary} fontSize="6" textAnchor="middle">{tConfig(effet, 'name').split(' ').slice(1).join(' ')}</text>
                   </g>
                 );
               })}

@@ -25,13 +25,16 @@ function SuiviObjectifs({ darkMode, actions }) {
       return {
         id: a.id,
         os: extractOSLocal(a.id),
-        texte: a.action,
+        texte:    a.action,
+        texte_en: a.action_en,
         objectif: a.objectif,
         statut: a.statutObjectif || 'non démarré',
         axeId: axeConfig?.id || a.axe,
-        axe: axeConfig?.name || a.axe,
-        axeColor: axeConfig?.color || '#6b7280',
-        chantier: chantierConfig?.name || a.chantier,
+        axe:        axeConfig?.name    || a.axe,
+        axe_en:     axeConfig?.name_en || a.axe,
+        axeColor:   axeConfig?.color || '#6b7280',
+        chantier:    chantierConfig?.name    || a.chantier,
+        chantier_en: chantierConfig?.name_en || a.chantier,
         chantierIcon: chantierConfig?.icon || '',
         chantierColor: chantierConfig?.color || '#6b7280',
         projet: a.projet || '',
@@ -40,20 +43,20 @@ function SuiviObjectifs({ darkMode, actions }) {
     });
   }, [actions]);
 
-  // Filter by search
+  // Filter by search — recherche dans la langue actuelle
   const filtered = useMemo(() => {
     if (!searchTerm.trim()) return objectifs;
     const term = searchTerm.toLowerCase();
     return objectifs.filter(o =>
-      o.texte.toLowerCase().includes(term) ||
-      o.objectif.toLowerCase().includes(term) ||
+      tConfig(o, 'texte').toLowerCase().includes(term) ||
+      (o.objectif || '').toLowerCase().includes(term) ||
       o.id.toLowerCase().includes(term) ||
-      o.axe.toLowerCase().includes(term) ||
-      o.chantier.toLowerCase().includes(term) ||
+      tConfig(o, 'axe').toLowerCase().includes(term) ||
+      tConfig(o, 'chantier').toLowerCase().includes(term) ||
       o.projet.toLowerCase().includes(term) ||
       o.nomProjet.toLowerCase().includes(term)
     );
-  }, [objectifs, searchTerm]);
+  }, [objectifs, searchTerm, window.LANG]);
 
   // Group by status
   const groups = useMemo(() => ({
@@ -63,9 +66,9 @@ function SuiviObjectifs({ darkMode, actions }) {
   }), [filtered]);
 
   const sectionConfig = {
-    'en cours':    { title: 'En cours',    color: '#f59e0b', icon: '◐' },
-    'terminé':     { title: 'Terminés',    color: '#22c55e', icon: '●' },
-    'non démarré': { title: 'Non démarrés', color: '#6b7280', icon: '○' },
+    'en cours':    { title: t('suivi.section.en-cours'),     color: '#f59e0b', icon: '◐' },
+    'terminé':     { title: t('suivi.section.termines'),     color: '#22c55e', icon: '●' },
+    'non démarré': { title: t('suivi.section.non-demarres'), color: '#6b7280', icon: '○' },
   };
 
   return (
@@ -73,10 +76,10 @@ function SuiviObjectifs({ darkMode, actions }) {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-3">
           <h1 className={`text-2xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent`}>
-            Suivi des objectifs
+            {t('suivi.title')}
           </h1>
           <p className={`${theme.textMuted} text-xs mt-1`}>
-            {objectifs.length} actions • {groups['en cours'].length} en cours · {groups['terminé'].length} terminées · {groups['non démarré'].length} non démarrées
+            {objectifs.length} {t('parax.actions')} • {groups['en cours'].length} {t('suivi.stats.en-cours')} · {groups['terminé'].length} {t('suivi.stats.terminees')} · {groups['non démarré'].length} {t('suivi.stats.non-demarrees')}
           </p>
         </div>
 
@@ -85,7 +88,7 @@ function SuiviObjectifs({ darkMode, actions }) {
           <div className="relative">
             <input
               type="text"
-              placeholder="Rechercher un objectif..."
+              placeholder={t('suivi.search-placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full px-4 py-2 pl-10 rounded-full text-sm ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
@@ -99,7 +102,7 @@ function SuiviObjectifs({ darkMode, actions }) {
           </div>
           {searchTerm && (
             <div className={`mt-1 text-xs ${theme.textMuted} text-center`}>
-              {filtered.length} action{filtered.length !== 1 ? 's' : ''} trouvée{filtered.length !== 1 ? 's' : ''}
+              {filtered.length} {filtered.length !== 1 ? t('parax.actions') : t('parax.action')} {filtered.length !== 1 ? t('suivi.found.plural') : t('suivi.found')}
             </div>
           )}
         </div>
@@ -121,9 +124,9 @@ function SuiviObjectifs({ darkMode, actions }) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 6 }}>
             {[
-              { label: 'Terminé', count: groups['terminé'].length, color: '#22c55e' },
-              { label: 'En cours', count: groups['en cours'].length, color: '#f59e0b' },
-              { label: 'Non démarré', count: groups['non démarré'].length, color: darkMode ? '#64748b' : '#9ca3af' },
+              { label: t('suivi.stats.terminees').charAt(0).toUpperCase() + t('suivi.stats.terminees').slice(1), count: groups['terminé'].length, color: '#22c55e' },
+              { label: t('suivi.stats.en-cours').charAt(0).toUpperCase() + t('suivi.stats.en-cours').slice(1), count: groups['en cours'].length, color: '#f59e0b' },
+              { label: t('suivi.stats.non-demarrees').charAt(0).toUpperCase() + t('suivi.stats.non-demarrees').slice(1), count: groups['non démarré'].length, color: darkMode ? '#64748b' : '#9ca3af' },
             ].map(s => (
               <span key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: s.color, fontWeight: 500 }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: s.color, display: 'inline-block' }} />
@@ -174,7 +177,7 @@ function SuiviObjectifs({ darkMode, actions }) {
                     </div>
                     {/* Texte de l'action */}
                     <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937', lineHeight: 1.4 }}>
-                      {obj.texte}
+                      {tConfig(obj, 'texte')}
                     </div>
                     {obj.objectif && (
                       <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1.35, fontStyle: 'italic' }}>
@@ -192,20 +195,20 @@ function SuiviObjectifs({ darkMode, actions }) {
                           fontWeight: 600, textDecoration: 'none',
                           display: 'inline-flex', alignItems: 'center', gap: 4,
                         }}
-                        title={`Voir la vue par axe : ${obj.axe}`}
+                        title={`${t('suivi.link.voir-axe')} ${tConfig(obj, 'axe')}`}
                       >
                         <span style={{
                           background: obj.axeColor, color: 'white',
                           padding: '1px 5px', borderRadius: 6,
                           fontSize: 9, fontWeight: 700,
                         }}>{obj.axeId}</span>
-                        <span>{obj.axe}</span>
+                        <span>{tConfig(obj, 'axe')}</span>
                       </a>
                       {/* Projet (avec icône chantier) — cliquable vers vue par chantier */}
                       {obj.projet && (
                         <a
                           href={`#analyse?project=${encodeURIComponent(obj.projet)}`}
-                          title={obj.nomProjet ? `Aller au projet ${obj.projet} — ${obj.nomProjet}` : `Aller au projet ${obj.projet}`}
+                          title={obj.nomProjet ? `${t('suivi.link.aller-projet')} ${obj.projet} — ${obj.nomProjet}` : `${t('suivi.link.aller-projet')} ${obj.projet}`}
                           style={{
                             fontSize: 10, padding: '3px 9px', borderRadius: 10,
                             backgroundColor: obj.chantierColor + '18',
