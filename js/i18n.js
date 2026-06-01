@@ -87,6 +87,20 @@
       'suivi.stats.en-cours': 'en cours',
       'suivi.stats.terminees': 'terminées',
       'suivi.stats.non-demarrees': 'non démarrées',
+
+      // ── Structure & Gouvernance ──
+      'structure.title': 'Structure scientifique du RSN',
+      'structure.subtitle': 'Cliquez sur un élément pour voir ses responsables',
+      'structure.gouvernance': 'Gouvernance',
+      'structure.direction': 'Direction',
+      'structure.membres': 'Membres',
+      'structure.membres-a-venir': 'Membres à venir',
+      'structure.a-venir': 'À venir',
+      'structure.membre': 'membre',
+      'structure.membres-count': 'membres',
+      'structure.resp-abbr': 'resp.',
+      'structure.responsable': 'Responsable',
+      'structure.responsables': 'Responsables',
     },
     en: {
       // ── App / header / tabs ──
@@ -157,6 +171,20 @@
       'suivi.stats.en-cours': 'in progress',
       'suivi.stats.terminees': 'completed',
       'suivi.stats.non-demarrees': 'not started',
+
+      // ── Structure & Governance ──
+      'structure.title': 'RSN scientific structure',
+      'structure.subtitle': 'Click on an element to see its leads',
+      'structure.gouvernance': 'Governance',
+      'structure.direction': 'Direction',
+      'structure.membres': 'Members',
+      'structure.membres-a-venir': 'Members to come',
+      'structure.a-venir': 'To come',
+      'structure.membre': 'member',
+      'structure.membres-count': 'members',
+      'structure.resp-abbr': 'leads',
+      'structure.responsable': 'Lead',
+      'structure.responsables': 'Leads',
     },
   };
 
