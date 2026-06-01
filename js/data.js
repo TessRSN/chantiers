@@ -61,6 +61,86 @@ const NOM_PROJET_EN = {
   'Communications et contenus de diffusion': 'Communications and outreach content',
 };
 
+// ── Traductions des libellés d'objectifs stratégiques (OS) ──
+const OS_LABEL_EN = {
+  // Axe 1
+  "Favoriser l'acceptabilité sociale de l'utilisation des données de santé dans un contexte de recherche":
+    "Foster social acceptability of using health data in a research context",
+  "Soutenir les plateformes numériques et favoriser leur alignement sur les plans technique, éthique et de gestion":
+    "Support digital platforms and foster their alignment on technical, ethical and management fronts",
+  "Représenter les besoins de la communauté des chercheurs en matière de gouvernance de l'information et influencer les décisions gouvernementales":
+    "Represent the research community's information-governance needs and influence government decisions",
+  // Axe 2
+  "Faciliter le maillage entre les méthodologistes et la formation de la relève":
+    "Facilitate networking between methodologists and next-generation training",
+  "Colliger et harmoniser les bonnes pratiques et les rendre accessibles":
+    "Collect and harmonize best practices and make them accessible",
+  "Connecter les méthodologistes aux utilisateurs de connaissances":
+    "Connect methodologists with knowledge users",
+  // Axe 3
+  "Améliorer l'accessibilité et l'utilisation de la recherche en santé numérique":
+    "Improve the accessibility and use of digital health research",
+  "Favoriser le rapprochement entre les chercheurs et les milieux preneurs pour optimiser l'accompagnement et le transfert de connaissances":
+    "Foster engagement between researchers and end-user settings to optimize support and knowledge transfer",
+  "Accélérer la collaboration entre chercheurs et développeurs d'interventions numériques pour favoriser l'adéquation aux besoins des parties prenantes":
+    "Accelerate collaboration between researchers and digital intervention developers to better meet stakeholder needs",
+  // Axe 4
+  "Aviser les organisations à une gestion efficace du numérique et de ses tensions":
+    "Advise organizations on effective management of digital tools and their tensions",
+  "Outiller les chercheurs, gestionnaires et patients pour comprendre les nouveaux cadres en lien avec le numérique en santé":
+    "Equip researchers, managers and patients to understand the new frameworks linked to digital health",
+  "Alimenter la réflexion autour des politiques publiques pour favoriser une transformation numérique basée sur des évidences scientifiques":
+    "Inform public-policy reflection to support an evidence-based digital transformation",
+  "Mesurer et suivre l'adoption du numérique en santé par les patients, les citoyens et les prestataires":
+    "Measure and monitor digital health adoption by patients, citizens and providers",
+  // CA-FORM
+  "Promouvoir le développement d'une formation interdisciplinaire en santé numérique":
+    "Promote the development of interdisciplinary digital health training",
+  "Encourager la diversité des approches de recherche et de méthodologies":
+    "Encourage diversity in research approaches and methodologies",
+  "Faciliter l'accès des chercheurs aux formations existantes":
+    "Facilitate researcher access to existing training programs",
+  // CA-MOB
+  "Renforcer l'engagement citoyen et la littératie numérique en santé par la diffusion accessible des connaissances et des pratiques fondées sur des données probantes":
+    "Strengthen citizen engagement and digital health literacy through accessible dissemination of evidence-based knowledge and practices",
+  "Favoriser l'accessibilité de la patientèle et du public aux connaissances et interventions en santé numérique":
+    "Foster patient and public accessibility to digital health knowledge and interventions",
+  // CA-RENF
+  "Consolider les compétences de l'ensemble des chercheur(e)s":
+    "Consolidate the skills of all researchers",
+  "Assurer la cohérence des solutions existantes et nouvelles entre les axes et optimiser les solutions communes pour la recherche collaborative de bout en bout (end-to-end)":
+    "Ensure coherence of existing and new solutions across axes and optimize shared solutions for end-to-end collaborative research",
+  "Outiller les chercheur(e)s pour mesurer adéquatement l'impact de leurs activités en termes de capacité":
+    "Equip researchers to adequately measure the capacity-building impact of their activities",
+  // PD-ENG
+  "Renforcer la compréhension des perspectives citoyennes et usagères dans la conception des projets":
+    "Strengthen the understanding of citizen and user perspectives in project design",
+  "Favoriser la co-construction de projets en santé numérique avec la patientèle et le public":
+    "Foster co-construction of digital health projects with patients and the public",
+  "Promouvoir le dialogue et l'engagement de la patientèle et du public autour des interventions en santé numérique":
+    "Promote dialogue and engagement of patients and the public around digital health interventions",
+  // PD-CONF
+  "Intégrer une vision partagée du numérique de confiance dans les axes et les actions du RSN":
+    "Embed a shared vision of trustworthy digital across RSN axes and actions",
+  // PD-DUR
+  "Former et sensibiliser les membres du réseau et les parties prenantes sur la santé numérique durable":
+    "Train and raise awareness of network members and stakeholders on sustainable digital health",
+  "Formuler des recommandations pour assurer la santé numérique durable au Québec":
+    "Issue recommendations to ensure sustainable digital health in Québec",
+  // PD-SCI
+  "Favoriser la mise en place d'un référentiel commun et accessible pour la science ouverte":
+    "Foster the establishment of a common and accessible reference framework for open science",
+  "Favoriser des normes et pratiques partagées autour de la transparence, la sécurité, l'éthique, l'éco-responsabilité et la réciprocité":
+    "Foster shared standards and practices around transparency, security, ethics, eco-responsibility and reciprocity",
+  "Promouvoir une culture de la science ouverte au sein du réseau et à l'externe":
+    "Promote a culture of open science within the network and externally",
+  // PD-EDIA
+  "Favoriser une culture inclusive et respectueuse":
+    "Foster an inclusive and respectful culture",
+  "Assurer l'équité dans le processus de dotation des organisations":
+    "Ensure equity in the recruitment processes of organizations",
+};
+
 // ── Chargement CSV → toutes les lignes enrichies (avec versions EN si présentes) ──
 function csvRowsToAllData(rows) {
   return rows.map(row => ({
@@ -71,7 +151,8 @@ function csvRowsToAllData(rows) {
     action_en:       row['Action réécrite EN'] || row['Action originale EN'] || '',
     actionOriginale:    row['Action originale']    || '',
     actionOriginale_en: row['Action originale EN'] || '',
-    objectif: row['Objectif stratégique'],
+    objectif:    row['Objectif stratégique'],
+    objectif_en: OS_LABEL_EN[(row['Objectif stratégique'] || '').trim()] || row['Objectif stratégique'] || '',
     axeFullName: row['Axe'],
     chantierFullName: row['Chantier suggéré'],
     // Champs analyse

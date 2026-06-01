@@ -55,9 +55,9 @@ function RSNRadialGraph({ darkMode }) {
   const effetRadius = 70;
 
   const effetsStrategiques = [
-    { id: 'ES1', name: 'Consolidation écosystème',         name_en: 'Ecosystem consolidation',     color: '#3B82F6', chantiers: ['C1', 'C2'] },
-    { id: 'ES2', name: 'Maillage environnement',           name_en: 'Environment networking',      color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
-    { id: 'ES3', name: 'Rapprochement preneurs/décideurs', name_en: 'End-user / decision-maker engagement', color: '#F59E0B', chantiers: ['C5', 'C6'] },
+    { id: 'ES1', name: 'Consolidation écosystème',         name_en: 'Consolidation ecosystem',         color: '#3B82F6', chantiers: ['C1', 'C2'] },
+    { id: 'ES2', name: 'Maillage environnement',           name_en: 'Networking environment',          color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
+    { id: 'ES3', name: 'Rapprochement preneurs/décideurs', name_en: 'Engagement end-users/decision-makers', color: '#F59E0B', chantiers: ['C5', 'C6'] },
   ];
 
   const effetPositions = useMemo(() => {

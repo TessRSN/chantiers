@@ -67,6 +67,7 @@
       'parax.toutes-de-cet-axe': 'toutes de cet axe',
       'parax.voir-tout': 'Voir tout le chantier',
       'parax.sans-projet': 'Sans projet',
+      'parax.sans-intitule': 'Sans intitulé',
 
       // ── Vue par chantier ──
       'chantiers.aller-a': 'Aller à',
@@ -170,6 +171,7 @@
       'parax.toutes-de-cet-axe': 'all from this axis',
       'parax.voir-tout': 'See the full workstream',
       'parax.sans-projet': 'No project',
+      'parax.sans-intitule': 'Untitled',
 
       // ── By workstream ──
       'chantiers.aller-a': 'Jump to',

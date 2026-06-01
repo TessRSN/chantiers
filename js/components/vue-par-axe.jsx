@@ -3,7 +3,10 @@
 // Liste des entités (4 axes + 5 PD + 3 champs) issues de la config statique
 function getEntities() {
   return AXES_CONFIG.map(a => ({
-    id: a.id, name: a.name, fullName: a.fullName, type: a.type, color: a.color,
+    id: a.id,
+    name: a.name,         name_en: a.name_en,
+    fullName: a.fullName, fullName_en: a.fullName_en,
+    type: a.type, color: a.color,
   }));
 }
 
@@ -65,7 +68,7 @@ function buildEntityData(entity, allActions) {
   const osMap = {};
   fdrActions.forEach(a => {
     const os = extractOS(a.id);
-    if (!osMap[os]) osMap[os] = { id: os, label: a.objectif || '', actions: [] };
+    if (!osMap[os]) osMap[os] = { id: os, label: a.objectif || '', label_en: a.objectif_en || '', actions: [] };
     osMap[os].actions.push(a);
     // Si label vide jusqu'ici, prendre celui-ci
     if (!osMap[os].label && a.objectif) osMap[os].label = a.objectif;
@@ -383,7 +386,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
         const dimmed = hoveredKey && !hoveredKey.startsWith(`os:${os.id}`)
           && !(hoveredKey.startsWith('sub:') && sousObjs.find(s => s.id === hoveredKey.slice(4))?.os === os.id);
         const maxNameLines = Math.max(1, Math.floor((os.h - 50) / 16));
-        const nameLines = wrapText(os.label, 28, maxNameLines);
+        const nameLines = wrapText(tConfig(os, 'label'), 28, maxNameLines);
         return (
           <g
             key={`os-${os.id}`}
@@ -709,7 +712,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
               background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 4,
               fontSize: 11, fontWeight: 700,
             }}>{os.id}</span>
-            <span style={{ flex: 1 }}>{os.label || 'Sans intitulé'}</span>
+            <span style={{ flex: 1 }}>{tConfig(os, 'label') || t('parax.sans-intitule')}</span>
             <span style={{ fontSize: 11, opacity: 0.85 }}>{os.actions.length} action{os.actions.length > 1 ? 's' : ''}</span>
           </div>
 
@@ -723,7 +726,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
               // Récupérer le nom complet du projet pour la pastille
               const projectInfo = data.projectList.find(p => p.id === projet);
               const projectShortName = projectInfo
-                ? (projectInfo.name || projet)
+                ? (tConfig(projectInfo, 'name') || projet)
                 : projet;
               return (
                 <div
