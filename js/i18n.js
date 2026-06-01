@@ -18,8 +18,34 @@
 
   // ── Dictionnaire — enrichi au fur et à mesure des tâches ──
   window.I18N = {
-    fr: {},
-    en: {},
+    fr: {
+      // ── App / header / onglets ──
+      'app.header': 'RSN — Tableau de bord',
+      'tab.structure': 'Structure & Gouvernance',
+      'tab.vue-globale': 'Vue globale',
+      'tab.par-axe': 'Vue par axe',
+      'tab.analyse': 'Vue par chantier',
+      'tab.suivi': 'Suivi des objectifs',
+      'toggle.light': 'Mode clair',
+      'toggle.dark': 'Mode sombre',
+      'app.loading': 'Chargement des données…',
+      'app.error': 'Erreur',
+      'app.error.help': 'Vérifiez que data.csv et membres.csv sont présents à côté de index.html',
+    },
+    en: {
+      // ── App / header / tabs ──
+      'app.header': 'RSN — Dashboard',
+      'tab.structure': 'Structure & Governance',
+      'tab.vue-globale': 'Overview',
+      'tab.par-axe': 'By axis',
+      'tab.analyse': 'By workstream',
+      'tab.suivi': 'Objective tracker',
+      'toggle.light': 'Light mode',
+      'toggle.dark': 'Dark mode',
+      'app.loading': 'Loading data…',
+      'app.error': 'Error',
+      'app.error.help': 'Make sure data.csv and membres.csv are next to index.html',
+    },
   };
 
   // ── Helpers ──

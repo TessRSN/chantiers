@@ -151,11 +151,11 @@ function MainApp() {
   }, []);
 
   const tabs = [
-    { id: 'structure',   label: 'Structure & Gouvernance', icon: 'structure' },
-    { id: 'vue-globale', label: 'Vue globale', icon: 'vue-globale' },
-    { id: 'par-axe',     label: 'Vue par axe', icon: 'par-axe' },
-    { id: 'analyse',     label: 'Vue par chantier', icon: 'analyse' },
-    { id: 'suivi',       label: 'Suivi des objectifs', icon: 'suivi' },
+    { id: 'structure',   label: t('tab.structure'),   icon: 'structure' },
+    { id: 'vue-globale', label: t('tab.vue-globale'), icon: 'vue-globale' },
+    { id: 'par-axe',     label: t('tab.par-axe'),     icon: 'par-axe' },
+    { id: 'analyse',     label: t('tab.analyse'),     icon: 'analyse' },
+    { id: 'suivi',       label: t('tab.suivi'),       icon: 'suivi' },
   ];
 
   const tabBarBg = darkMode ? '#0f172a' : '#ffffff';
@@ -171,7 +171,7 @@ function MainApp() {
       <div style={{ backgroundColor: tabBarBg, borderBottom: `1px solid ${tabBarBorder}`, position: 'sticky', top: 0, zIndex: 100 }}>
         {/* Title row */}
         <div style={{ textAlign: 'center', padding: '8px 16px 2px', fontSize: 13, fontWeight: 600, color: darkMode ? '#94a3b8' : '#6b7280', letterSpacing: '0.02em' }}>
-          RSN — Tableau de bord
+          {t('app.header')}
         </div>
         {/* Tabs + toggle row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 40 }}>
@@ -293,14 +293,14 @@ function MainApp() {
               <svg xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
-              Mode clair
+              {t('toggle.light')}
             </>
           ) : (
             <>
               <svg xmlns="http://www.w3.org/2000/svg" style={{ width: 14, height: 14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
-              Mode sombre
+              {t('toggle.dark')}
             </>
           )}
         </button>
@@ -313,7 +313,7 @@ function MainApp() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 70px)', color: darkMode ? '#94a3b8' : '#6b7280' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
-            <p>Chargement des données...</p>
+            <p>{t('app.loading')}</p>
           </div>
         </div>
       )}
@@ -321,8 +321,8 @@ function MainApp() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 70px)', color: '#ef4444' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
-            <p>Erreur : {csvError}</p>
-            <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>Vérifiez que data.csv et membres.csv sont présents à côté de index.html</p>
+            <p>{t('app.error')} : {csvError}</p>
+            <p style={{ fontSize: 12, color: darkMode ? '#64748b' : '#9ca3af', marginTop: 8 }}>{t('app.error.help')}</p>
           </div>
         </div>
       )}
