@@ -65,7 +65,7 @@ function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
             onClick={() => setExpanded(!expanded)}
             className={`${theme.textLight} hover:${theme.text} shrink-0 mt-0.5`}
             style={{ fontSize: 10 }}
-            title="Détails"
+            title={t('shared.details')}
           >
             {expanded ? '▲' : '▼'}
           </button>

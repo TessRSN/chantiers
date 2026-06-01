@@ -108,6 +108,9 @@
       'vueglobale.search-placeholder': 'Rechercher une action…',
       'vueglobale.axes': 'axes',
       'vueglobale.chantiers': 'chantiers',
+
+      // ── Partagé ──
+      'shared.details': 'Détails',
     },
     en: {
       // ── App / header / tabs ──
@@ -199,6 +202,9 @@
       'vueglobale.search-placeholder': 'Search an action…',
       'vueglobale.axes': 'axes',
       'vueglobale.chantiers': 'workstreams',
+
+      // ── Shared ──
+      'shared.details': 'Details',
     },
   };
 
