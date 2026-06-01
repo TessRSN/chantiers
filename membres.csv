@@ -1,42 +1,42 @@
-Nom,Initiales,Affiliation,Role,Groupes
-Sara Ahmed,SA,McGill University,Directrice,Direction;A3;PD-EDIA;PD-ENG;Comité scientifique;Comité citoyen
-Philippe Després,PD,Université Laval,Codirecteur,Direction;A1;PD-DUR
-Aude Motulsky,AM,Université de Montréal,Codirectrice,Direction;A4;PD-CONF
-Bouchra Nasri,BN,Université de Montréal,Codirectrice,Direction;A2;CA-FORM;CA-MOB;Comité scientifique
-Martin Vallières,MV,McGill University,Codirecteur,Direction;A1;A2;CA-RENF;PD-SCI
-Jacques Bélair,JB,Université de Montréal,,Comité aviseur
-Franco Saliola,FS,UQAM,,Comité aviseur
-Aurélie Labbé,AL,HEC Montréal,,Comité aviseur
-Robyn Tamblyn,RT,McGill University,,Comité aviseur
-Laurette Dubé,LD,McGill University,,Comité aviseur
-Alan Forster,AF,McGill University,,Comité aviseur
-Yves Joannette,YJ,Université de Montréal,,Comité aviseur
-Jean Nikiema,JN,Université de Montréal,Colead A1,A1
-Robert Platt,RP,McGill University,Colead A1,A1;Comité scientifique
-Morgan Craig,MC,Université de Montréal,Colead A2,A2
-Audrey Durand,AD,Université Laval,Colead A2,A2
-Denis Talbot,DT,Université Laval,Colead A2,A2;Comité scientifique
-Alexander Baldwin,AB,McGill University,Colead A3,A3;Comité scientifique
-Louis Valiquette,LV,Université de Sherbrooke,Colead A3,A3
-Anmar Khadra,AK,McGill University,Colead A3,A3
-Pierre-Luc Déziel,PLD,Université Laval,Colead A4,A4
-Samer Faraj,SF,McGill University,Colead A4,A4
-Nitika Pai,NP,McGill University,Colead A4,A4;CA-FORM;Comité scientifique
-Bessam Abdulrazak,BA,Université de Sherbrooke,Colead CA-RENF,CA-RENF
-Sylvie Lambert,SL,McGill University,Colead PD-ENG,PD-ENG;Comité scientifique;Comité citoyen
-Celia Greenwood,CG,McGill University,Colead CA-FORM,CA-FORM;Comité scientifique
-Aliki Thomas,AT,McGill University,Colead CA-MOB,CA-MOB;Comité scientifique
-Tatiana Ogourtsova,TO,McGill University,Colead CA-MOB,CA-MOB
-Amédé Gogovor,AG,Université Laval,Colead PD-EDIA,PD-EDIA;Comité scientifique
-Karina Prévost,KP,,Colead PD-EDIA,PD-EDIA
-Annabelle Cumyn,AC,Université de Sherbrooke,Colead PD-CONF,PD-CONF
-Véronique Nabelsi,VN,UQO,Colead PD-CONF,PD-CONF;Comité scientifique
-Marie-Pascale Pomey,MPP,Université de Montréal,Colead PD-ENG,PD-ENG;Comité citoyen
-Holly Witteman,HW,Université Laval,Colead PD-DUR,PD-DUR
-Patrick Archambault,PA,Université Laval,Colead PD-DUR,PD-DUR;Comité scientifique
-Louis Archambault,LA,Université Laval,Colead PD-SCI,PD-SCI;Comité scientifique
-Toby Hocking,TH,Université de Sherbrooke,Colead PD-SCI,PD-SCI
-Denis Cormier-Piché,DCP,,Patient-Partenaire,Patients partenaires;Comité citoyen;Comité scientifique
-Marie-Dominique Poirier,MDP,,Patient-Partenaire,Patients partenaires;Comité citoyen;Comité scientifique
-Doriane Etienne,DE,,,Comité étudiants
-Hakima Laribi,HL,,,Comité étudiants
+Nom,Initiales,Affiliation,Role,Role EN,Groupes
+Sara Ahmed,SA,McGill University,Directrice,Director,Direction;A3;PD-EDIA;PD-ENG;Comité scientifique;Comité citoyen
+Philippe Després,PD,Université Laval,Codirecteur,Co-director,Direction;A1;PD-DUR
+Aude Motulsky,AM,Université de Montréal,Codirectrice,Co-director,Direction;A4;PD-CONF
+Bouchra Nasri,BN,Université de Montréal,Codirectrice,Co-director,Direction;A2;CA-FORM;CA-MOB;Comité scientifique
+Martin Vallières,MV,McGill University,Codirecteur,Co-director,Direction;A1;A2;CA-RENF;PD-SCI
+Jacques Bélair,JB,Université de Montréal,,,Comité aviseur
+Franco Saliola,FS,UQAM,,,Comité aviseur
+Aurélie Labbé,AL,HEC Montréal,,,Comité aviseur
+Robyn Tamblyn,RT,McGill University,,,Comité aviseur
+Laurette Dubé,LD,McGill University,,,Comité aviseur
+Alan Forster,AF,McGill University,,,Comité aviseur
+Yves Joannette,YJ,Université de Montréal,,,Comité aviseur
+Jean Nikiema,JN,Université de Montréal,Colead A1,Co-lead Axis 1,A1
+Robert Platt,RP,McGill University,Colead A1,Co-lead Axis 1,A1;Comité scientifique
+Morgan Craig,MC,Université de Montréal,Colead A2,Co-lead Axis 2,A2
+Audrey Durand,AD,Université Laval,Colead A2,Co-lead Axis 2,A2
+Denis Talbot,DT,Université Laval,Colead A2,Co-lead Axis 2,A2;Comité scientifique
+Alexander Baldwin,AB,McGill University,Colead A3,Co-lead Axis 3,A3;Comité scientifique
+Louis Valiquette,LV,Université de Sherbrooke,Colead A3,Co-lead Axis 3,A3
+Anmar Khadra,AK,McGill University,Colead A3,Co-lead Axis 3,A3
+Pierre-Luc Déziel,PLD,Université Laval,Colead A4,Co-lead Axis 4,A4
+Samer Faraj,SF,McGill University,Colead A4,Co-lead Axis 4,A4
+Nitika Pai,NP,McGill University,Colead A4,Co-lead Axis 4,A4;CA-FORM;Comité scientifique
+Bessam Abdulrazak,BA,Université de Sherbrooke,Colead CA-RENF,Co-lead Capacity building,CA-RENF
+Sylvie Lambert,SL,McGill University,Colead PD-ENG,Co-lead Citizen engagement,PD-ENG;Comité scientifique;Comité citoyen
+Celia Greenwood,CG,McGill University,Colead CA-FORM,Co-lead Interdisciplinary training,CA-FORM;Comité scientifique
+Aliki Thomas,AT,McGill University,Colead CA-MOB,Co-lead Knowledge mobilization,CA-MOB;Comité scientifique
+Tatiana Ogourtsova,TO,McGill University,Colead CA-MOB,Co-lead Knowledge mobilization,CA-MOB
+Amédé Gogovor,AG,Université Laval,Colead PD-EDIA,Co-lead EDIA,PD-EDIA;Comité scientifique
+Karina Prévost,KP,,Colead PD-EDIA,Co-lead EDIA,PD-EDIA
+Annabelle Cumyn,AC,Université de Sherbrooke,Colead PD-CONF,Co-lead Trustworthy digital,PD-CONF
+Véronique Nabelsi,VN,UQO,Colead PD-CONF,Co-lead Trustworthy digital,PD-CONF;Comité scientifique
+Marie-Pascale Pomey,MPP,Université de Montréal,Colead PD-ENG,Co-lead Citizen engagement,PD-ENG;Comité citoyen
+Holly Witteman,HW,Université Laval,Colead PD-DUR,Co-lead Sustainable health,PD-DUR
+Patrick Archambault,PA,Université Laval,Colead PD-DUR,Co-lead Sustainable health,PD-DUR;Comité scientifique
+Louis Archambault,LA,Université Laval,Colead PD-SCI,Co-lead Open science,PD-SCI;Comité scientifique
+Toby Hocking,TH,Université de Sherbrooke,Colead PD-SCI,Co-lead Open science,PD-SCI
+Denis Cormier-Piché,DCP,,Patient-Partenaire,Patient partner,Patients partenaires;Comité citoyen;Comité scientifique
+Marie-Dominique Poirier,MDP,,Patient-Partenaire,Patient partner,Patients partenaires;Comité citoyen;Comité scientifique
+Doriane Etienne,DE,,,,Comité étudiants
+Hakima Laribi,HL,,,,Comité étudiants
