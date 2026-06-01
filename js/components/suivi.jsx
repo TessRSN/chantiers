@@ -155,7 +155,7 @@ function SuiviObjectifs({ darkMode, actions }) {
                     borderTop: `1px solid ${theme.cardBorder}`,
                     borderRight: `1px solid ${theme.cardBorder}`,
                     borderBottom: `1px solid ${theme.cardBorder}`,
-                    borderLeft: `4px solid ${tConfig(obj, 'axe')Color}`,
+                    borderLeft: `4px solid ${obj.axeColor}`,
                     borderRadius: 14,
                     padding: '14px 16px',
                     display: 'flex', flexDirection: 'column', gap: 8,
@@ -163,12 +163,12 @@ function SuiviObjectifs({ darkMode, actions }) {
                     {/* Top row : ID + OS + status */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6, flexWrap: 'wrap' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: tConfig(obj, 'axe')Color, fontFamily: 'monospace' }}>{obj.id}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: obj.axeColor, fontFamily: 'monospace' }}>{obj.id}</span>
                         {obj.os && (
                           <span style={{
                             fontSize: 9, fontWeight: 700,
                             padding: '1px 6px', borderRadius: 3,
-                            background: tConfig(obj, 'axe')Color + '25', color: tConfig(obj, 'axe')Color,
+                            background: obj.axeColor + '25', color: obj.axeColor,
                             letterSpacing: '0.04em',
                           }}>{obj.os}</span>
                         )}
@@ -188,20 +188,20 @@ function SuiviObjectifs({ darkMode, actions }) {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 'auto' }}>
                       {/* Entité */}
                       <a
-                        href={`#par-axe?entite=${tConfig(obj, 'axe')Id}`}
+                        href={`#par-axe?entite=${obj.axeId}`}
                         style={{
                           fontSize: 10, padding: '3px 9px', borderRadius: 10,
-                          backgroundColor: tConfig(obj, 'axe')Color + '20', color: tConfig(obj, 'axe')Color,
+                          backgroundColor: obj.axeColor + '20', color: obj.axeColor,
                           fontWeight: 600, textDecoration: 'none',
                           display: 'inline-flex', alignItems: 'center', gap: 4,
                         }}
                         title={`${t('suivi.link.voir-axe')} ${tConfig(obj, 'axe')}`}
                       >
                         <span style={{
-                          background: tConfig(obj, 'axe')Color, color: 'white',
+                          background: obj.axeColor, color: 'white',
                           padding: '1px 5px', borderRadius: 6,
                           fontSize: 9, fontWeight: 700,
-                        }}>{tConfig(obj, 'axe')Id}</span>
+                        }}>{obj.axeId}</span>
                         <span>{tConfig(obj, 'axe')}</span>
                       </a>
                       {/* Projet (avec icône chantier) — cliquable vers vue par chantier */}
