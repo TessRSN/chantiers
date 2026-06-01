@@ -820,7 +820,7 @@ function CoResponsableAvatar({ person, color, darkMode }) {
   };
   return (
     <div
-      title={`${person.name}${person.affiliation ? ' — ' + person.affiliation : ''}${person.role ? ' (' + person.role + ')' : ''}`}
+      title={`${person.name}${person.affiliation ? ' — ' + person.affiliation : ''}${person.role ? ' (' + tConfig(person, 'role') + ')' : ''}`}
       style={{
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '4px 10px 4px 4px', borderRadius: 18,

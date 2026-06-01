@@ -101,7 +101,10 @@ function buildGouvernanceFromCSV(rows) {
 
   rows.forEach(row => {
     const person = { name: row['Nom'], initials: row['Initiales'], affiliation: row['Affiliation'] || '' };
-    if (row['Role']) person.role = row['Role'];
+    if (row['Role']) {
+      person.role = row['Role'];
+      person.role_en = row['Role EN'] || '';
+    }
 
     const groupes = (row['Groupes'] || '').split(';').map(g => g.trim()).filter(Boolean);
     groupes.forEach(g => {

@@ -102,7 +102,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
         <div>
           <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937' }}>{p.name}</div>
           {p.affiliation && <div style={{ fontSize: 11, color: darkMode ? '#94a3b8' : '#6b7280' }}>{p.affiliation}</div>}
-          {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{p.role}</div>}
+          {p.role && <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af' }}>{tConfig(p, 'role')}</div>}
         </div>
       </div>
     );
