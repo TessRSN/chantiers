@@ -244,6 +244,8 @@ function MainApp() {
           })}
         </div>
 
+        {/* Right-side toggles (langue + thème) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         {/* Language toggle */}
         <button
           onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
@@ -261,7 +263,6 @@ function MainApp() {
             cursor: 'pointer',
             fontSize: 12,
             fontWeight: 600,
-            marginRight: 8,
             transition: 'all 0.15s',
           }}
         >
@@ -303,6 +304,7 @@ function MainApp() {
             </>
           )}
         </button>
+        </div>
         </div>
       </div>
 
