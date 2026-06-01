@@ -37,8 +37,24 @@ function migrateLegacyHash(p) {
   return p;
 }
 
+// Hook bilingue — synchronise window.LANG, localStorage.
+// L'URL hash sera mis à jour via le useEffect de routing principal (qui inclut lang dans les params).
+function useLang() {
+  const [lang, setLangState] = React.useState(window.LANG);
+
+  const setLang = React.useCallback((newLang) => {
+    if (newLang !== 'fr' && newLang !== 'en') return;
+    window.LANG = newLang;
+    setLangState(newLang);
+    try { localStorage.setItem('rsn-lang', newLang); } catch (_) {}
+  }, []);
+
+  return [lang, setLang];
+}
+
 function MainApp() {
   const [darkMode, setDarkMode] = useState(true);
+  const [lang, setLang] = useLang();
   const validTabs = ['structure', 'vue-globale', 'par-axe', 'analyse', 'suivi'];
 
   const initialRaw = parseHash(window.location.hash);
@@ -59,11 +75,13 @@ function MainApp() {
     } else if (activeTab === 'analyse' && targetProject) {
       params = { project: targetProject };
     }
+    // Préserver la langue dans l'URL si non-FR
+    if (lang === 'en') params.lang = 'en';
     const newHash = buildHash(activeTab, params);
     if (newHash !== window.location.hash.replace(/^#/, '')) {
       window.location.hash = newHash;
     }
-  }, [activeTab, vueEntityId, targetProject]);
+  }, [activeTab, vueEntityId, targetProject, lang]);
 
   // Sync URL hash → state (back/forward navigation + ancien lien migré)
   useEffect(() => {
@@ -72,10 +90,14 @@ function MainApp() {
       if (validTabs.includes(p.tab)) setActiveTab(p.tab);
       if (p.tab === 'par-axe' && p.params.entite) setVueEntityId(p.params.entite);
       if (p.tab === 'analyse') setTargetProject(p.params.project || null);
+      // Langue depuis URL — l'URL gagne sur le state local
+      if (p.params.lang === 'fr' || p.params.lang === 'en') {
+        if (p.params.lang !== lang) setLang(p.params.lang);
+      }
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
-  }, []);
+  }, [lang, setLang]);
 
   const [csvLoading, setCsvLoading] = useState(true);
   const [csvError, setCsvError] = useState(null);
