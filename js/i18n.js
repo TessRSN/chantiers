@@ -73,6 +73,20 @@
       'chantiers.actions': 'Actions',
       'chantiers.aucun-sous-projet': 'Aucun sous-projet',
       'chantiers.aller-vue-axe': 'Aller à la vue par axe de',
+
+      // ── Suivi ──
+      'suivi.title': 'Suivi des objectifs',
+      'suivi.search-placeholder': 'Rechercher un objectif…',
+      'suivi.found': 'trouvée',
+      'suivi.found.plural': 'trouvées',
+      'suivi.section.en-cours': 'En cours',
+      'suivi.section.termines': 'Terminés',
+      'suivi.section.non-demarres': 'Non démarrés',
+      'suivi.link.voir-axe': 'Voir la vue par axe :',
+      'suivi.link.aller-projet': 'Aller au projet',
+      'suivi.stats.en-cours': 'en cours',
+      'suivi.stats.terminees': 'terminées',
+      'suivi.stats.non-demarrees': 'non démarrées',
     },
     en: {
       // ── App / header / tabs ──
@@ -129,6 +143,20 @@
       'chantiers.actions': 'Actions',
       'chantiers.aucun-sous-projet': 'No sub-project',
       'chantiers.aller-vue-axe': 'Open the axis view of',
+
+      // ── Tracker ──
+      'suivi.title': 'Objective tracker',
+      'suivi.search-placeholder': 'Search an objective…',
+      'suivi.found': 'found',
+      'suivi.found.plural': 'found',
+      'suivi.section.en-cours': 'In progress',
+      'suivi.section.termines': 'Completed',
+      'suivi.section.non-demarres': 'Not started',
+      'suivi.link.voir-axe': 'Open the axis view:',
+      'suivi.link.aller-projet': 'Open project',
+      'suivi.stats.en-cours': 'in progress',
+      'suivi.stats.terminees': 'completed',
+      'suivi.stats.non-demarrees': 'not started',
     },
   };
 
