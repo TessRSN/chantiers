@@ -21,10 +21,10 @@ function RSNRadialGraph({ darkMode }) {
     if (!searchTerm.trim()) return [];
     const term = searchTerm.toLowerCase();
     return vueGlobaleData.actions.filter(a =>
-      a.action.toLowerCase().includes(term) ||
+      tConfig(a, 'action').toLowerCase().includes(term) ||
       a.id.toLowerCase().includes(term)
     );
-  }, [searchTerm]);
+  }, [searchTerm, window.LANG]);
 
   const highlightedAxes = useMemo(() => [...new Set(searchResults.map(a => a.axe))], [searchResults]);
   const highlightedChantiers = useMemo(() => [...new Set(searchResults.map(a => a.chantier))], [searchResults]);

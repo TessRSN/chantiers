@@ -66,6 +66,7 @@
       'parax.de-cet-axe': 'de cet axe',
       'parax.toutes-de-cet-axe': 'toutes de cet axe',
       'parax.voir-tout': 'Voir tout le chantier',
+      'parax.sans-projet': 'Sans projet',
 
       // ── Vue par chantier ──
       'chantiers.aller-a': 'Aller à',
@@ -117,6 +118,8 @@
 
       // ── Partagé ──
       'shared.details': 'Détails',
+      'shared.original-action': 'Action originale :',
+      'shared.os-label': 'Objectif stratégique :',
     },
     en: {
       // ── App / header / tabs ──
@@ -166,6 +169,7 @@
       'parax.de-cet-axe': 'from this axis',
       'parax.toutes-de-cet-axe': 'all from this axis',
       'parax.voir-tout': 'See the full workstream',
+      'parax.sans-projet': 'No project',
 
       // ── By workstream ──
       'chantiers.aller-a': 'Jump to',
@@ -217,6 +221,8 @@
 
       // ── Shared ──
       'shared.details': 'Details',
+      'shared.original-action': 'Original action:',
+      'shared.os-label': 'Strategic objective:',
     },
   };
 

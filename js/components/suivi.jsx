@@ -25,13 +25,16 @@ function SuiviObjectifs({ darkMode, actions }) {
       return {
         id: a.id,
         os: extractOSLocal(a.id),
-        texte: a.action,
+        texte:    a.action,
+        texte_en: a.action_en,
         objectif: a.objectif,
         statut: a.statutObjectif || 'non démarré',
         axeId: axeConfig?.id || a.axe,
-        axe: axeConfig?.name || a.axe,
-        axeColor: axeConfig?.color || '#6b7280',
-        chantier: chantierConfig?.name || a.chantier,
+        axe:        axeConfig?.name    || a.axe,
+        axe_en:     axeConfig?.name_en || a.axe,
+        axeColor:   axeConfig?.color || '#6b7280',
+        chantier:    chantierConfig?.name    || a.chantier,
+        chantier_en: chantierConfig?.name_en || a.chantier,
         chantierIcon: chantierConfig?.icon || '',
         chantierColor: chantierConfig?.color || '#6b7280',
         projet: a.projet || '',
@@ -40,20 +43,20 @@ function SuiviObjectifs({ darkMode, actions }) {
     });
   }, [actions]);
 
-  // Filter by search
+  // Filter by search — recherche dans la langue actuelle
   const filtered = useMemo(() => {
     if (!searchTerm.trim()) return objectifs;
     const term = searchTerm.toLowerCase();
     return objectifs.filter(o =>
-      o.texte.toLowerCase().includes(term) ||
-      o.objectif.toLowerCase().includes(term) ||
+      tConfig(o, 'texte').toLowerCase().includes(term) ||
+      (o.objectif || '').toLowerCase().includes(term) ||
       o.id.toLowerCase().includes(term) ||
-      o.axe.toLowerCase().includes(term) ||
-      o.chantier.toLowerCase().includes(term) ||
+      tConfig(o, 'axe').toLowerCase().includes(term) ||
+      tConfig(o, 'chantier').toLowerCase().includes(term) ||
       o.projet.toLowerCase().includes(term) ||
       o.nomProjet.toLowerCase().includes(term)
     );
-  }, [objectifs, searchTerm]);
+  }, [objectifs, searchTerm, window.LANG]);
 
   // Group by status
   const groups = useMemo(() => ({
@@ -152,7 +155,7 @@ function SuiviObjectifs({ darkMode, actions }) {
                     borderTop: `1px solid ${theme.cardBorder}`,
                     borderRight: `1px solid ${theme.cardBorder}`,
                     borderBottom: `1px solid ${theme.cardBorder}`,
-                    borderLeft: `4px solid ${obj.axeColor}`,
+                    borderLeft: `4px solid ${tConfig(obj, 'axe')Color}`,
                     borderRadius: 14,
                     padding: '14px 16px',
                     display: 'flex', flexDirection: 'column', gap: 8,
@@ -160,12 +163,12 @@ function SuiviObjectifs({ darkMode, actions }) {
                     {/* Top row : ID + OS + status */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6, flexWrap: 'wrap' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: obj.axeColor, fontFamily: 'monospace' }}>{obj.id}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: tConfig(obj, 'axe')Color, fontFamily: 'monospace' }}>{obj.id}</span>
                         {obj.os && (
                           <span style={{
                             fontSize: 9, fontWeight: 700,
                             padding: '1px 6px', borderRadius: 3,
-                            background: obj.axeColor + '25', color: obj.axeColor,
+                            background: tConfig(obj, 'axe')Color + '25', color: tConfig(obj, 'axe')Color,
                             letterSpacing: '0.04em',
                           }}>{obj.os}</span>
                         )}
@@ -174,7 +177,7 @@ function SuiviObjectifs({ darkMode, actions }) {
                     </div>
                     {/* Texte de l'action */}
                     <div style={{ fontSize: 13, fontWeight: 500, color: darkMode ? '#e2e8f0' : '#1f2937', lineHeight: 1.4 }}>
-                      {obj.texte}
+                      {tConfig(obj, 'texte')}
                     </div>
                     {obj.objectif && (
                       <div style={{ fontSize: 11, color: darkMode ? '#64748b' : '#9ca3af', lineHeight: 1.35, fontStyle: 'italic' }}>
@@ -185,21 +188,21 @@ function SuiviObjectifs({ darkMode, actions }) {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 'auto' }}>
                       {/* Entité */}
                       <a
-                        href={`#par-axe?entite=${obj.axeId}`}
+                        href={`#par-axe?entite=${tConfig(obj, 'axe')Id}`}
                         style={{
                           fontSize: 10, padding: '3px 9px', borderRadius: 10,
-                          backgroundColor: obj.axeColor + '20', color: obj.axeColor,
+                          backgroundColor: tConfig(obj, 'axe')Color + '20', color: tConfig(obj, 'axe')Color,
                           fontWeight: 600, textDecoration: 'none',
                           display: 'inline-flex', alignItems: 'center', gap: 4,
                         }}
-                        title={`${t('suivi.link.voir-axe')} ${obj.axe}`}
+                        title={`${t('suivi.link.voir-axe')} ${tConfig(obj, 'axe')}`}
                       >
                         <span style={{
-                          background: obj.axeColor, color: 'white',
+                          background: tConfig(obj, 'axe')Color, color: 'white',
                           padding: '1px 5px', borderRadius: 6,
                           fontSize: 9, fontWeight: 700,
-                        }}>{obj.axeId}</span>
-                        <span>{obj.axe}</span>
+                        }}>{tConfig(obj, 'axe')Id}</span>
+                        <span>{tConfig(obj, 'axe')}</span>
                       </a>
                       {/* Projet (avec icône chantier) — cliquable vers vue par chantier */}
                       {obj.projet && (

@@ -91,8 +91,9 @@ function buildEntityData(entity, allActions) {
     if (!projectMap[pid]) {
       projectMap[pid] = {
         id: pid,
-        name: a.nomProjet || (pid === '—' ? 'Sans projet' : pid),
-        description: a.descriptionProjet || '',
+        name: a.nomProjet || (pid === '—' ? t('parax.sans-projet') : pid),
+        description:    a.descriptionProjet    || '',
+        description_en: a.descriptionProjet_en || '',
         chantierId: a.chantier || '',
         actions: [],
         totalCount: (allByProject[pid] || []).length,   // total tous axes confondus
@@ -454,8 +455,8 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
         const descStartY = 24 + nameHeight + 14;  // 14px de gap après le titre
         const descAvailH = p.h - descStartY - 36; // 36 = ratio bottom area
         const maxDescLines = Math.max(0, Math.floor(descAvailH / 14));
-        const descLines = maxDescLines > 0 && p.description
-          ? wrapText(p.description, 42, maxDescLines)
+        const descLines = maxDescLines > 0 && tConfig(p, 'description')
+          ? wrapText(tConfig(p, 'description'), 42, maxDescLines)
           : [];
         const ratioText = p.totalCount > p.actions.length
           ? `${p.actions.length} ${t('parax.de-cet-axe')} · ${p.totalCount} ${t('parax.au-total')}`
@@ -573,9 +574,9 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
           <div style={{ fontSize: 16, fontWeight: 700, color: textPrimary, marginTop: 2 }}>
             {project.name}
           </div>
-          {project.description && (
+          {tConfig(project, 'description') && (
             <div style={{ fontSize: 12, color: textSecondary, marginTop: 4, lineHeight: 1.4 }}>
-              {project.description}
+              {tConfig(project, 'description')}
             </div>
           )}
           <div style={{ fontSize: 12, color: textTertiary, marginTop: 6 }}>
@@ -644,7 +645,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
                           <span style={{ fontSize: 10, color: statusObj.color, fontWeight: 600 }}>{tConfig(statusObj, 'label')}</span>
                         </div>
                         <div style={{ fontSize: 12, color: textPrimary, lineHeight: 1.45, marginTop: 2 }}>
-                          {a.action}
+                          {tConfig(a, 'action')}
                         </div>
                       </div>
                     </div>
@@ -746,7 +747,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                         fontSize: 10, color: statusObj.color, fontWeight: 600,
                       }}>{tConfig(statusObj, 'label')}</span>
                     </div>
-                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{a.action}</div>
+                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{tConfig(a, 'action')}</div>
                   </div>
                   {chantier && projectInfo && (
                     <button
@@ -796,7 +797,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                   <div style={{ fontSize: 16, lineHeight: 1, paddingTop: 1, color: statusObj.color }}>{statusObj.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 10, color: textTertiary, marginBottom: 3, fontFamily: 'ui-monospace, monospace' }}>{a.id}</div>
-                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{a.action}</div>
+                    <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{tConfig(a, 'action')}</div>
                   </div>
                 </div>
               );

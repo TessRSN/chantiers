@@ -191,7 +191,7 @@ function ActionRowAnalyse({ action, darkMode }) {
           color: darkMode ? '#e2e8f0' : '#1f2937',
           lineHeight: 1.45,
         }}>
-          {action.action}
+          {tConfig(action, 'action')}
         </div>
       </div>
     </div>
@@ -261,13 +261,13 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
           }}>
             {project.name}
           </div>
-          {!open && project.description && (
+          {!open && tConfig(project, 'description') && (
             <div style={{
               fontSize: 11.5, color: descColor, lineHeight: 1.4,
               marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              {project.description}
+              {tConfig(project, 'description')}
             </div>
           )}
         </div>
@@ -289,12 +289,12 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
           padding: '0 16px 16px',
           borderTop: `1px solid ${cardBorder}`,
         }}>
-          {project.description && (
+          {tConfig(project, 'description') && (
             <p style={{
               fontSize: 12.5, color: descColor,
               lineHeight: 1.5, margin: '12px 0',
             }}>
-              {project.description}
+              {tConfig(project, 'description')}
             </p>
           )}
 

@@ -34,14 +34,16 @@ function parseCSVLine(line) {
   return result;
 }
 
-// ── Chargement CSV → toutes les lignes enrichies ──
+// ── Chargement CSV → toutes les lignes enrichies (avec versions EN si présentes) ──
 function csvRowsToAllData(rows) {
   return rows.map(row => ({
     id: row['ID Action'],
     axe: AXE_NAME_TO_ID[row['Axe']] || row['Axe'],
     chantier: CHANTIER_NAME_TO_ID[row['Chantier suggéré']] || row['Chantier suggéré'],
-    action: row['Action réécrite'] || row['Action originale'],
-    actionOriginale: row['Action originale'],
+    action:          row['Action réécrite']    || row['Action originale']    || '',
+    action_en:       row['Action réécrite EN'] || row['Action originale EN'] || '',
+    actionOriginale:    row['Action originale']    || '',
+    actionOriginale_en: row['Action originale EN'] || '',
     objectif: row['Objectif stratégique'],
     axeFullName: row['Axe'],
     chantierFullName: row['Chantier suggéré'],
@@ -49,7 +51,8 @@ function csvRowsToAllData(rows) {
     statusAnalyse: row['Statut analyse'] || '',
     projet: row['Projet'] || '',
     nomProjet: row['Nom projet'] || '',
-    descriptionProjet: row['Description projet'] || '',
+    descriptionProjet:    row['Description projet']    || '',
+    descriptionProjet_en: row['Description projet EN'] || '',
     notesAnalyse: row['Notes analyse'] || '',
     destination: row['Destination'] || '',
     approuve: (row['Approuvé'] || 'oui').toLowerCase(),
@@ -140,12 +143,17 @@ function buildAnalyseData(allRows) {
     if (row.projet) {
       if (!byChantier[chantierId].projets[row.projet]) {
         byChantier[chantierId].projets[row.projet] = {
-          id: row.projet, name: row.nomProjet, description: row.descriptionProjet, actions: [],
+          id: row.projet, name: row.nomProjet,
+          description:    row.descriptionProjet,
+          description_en: row.descriptionProjet_en,
+          actions: [],
         };
       }
       byChantier[chantierId].projets[row.projet].actions.push({
         id: row.id, axe: row.axeFullName, objectif: row.objectif,
-        action: row.action, status: row.statusAnalyse || 'keep',
+        action:    row.action,
+        action_en: row.action_en,
+        status: row.statusAnalyse || 'keep',
         notes: row.notesAnalyse,
         statutObjectif: row.statutObjectif,
       });
@@ -153,7 +161,9 @@ function buildAnalyseData(allRows) {
       // Actions sans projet ni destination (ex: à réécrire)
       byChantier[chantierId].orphans.push({
         id: row.id, axe: row.axeFullName, objectif: row.objectif,
-        action: row.action, status: row.statusAnalyse || 'keep',
+        action:    row.action,
+        action_en: row.action_en,
+        status: row.statusAnalyse || 'keep',
         notes: row.notesAnalyse,
         statutObjectif: row.statutObjectif,
       });
