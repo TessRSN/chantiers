@@ -42,6 +42,7 @@ const NOM_PROJET_EN = {
   'Infrastructure Science ouverte': 'Open Science infrastructure',
   'Guides de gouvernance': 'Governance guides',
   'Baromètre numérique': 'Digital barometer',
+  'Outils de mesure et de maturité de la transformation numérique': 'Digital transformation measurement and maturity tools',
   'Répertoire des expertises, actifs et infrastructures RSN': 'Directory of RSN expertise, assets and infrastructure',
   'Inventaire des formations en santé numérique': 'Inventory of digital health training programs',
   'Répertoire des outils et ressources thématiques': 'Directory of thematic tools and resources',
@@ -86,6 +87,12 @@ const OS_LABEL_EN = {
     "Foster engagement between researchers and end-user settings to optimize support and knowledge transfer",
   "Accélérer la collaboration entre chercheurs et développeurs d'interventions numériques pour favoriser l'adéquation aux besoins des parties prenantes":
     "Accelerate collaboration between researchers and digital intervention developers to better meet stakeholder needs",
+  "Soutenir et faciliter l'échange intersectoriel de connaissances et promouvoir les collaborations":
+    "Support and facilitate cross-sector knowledge exchange and promote collaborations",
+  "Soutenir la formation de la prochaine génération par l'acquisition de connaissances et la pratique":
+    "Support next-generation training through knowledge acquisition and practice",
+  "Structurer les partenariats et identifier les ressources pour soutenir les projets porteurs en santé durable":
+    "Structure partnerships and identify resources to support flagship sustainable health projects",
   // Axe 4
   "Aviser les organisations à une gestion efficace du numérique et de ses tensions":
     "Advise organizations on effective management of digital tools and their tensions",
