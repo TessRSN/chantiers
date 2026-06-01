@@ -37,6 +37,20 @@ function migrateLegacyHash(p) {
   return p;
 }
 
+// Petit globe SVG monochrome (suit currentColor pour s'adapter aux thèmes).
+function GlobeIcon({ size = 14 }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a14 14 0 010 18" />
+      <path d="M12 3a14 14 0 000 18" />
+    </svg>
+  );
+}
+
 // Hook bilingue — synchronise window.LANG, localStorage.
 // L'URL hash sera mis à jour via le useEffect de routing principal (qui inclut lang dans les params).
 function useLang() {
@@ -229,6 +243,31 @@ function MainApp() {
             );
           })}
         </div>
+
+        {/* Language toggle */}
+        <button
+          onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+          aria-label={lang === 'fr' ? 'Switch to English' : 'Passer au français'}
+          title={lang === 'fr' ? 'Switch to English' : 'Passer au français'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            borderRadius: 20,
+            border: `1px solid ${darkMode ? '#334155' : '#d1d5db'}`,
+            backgroundColor: darkMode ? '#1e293b' : '#f9fafb',
+            color: darkMode ? '#94a3b8' : '#6b7280',
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+            marginRight: 8,
+            transition: 'all 0.15s',
+          }}
+        >
+          <GlobeIcon size={14} />
+          {lang.toUpperCase()}
+        </button>
 
         {/* Dark mode toggle */}
         <button
