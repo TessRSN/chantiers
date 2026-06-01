@@ -131,7 +131,8 @@ function buildEntityData(entity, allActions) {
   const sousObjList = fdrActions
     .map(a => ({
       id: a.id,
-      title: a.action,
+      title:    a.action,
+      title_en: a.action_en,
       os: extractOS(a.id),
       projet: a.projet || '—',
       chantierId: a.chantier || '',
@@ -414,7 +415,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
       {sousObjs.map(s => {
         const dimmed = hoveredKey && !hoveredKey.startsWith(`sub:${s.id}`)
           && hoveredKey !== `os:${s.os}` && hoveredKey !== `proj:${s.projet}`;
-        const titleLines = wrapText(s.title, 64, 2);
+        const titleLines = wrapText(tConfig(s, 'title'), 64, 2);
         return (
           <g
             key={`sub-${s.id}`}
