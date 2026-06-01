@@ -34,6 +34,33 @@ function parseCSVLine(line) {
   return result;
 }
 
+// ── Traductions des noms de sous-projets (clé : Nom projet FR) ──
+const NOM_PROJET_EN = {
+  'Harmonisation des bonnes pratiques méthodologiques': 'Harmonization of methodological best practices',
+  'Lexique RSN — Définitions communes': 'RSN Lexicon — Shared definitions',
+  'Grilles de référence par principe directeur': 'Reference grids per guiding principle',
+  'Infrastructure Science ouverte': 'Open Science infrastructure',
+  'Guides de gouvernance': 'Governance guides',
+  'Baromètre numérique': 'Digital barometer',
+  'Répertoire des expertises, actifs et infrastructures RSN': 'Directory of RSN expertise, assets and infrastructure',
+  'Inventaire des formations en santé numérique': 'Inventory of digital health training programs',
+  'Répertoire des outils et ressources thématiques': 'Directory of thematic tools and resources',
+  'Tables de concertation thématiques': 'Thematic consultation tables',
+  'Comités et structures participatives': 'Committees and participatory structures',
+  'Communautés de pratique et réseaux collaboratifs': 'Communities of practice and collaborative networks',
+  'Partenariats externes et maillage inter-sectoriel': 'External partnerships and cross-sectoral networking',
+  'Formations et ressources éducatives': 'Training and educational resources',
+  'Événements et programmes de formation': 'Training events and programs',
+  'Consultations des besoins par public cible': 'Needs consultations by target audience',
+  'Engagement citoyen et coconstruction': 'Citizen engagement and co-construction',
+  'Sondages et outils de collecte': 'Surveys and data-collection tools',
+  'Plaidoyers et prises de position': 'Advocacy and position statements',
+  'Représentation dans les instances': 'Representation in governance bodies',
+  'Événements organisés par le RSN': 'Events hosted by the RSN',
+  'Participations et interventions externes': 'External participations and engagements',
+  'Communications et contenus de diffusion': 'Communications and outreach content',
+};
+
 // ── Chargement CSV → toutes les lignes enrichies (avec versions EN si présentes) ──
 function csvRowsToAllData(rows) {
   return rows.map(row => ({
@@ -50,7 +77,8 @@ function csvRowsToAllData(rows) {
     // Champs analyse
     statusAnalyse: row['Statut analyse'] || '',
     projet: row['Projet'] || '',
-    nomProjet: row['Nom projet'] || '',
+    nomProjet:    row['Nom projet'] || '',
+    nomProjet_en: NOM_PROJET_EN[(row['Nom projet'] || '').trim()] || row['Nom projet'] || '',
     descriptionProjet:    row['Description projet']    || '',
     descriptionProjet_en: row['Description projet EN'] || '',
     notesAnalyse: row['Notes analyse'] || '',
@@ -65,29 +93,29 @@ function buildGouvernanceFromCSV(rows) {
   const result = {
     direction: [],
     comites: [
-      { id: 'comite-sci', name: 'Comité scientifique', responsables: [] },
-      { id: 'comite-avis', name: 'Comité aviseur', responsables: [] },
-      { id: 'comite-etud', name: 'Comité étudiants', responsables: [] },
-      { id: 'comite-cit', name: 'Comité citoyen', responsables: [] },
-      { id: 'patients-part', name: 'Patients partenaires', responsables: [] },
+      { id: 'comite-sci',  name: 'Comité scientifique', name_en: 'Scientific Committee',  responsables: [] },
+      { id: 'comite-avis', name: 'Comité aviseur',      name_en: 'Advisory Committee',    responsables: [] },
+      { id: 'comite-etud', name: 'Comité étudiants',    name_en: 'Student Committee',     responsables: [] },
+      { id: 'comite-cit',  name: 'Comité citoyen',      name_en: 'Citizen Committee',     responsables: [] },
+      { id: 'patients-part', name: 'Patients partenaires', name_en: 'Patient partners', responsables: [] },
     ],
     axes: [
-      { id: 'A1', shortName: 'Axe 1', name: 'Plateformes numériques et gouvernance informationnelle', label: 'Plateformes', description: 'Générer et gérer des données de qualité et de confiance', color: '#3B82F6', responsables: [] },
-      { id: 'A2', shortName: 'Axe 2', name: 'Modélisation et méthodes numériques', label: 'Modélisation', description: "Création et validation d'algorithmes, incluant la modélisation mathématique, les méthodes statistiques et l'IA", color: '#8B5CF6', responsables: [] },
-      { id: 'A3', shortName: 'Axe 3', name: 'Interventions numériques', label: 'Interventions', description: "Cycle de vie des interventions numériques, synthèses des évidences, de la conception à l'implantation, incluant l'adoption et la mise à l'échelle", color: '#EC4899', responsables: [] },
-      { id: 'A4', shortName: 'Axe 4', name: 'Transformation numérique', label: 'Transformation', description: 'Transformation des organisations, du système et des politiques soutenant le cycle de vie des interventions numériques', color: '#F59E0B', responsables: [] },
+      { id: 'A1', shortName: 'Axe 1', shortName_en: 'Axis 1', name: 'Plateformes numériques et gouvernance informationnelle', name_en: 'Digital platforms and information governance', label: 'Plateformes', label_en: 'Platforms', description: 'Générer et gérer des données de qualité et de confiance', description_en: 'Generate and manage high-quality, trustworthy data', color: '#3B82F6', responsables: [] },
+      { id: 'A2', shortName: 'Axe 2', shortName_en: 'Axis 2', name: 'Modélisation et méthodes numériques', name_en: 'Modelling and numerical methods', label: 'Modélisation', label_en: 'Modelling', description: "Création et validation d'algorithmes, incluant la modélisation mathématique, les méthodes statistiques et l'IA", description_en: "Creation and validation of algorithms, including mathematical modelling, statistical methods and AI", color: '#8B5CF6', responsables: [] },
+      { id: 'A3', shortName: 'Axe 3', shortName_en: 'Axis 3', name: 'Interventions numériques', name_en: 'Digital interventions', label: 'Interventions', label_en: 'Interventions', description: "Cycle de vie des interventions numériques, synthèses des évidences, de la conception à l'implantation, incluant l'adoption et la mise à l'échelle", description_en: "Life cycle of digital interventions, evidence synthesis, from design to implementation, including adoption and scaling", color: '#EC4899', responsables: [] },
+      { id: 'A4', shortName: 'Axe 4', shortName_en: 'Axis 4', name: 'Transformation numérique', name_en: 'Digital transformation', label: 'Transformation', label_en: 'Transformation', description: 'Transformation des organisations, du système et des politiques soutenant le cycle de vie des interventions numériques', description_en: 'Transformation of organizations, the system and policies supporting the digital intervention life cycle', color: '#F59E0B', responsables: [] },
     ],
     champs: [
-      { id: 'CA-RENF', name: 'Renforcement', fullName: 'Renforcement des capacités', label: 'Renforcement', color: '#10B981', responsables: [] },
-      { id: 'CA-FORM', name: 'Formation', fullName: 'Formation interdisciplinaire', label: 'Formation', color: '#14B8A6', responsables: [] },
-      { id: 'CA-MOB', name: 'Mobilisation', fullName: 'Mobilisation des connaissances', label: 'Mobilisation', color: '#06B6D4', responsables: [] },
+      { id: 'CA-RENF', name: 'Renforcement', name_en: 'Capacity building',     fullName: 'Renforcement des capacités',    fullName_en: 'Capacity building',          label: 'Renforcement',  label_en: 'Capacity',     color: '#10B981', responsables: [] },
+      { id: 'CA-FORM', name: 'Formation',    name_en: 'Training',              fullName: 'Formation interdisciplinaire',  fullName_en: 'Interdisciplinary training', label: 'Formation',     label_en: 'Training',     color: '#14B8A6', responsables: [] },
+      { id: 'CA-MOB',  name: 'Mobilisation', name_en: 'Knowledge mobilization',fullName: 'Mobilisation des connaissances',fullName_en: 'Knowledge mobilization',     label: 'Mobilisation',  label_en: 'Mobilization', color: '#06B6D4', responsables: [] },
     ],
     principes: [
-      { id: 'PD-EDIA', name: 'EDIA', fullName: 'Équité, Diversité, Inclusion, Accessibilité', label: 'EDIA', color: '#EF4444', responsables: [] },
-      { id: 'PD-CONF', name: 'Num. confiance', fullName: 'Numérique de confiance', label: 'Confiance', color: '#A855F7', responsables: [] },
-      { id: 'PD-ENG', name: 'Engagement', fullName: 'Engagement citoyen', label: 'Engagement', color: '#6366F1', responsables: [] },
-      { id: 'PD-DUR', name: 'Santé durable', fullName: 'Santé durable', label: 'Santé durable', color: '#22C55E', responsables: [] },
-      { id: 'PD-SCI', name: 'Science ouverte', fullName: 'Science ouverte', label: 'Science ouv.', color: '#EAB308', responsables: [] },
+      { id: 'PD-EDIA', name: 'EDIA',            name_en: 'EDIA',                  fullName: 'Équité, Diversité, Inclusion, Accessibilité', fullName_en: 'Equity, Diversity, Inclusion, Accessibility', label: 'EDIA',         label_en: 'EDIA',         color: '#EF4444', responsables: [] },
+      { id: 'PD-CONF', name: 'Num. confiance',  name_en: 'Trust',                 fullName: 'Numérique de confiance',                       fullName_en: 'Trustworthy digital',                        label: 'Confiance',     label_en: 'Trust',        color: '#A855F7', responsables: [] },
+      { id: 'PD-ENG',  name: 'Engagement',      name_en: 'Engagement',            fullName: 'Engagement citoyen',                           fullName_en: 'Citizen engagement',                         label: 'Engagement',    label_en: 'Engagement',   color: '#6366F1', responsables: [] },
+      { id: 'PD-DUR',  name: 'Santé durable',   name_en: 'Sustainable health',    fullName: 'Santé durable',                                fullName_en: 'Sustainable health',                         label: 'Santé durable', label_en: 'Sustainable',  color: '#22C55E', responsables: [] },
+      { id: 'PD-SCI',  name: 'Science ouverte', name_en: 'Open science',          fullName: 'Science ouverte',                              fullName_en: 'Open science',                               label: 'Science ouv.',  label_en: 'Open science', color: '#EAB308', responsables: [] },
     ],
   };
 
@@ -146,7 +174,9 @@ function buildAnalyseData(allRows) {
     if (row.projet) {
       if (!byChantier[chantierId].projets[row.projet]) {
         byChantier[chantierId].projets[row.projet] = {
-          id: row.projet, name: row.nomProjet,
+          id: row.projet,
+          name:    row.nomProjet,
+          name_en: row.nomProjet_en,
           description:    row.descriptionProjet,
           description_en: row.descriptionProjet_en,
           actions: [],

@@ -176,7 +176,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
             </div>
             <GovBox id="direction" name={t('structure.direction')} members={gouvernanceData.direction} color={govColor} />
             {gouvernanceData.comites.map(c => (
-              <GovBox key={c.id} id={c.id} name={c.name} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
+              <GovBox key={c.id} id={c.id} name={tConfig(c, 'name')} members={c.responsables} color={darkMode ? '#6366f1' : '#4f46e5'} />
             ))}
             <div style={{ minHeight: 20, flexShrink: 0 }} />
           </div>
@@ -220,8 +220,8 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                     <circle cx={ax.x} cy={ax.y} r={isSel ? axeNodeR + 3 : axeNodeR}
                       fill={ax.color} opacity={0.9}
                       stroke={isSel ? 'white' : 'transparent'} strokeWidth={3} />
-                    <text x={ax.x} y={ax.y - 10} fill="white" fontSize="9" fontWeight="700" textAnchor="middle">{ax.shortName}</text>
-                    <text x={ax.x} y={ax.y + 3} fill="rgba(255,255,255,0.9)" fontSize="9.5" textAnchor="middle">{ax.label}</text>
+                    <text x={ax.x} y={ax.y - 10} fill="white" fontSize="9" fontWeight="700" textAnchor="middle">{tConfig(ax, 'shortName')}</text>
+                    <text x={ax.x} y={ax.y + 3} fill="rgba(255,255,255,0.9)" fontSize="9.5" textAnchor="middle">{tConfig(ax, 'label')}</text>
                     <text x={ax.x} y={ax.y + 16} fill="rgba(255,255,255,0.5)" fontSize="7.5" textAnchor="middle">{ax.responsables.length} {t('structure.resp-abbr')}</text>
                   </g>
                 );
@@ -236,7 +236,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                     opacity={dim ? 0.25 : 1} className="transition-opacity duration-300">
                     <circle cx={ch.x} cy={ch.y} r={isSel ? champNodeR + 3 : champNodeR}
                       fill={theme.svgNodeBg} stroke={ch.color} strokeWidth={isSel ? 3.5 : 2} />
-                    <text x={ch.x} y={ch.y - 5} fill={ch.color} fontSize="10" fontWeight="700" textAnchor="middle">{ch.label}</text>
+                    <text x={ch.x} y={ch.y - 5} fill={ch.color} fontSize="10" fontWeight="700" textAnchor="middle">{tConfig(ch, 'label')}</text>
                     <text x={ch.x} y={ch.y + 10} fill={theme.svgLabelMuted} fontSize="8" textAnchor="middle">{ch.responsables.length} {t('structure.resp-abbr')}</text>
                   </g>
                 );
@@ -252,7 +252,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                     <circle cx={pr.x} cy={pr.y} r={isSel ? princNodeR + 3 : princNodeR}
                       fill={pr.color} opacity={0.9}
                       stroke={isSel ? 'white' : 'transparent'} strokeWidth={3} />
-                    <text x={pr.x} y={pr.y - 4} fill="white" fontSize="9.5" fontWeight="600" textAnchor="middle">{pr.label}</text>
+                    <text x={pr.x} y={pr.y - 4} fill="white" fontSize="9.5" fontWeight="600" textAnchor="middle">{tConfig(pr, 'label')}</text>
                     <text x={pr.x} y={pr.y + 10} fill="rgba(255,255,255,0.55)" fontSize="7.5" textAnchor="middle">{pr.responsables.length} {t('structure.resp-abbr')}</text>
                   </g>
                 );
@@ -283,7 +283,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
               </div>
 
               {selectedNode.description && (
-                <p className={`text-xs ${theme.textMuted} mb-4 leading-relaxed`}>{selectedNode.description}</p>
+                <p className={`text-xs ${theme.textMuted} mb-4 leading-relaxed`}>{tConfig(selectedNode, 'description')}</p>
               )}
 
               <div className={`text-xs font-semibold ${theme.textLight} uppercase tracking-wider mb-3`}>

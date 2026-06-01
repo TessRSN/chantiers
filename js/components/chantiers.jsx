@@ -259,7 +259,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
             fontSize: 14, fontWeight: 600, color: titleColor,
             lineHeight: 1.35,
           }}>
-            {project.name}
+            {tConfig(project, 'name')}
           </div>
           {!open && tConfig(project, 'description') && (
             <div style={{

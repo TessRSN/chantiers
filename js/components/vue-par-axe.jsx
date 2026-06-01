@@ -91,7 +91,8 @@ function buildEntityData(entity, allActions) {
     if (!projectMap[pid]) {
       projectMap[pid] = {
         id: pid,
-        name: a.nomProjet || (pid === '—' ? t('parax.sans-projet') : pid),
+        name:    a.nomProjet    || (pid === '—' ? t('parax.sans-projet') : pid),
+        name_en: a.nomProjet_en || (pid === '—' ? t('parax.sans-projet') : pid),
         description:    a.descriptionProjet    || '',
         description_en: a.descriptionProjet_en || '',
         chantierId: a.chantier || '',
@@ -282,7 +283,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
     return ch ? ch.icon : '';
   };
   // Nom court du chantier (sans le code), avec fallback
-  const chantierName = (p) => p.name || p.id;
+  const chantierName = (p) => tConfig(p, 'name') || p.id;
 
   const flowPath = (x1, y1, x2, y2) => {
     const cx = (x1 + x2) / 2;
@@ -572,7 +573,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
             {t('parax.chantier-transversal')} · {project.id}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: textPrimary, marginTop: 2 }}>
-            {project.name}
+            {tConfig(project, 'name')}
           </div>
           {tConfig(project, 'description') && (
             <div style={{ fontSize: 12, color: textSecondary, marginTop: 4, lineHeight: 1.4 }}>

@@ -55,9 +55,9 @@ function RSNRadialGraph({ darkMode }) {
   const effetRadius = 70;
 
   const effetsStrategiques = [
-    { id: 'ES1', name: 'Consolidation écosystème', color: '#3B82F6', chantiers: ['C1', 'C2'] },
-    { id: 'ES2', name: 'Maillage environnement', color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
-    { id: 'ES3', name: 'Rapprochement preneurs/décideurs', color: '#F59E0B', chantiers: ['C5', 'C6'] },
+    { id: 'ES1', name: 'Consolidation écosystème',         name_en: 'Ecosystem consolidation',     color: '#3B82F6', chantiers: ['C1', 'C2'] },
+    { id: 'ES2', name: 'Maillage environnement',           name_en: 'Environment networking',      color: '#10B981', chantiers: ['C3', 'C4', 'C7'] },
+    { id: 'ES3', name: 'Rapprochement preneurs/décideurs', name_en: 'End-user / decision-maker engagement', color: '#F59E0B', chantiers: ['C5', 'C6'] },
   ];
 
   const effetPositions = useMemo(() => {
@@ -371,8 +371,8 @@ function RSNRadialGraph({ darkMode }) {
                     <circle cx={effet.x} cy={effet.y} r={isSelected ? 42 : 38}
                       fill={theme.svgBg} stroke={effet.color} strokeWidth={isSelected ? 4 : 3} />
                     <text x={effet.x} y={effet.y - 8} fill={effet.color} fontSize="12" fontWeight="bold" textAnchor="middle">{percentage}%</text>
-                    <text x={effet.x} y={effet.y + 5} fill={theme.svgLabelPrimary} fontSize="7" fontWeight="500" textAnchor="middle">{effet.name.split(' ')[0]}</text>
-                    <text x={effet.x} y={effet.y + 14} fill={theme.svgLabelSecondary} fontSize="6" textAnchor="middle">{effet.name.split(' ').slice(1).join(' ')}</text>
+                    <text x={effet.x} y={effet.y + 5} fill={theme.svgLabelPrimary} fontSize="7" fontWeight="500" textAnchor="middle">{tConfig(effet, 'name').split(' ')[0]}</text>
+                    <text x={effet.x} y={effet.y + 14} fill={theme.svgLabelSecondary} fontSize="6" textAnchor="middle">{tConfig(effet, 'name').split(' ').slice(1).join(' ')}</text>
                   </g>
                 );
               })}
