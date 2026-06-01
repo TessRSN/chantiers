@@ -66,6 +66,13 @@
       'parax.de-cet-axe': 'de cet axe',
       'parax.toutes-de-cet-axe': 'toutes de cet axe',
       'parax.voir-tout': 'Voir tout le chantier',
+
+      // ── Vue par chantier ──
+      'chantiers.aller-a': 'Aller à',
+      'chantiers.contributeurs': 'Contributeurs',
+      'chantiers.actions': 'Actions',
+      'chantiers.aucun-sous-projet': 'Aucun sous-projet',
+      'chantiers.aller-vue-axe': 'Aller à la vue par axe de',
     },
     en: {
       // ── App / header / tabs ──
@@ -115,6 +122,13 @@
       'parax.de-cet-axe': 'from this axis',
       'parax.toutes-de-cet-axe': 'all from this axis',
       'parax.voir-tout': 'See the full workstream',
+
+      // ── By workstream ──
+      'chantiers.aller-a': 'Jump to',
+      'chantiers.contributeurs': 'Contributors',
+      'chantiers.actions': 'Actions',
+      'chantiers.aucun-sous-projet': 'No sub-project',
+      'chantiers.aller-vue-axe': 'Open the axis view of',
     },
   };
 

@@ -99,7 +99,7 @@ function EntityPill({ entity, count, darkMode, onClick }) {
   return (
     <button
       onClick={onClick}
-      title={`Aller à la vue par axe de ${entity.fullName || entity.name}`}
+      title={`${t('chantiers.aller-vue-axe')} ${entity.fullName || entity.name}`}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,
         padding: '4px 10px 4px 4px',
@@ -280,7 +280,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
             background: idBg, padding: '3px 8px', borderRadius: 10,
             fontWeight: 600, whiteSpace: 'nowrap',
           }}>
-            {total} action{total > 1 ? 's' : ''}
+            {total} {total > 1 ? t('parax.actions') : t('parax.action')}
           </span>
         </div>
       </button>
@@ -306,7 +306,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
                 color: descColor, textTransform: 'uppercase',
                 letterSpacing: '0.08em', marginBottom: 8,
               }}>
-                Contributeurs ({contributors.length})
+                {t('chantiers.contributeurs')} ({contributors.length})
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {contributors.map(({ entity, count }) => (
@@ -329,7 +329,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
               color: descColor, textTransform: 'uppercase',
               letterSpacing: '0.08em', marginBottom: 8,
             }}>
-              Actions ({total})
+              {t('chantiers.actions')} ({total})
             </div>
             <div>
               {project.actions
@@ -405,7 +405,7 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
               {projects.length} projet{projects.length > 1 ? 's' : ''}
             </div>
             <div style={{ fontSize: 11, opacity: 0.7 }}>
-              {total} action{total > 1 ? 's' : ''}
+              {total} {total > 1 ? t('parax.actions') : t('parax.action')}
             </div>
           </div>
         </div>
@@ -475,7 +475,7 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
             padding: '20px', textAlign: 'center',
             color: subtitleColor, fontSize: 12,
           }}>
-            Aucun sous-projet
+            {t('chantiers.aucun-sous-projet')}
           </div>
         )}
       </div>
@@ -548,7 +548,7 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject,
           textTransform: 'uppercase', letterSpacing: '0.08em',
           padding: '0 8px', marginBottom: 10,
         }}>
-          Aller à
+          {t('chantiers.aller-a')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {chantiersMeta.map(c => {
