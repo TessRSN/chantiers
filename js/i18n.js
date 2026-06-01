@@ -101,6 +101,13 @@
       'structure.resp-abbr': 'resp.',
       'structure.responsable': 'Responsable',
       'structure.responsables': 'Responsables',
+
+      // ── Vue globale ──
+      'vueglobale.title': 'Réseau des Actions RSN',
+      'vueglobale.subtitle.intro': 'Cliquez sur un nœud pour voir ses connexions',
+      'vueglobale.search-placeholder': 'Rechercher une action…',
+      'vueglobale.axes': 'axes',
+      'vueglobale.chantiers': 'chantiers',
     },
     en: {
       // ── App / header / tabs ──
@@ -185,6 +192,13 @@
       'structure.resp-abbr': 'leads',
       'structure.responsable': 'Lead',
       'structure.responsables': 'Leads',
+
+      // ── Overview ──
+      'vueglobale.title': 'RSN Actions network',
+      'vueglobale.subtitle.intro': 'Click a node to see its connections',
+      'vueglobale.search-placeholder': 'Search an action…',
+      'vueglobale.axes': 'axes',
+      'vueglobale.chantiers': 'workstreams',
     },
   };
 

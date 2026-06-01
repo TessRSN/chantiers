@@ -111,10 +111,10 @@ function RSNRadialGraph({ darkMode }) {
       <div className="mx-auto">
         <div className="text-center mb-0">
           <h1 className={`text-3xl font-bold ${darkMode ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'} bg-clip-text text-transparent mb-0`}>
-            Réseau des Actions RSN
+            {t('vueglobale.title')}
           </h1>
           <p className={`${theme.textMuted} text-sm mb-0`}>
-            Cliquez sur un nœud pour voir ses connexions • {vueGlobaleData.actions.length} actions • {vueGlobaleData.axes.length} axes • {vueGlobaleData.chantiers.length} chantiers
+            {t('vueglobale.subtitle.intro')} • {vueGlobaleData.actions.length} {t('parax.actions')} • {vueGlobaleData.axes.length} {t('vueglobale.axes')} • {vueGlobaleData.chantiers.length} {t('vueglobale.chantiers')}
           </p>
         </div>
 
@@ -125,7 +125,7 @@ function RSNRadialGraph({ darkMode }) {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Rechercher une action..."
+                placeholder={t('vueglobale.search-placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full px-3 py-2 pl-9 rounded-full text-xs ${darkMode ? 'bg-slate-800 text-white placeholder-slate-400 border-slate-700' : 'bg-white text-gray-900 placeholder-gray-400 border-gray-300'} border focus:outline-none focus:ring-2 focus:ring-purple-500`}
@@ -139,7 +139,7 @@ function RSNRadialGraph({ darkMode }) {
             </div>
             {searchTerm && (
               <div className={`text-xs ${theme.textMuted} px-1`}>
-                {searchResults.length} action{searchResults.length !== 1 ? 's' : ''} trouvée{searchResults.length !== 1 ? 's' : ''}
+                {searchResults.length} {searchResults.length !== 1 ? t('parax.actions') : t('parax.action')} {searchResults.length !== 1 ? t('suivi.found.plural') : t('suivi.found')}
               </div>
             )}
 
@@ -150,7 +150,7 @@ function RSNRadialGraph({ darkMode }) {
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs bg-purple-500">{searchResults.length}</div>
                   <div>
                     <div className={`font-bold ${theme.text} text-xs`}>Résultats</div>
-                    <div className={`text-xs ${theme.textLight}`}>{searchResults.length} action{searchResults.length !== 1 ? 's' : ''}</div>
+                    <div className={`text-xs ${theme.textLight}`}>{searchResults.length} {searchResults.length !== 1 ? t('parax.actions') : t('parax.action')}</div>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -200,14 +200,14 @@ function RSNRadialGraph({ darkMode }) {
                       <div>
                         <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
                         <span className={`text-xs ${theme.textLight}`} style={{ fontSize: 10 }}>
-                          {selectedNode.type === 'axe' ? 'Axe thématique' : selectedNode.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                          {selectedNode.type === 'axe' ? t('parax.entity.label.axe') : selectedNode.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                         </span>
                       </div>
                     </>
                   )}
                 </div>
                 <div className="space-y-3">
-                  <div className={`text-xs ${theme.textMuted} mb-1`}>{selectedActions.length} action{selectedActions.length > 1 ? 's' : ''}</div>
+                  <div className={`text-xs ${theme.textMuted} mb-1`}>{selectedActions.length} {selectedActions.length > 1 ? t('parax.actions') : t('parax.action')}</div>
                   {selectedNode.type === 'chantier' ? (
                     vueGlobaleData.axes.map(axe => {
                       const axeActions = selectedActions.filter(a => a.axe === axe.id);
@@ -293,7 +293,7 @@ function RSNRadialGraph({ darkMode }) {
                       onMouseLeave={() => setHoveredConnection(null)} style={{ cursor: 'pointer' }} />
                     {isHovered && selectedNode?.type !== 'effet' && (
                       <text x={ctrlX} y={ctrlY} fill={theme.svgLabelPrimary} fontSize="12" textAnchor="middle" className="pointer-events-none">
-                        {conn.count} action{conn.count > 1 ? 's' : ''}
+                        {conn.count} {conn.count > 1 ? t('parax.actions') : t('parax.action')}
                       </text>
                     )}
                   </g>
