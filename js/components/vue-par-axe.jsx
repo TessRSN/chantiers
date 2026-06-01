@@ -1072,26 +1072,8 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
           background: cardBg, border: `1px solid ${cardBorder}`,
           borderRadius: 10, padding: 16, marginBottom: 20,
         }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            gap: 12, flexWrap: 'wrap', marginBottom: 10,
-          }}>
-            <div style={{ fontSize: 11, color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Diagramme — Survolez ou cliquez sur un chantier pour voir son contenu complet
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 11, color: textSecondary }}>
-              {['terminé', 'en cours', 'non démarré'].map(key => {
-                const p = PROGRESS[key];
-                return (
-                  <span key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                    <span style={{
-                      fontSize: 14, lineHeight: 1, color: p.color, fontWeight: 700,
-                    }}>{p.icon}</span>
-                    <span style={{ color: textSecondary, textTransform: 'lowercase' }}>{p.label.toLowerCase()}</span>
-                  </span>
-                );
-              })}
-            </div>
+          <div style={{ fontSize: 11, color: textSecondary, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Diagramme — Survolez ou cliquez sur un chantier pour voir son contenu complet
           </div>
           <SankeyDiagram
             entity={entity}
@@ -1102,6 +1084,27 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
             setHoveredKey={setHoveredKey}
             expandedProjectId={expandedProjectId}
           />
+          {/* Légende des statuts */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 18, fontSize: 11, color: textSecondary, marginTop: 12,
+            paddingTop: 12, borderTop: `1px solid ${cardBorder}`,
+          }}>
+            <span style={{ textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: 4 }}>
+              Légende —
+            </span>
+            {['terminé', 'en cours', 'non démarré'].map(key => {
+              const p = PROGRESS[key];
+              return (
+                <span key={key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{
+                    fontSize: 14, lineHeight: 1, color: p.color, fontWeight: 700,
+                  }}>{p.icon}</span>
+                  <span>{p.label.toLowerCase()}</span>
+                </span>
+              );
+            })}
+          </div>
           {/* Panneau détail du chantier sélectionné */}
           {expandedProjectId && (
             <ChantierDetailPanel
