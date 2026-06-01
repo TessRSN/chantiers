@@ -11,7 +11,7 @@ function ProgressBadge({ statut, darkMode, size = 'sm' }) {
       backgroundColor: bg, border: `1px solid ${border}`, color: p.color,
       fontWeight: 600, whiteSpace: 'nowrap',
     }}>
-      <span style={{ fontSize: fontSize + 2 }}>{p.icon}</span> {p.label}
+      <span style={{ fontSize: fontSize + 2 }}>{p.icon}</span> {tConfig(p, 'label')}
     </span>
   );
 }
@@ -49,7 +49,7 @@ function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
       {axe && (
         <div className="flex items-center gap-1 mb-1">
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: axe.color }}></div>
-          <span className={`text-xs ${theme.textLight}`}>{axe.name}</span>
+          <span className={`text-xs ${theme.textLight}`}>{tConfig(axe, 'name')}</span>
         </div>
       )}
       <div className="flex items-start justify-between gap-1">

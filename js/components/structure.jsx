@@ -275,7 +275,7 @@ function StructureGouvernance({ darkMode, gouvernanceData }) {
                   {selectedNode.type === 'axe' ? selectedNode.shortName?.replace('Axe ', '') : selectedNode.responsables?.length || '—'}
                 </div>
                 <div>
-                  <h3 className={`font-bold ${theme.text} text-sm`}>{selectedNode.fullName || selectedNode.name}</h3>
+                  <h3 className={`font-bold ${theme.text} text-sm`}>{tConfig(selectedNode, 'fullName') || tConfig(selectedNode, 'name')}</h3>
                   <span className={`text-xs ${theme.textLight}`}>
                     {selectedNode.type === 'axe' ? t('parax.entity.label.axe') : selectedNode.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                   </span>

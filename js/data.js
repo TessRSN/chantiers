@@ -176,14 +176,21 @@ function buildAnalyseData(allRows) {
 
 // ── Construire CHANTIERS_META dynamiquement ──
 function buildChantiersMeta(allRows, analyseData) {
-  const verbMap = { C1: 'PRODUIRE', C2: 'RECENSER', C3: 'CONNECTER', C4: 'FORMER', C5: 'ÉCOUTER', C6: 'CONVAINCRE', C7: 'ANIMER' };
-  const nameMap = { C1: 'Guides & Outils', C2: 'Répertoires & Cartographie', C3: 'Maillage et Concertation', C4: 'Formation & Relève', C5: 'Écoute et Consultation', C6: 'Influence & Représentation', C7: 'Événements & Rayonnement' };
+  const verbMap   = { C1: 'PRODUIRE',           C2: 'RECENSER',                  C3: 'CONNECTER',                C4: 'FORMER',           C5: 'ÉCOUTER',                  C6: 'CONVAINCRE',                C7: 'ANIMER' };
+  const verbMapEn = { C1: 'PRODUCE',            C2: 'MAP',                       C3: 'CONNECT',                  C4: 'TRAIN',            C5: 'LISTEN',                   C6: 'ADVOCATE',                  C7: 'ENGAGE' };
+  const nameMap   = { C1: 'Guides & Outils',    C2: 'Répertoires & Cartographie',C3: 'Maillage et Concertation', C4: 'Formation & Relève', C5: 'Écoute et Consultation',   C6: 'Influence & Représentation',C7: 'Événements & Rayonnement' };
+  const nameMapEn = { C1: 'Guides & Tools',     C2: 'Directories & Mapping',     C3: 'Networking & Consultation',C4: 'Training & Next-gen', C5: 'Listening & Consultation', C6: 'Advocacy & Representation', C7: 'Events & Outreach' };
   const chantierIdToNum = { C1: 1, C2: 2, C3: 3, C4: 4, C5: 5, C6: 6, C7: 7 };
 
   return CHANTIERS_CONFIG.map(c => {
     const num = chantierIdToNum[c.id];
     const totalActions = allRows.filter(r => r.chantier === c.id && r.approuve !== 'non').length;
     const analyzed = !!analyseData[num];
-    return { id: num, name: nameMap[c.id], verb: verbMap[c.id], totalActions, analyzed };
+    return {
+      id: num,
+      name:     nameMap[c.id],   name_en: nameMapEn[c.id],
+      verb:     verbMap[c.id],   verb_en: verbMapEn[c.id],
+      totalActions, analyzed,
+    };
   });
 }

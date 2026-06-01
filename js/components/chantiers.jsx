@@ -99,7 +99,7 @@ function EntityPill({ entity, count, darkMode, onClick }) {
   return (
     <button
       onClick={onClick}
-      title={`${t('chantiers.aller-vue-axe')} ${entity.fullName || entity.name}`}
+      title={`${t('chantiers.aller-vue-axe')} ${tConfig(entity, 'fullName') || tConfig(entity, 'name')}`}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6,
         padding: '4px 10px 4px 4px',
@@ -135,7 +135,7 @@ function EntityPill({ entity, count, darkMode, onClick }) {
         fontSize: 11.5, fontWeight: 500,
         color: entity.color,
       }}>
-        {entity.name}
+        {tConfig(entity, 'name')}
       </span>
       <span style={{
         fontSize: 10, fontWeight: 700,
@@ -183,7 +183,7 @@ function ActionRowAnalyse({ action, darkMode }) {
             }}>{entity.id}</span>
           )}
           <span style={{ fontSize: 10, color: statusObj.color, fontWeight: 600 }}>
-            {statusObj.label}
+            {tConfig(statusObj, 'label')}
           </span>
         </div>
         <div style={{
@@ -391,13 +391,13 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
               textTransform: 'uppercase', letterSpacing: '0.1em',
               fontFamily: 'ui-monospace, monospace',
             }}>
-              {chantierConfig.id} · {chantierConfig.verb}
+              {chantierConfig.id} · {tConfig(chantierConfig, 'verb')}
             </div>
             <h2 style={{
               fontSize: 17, fontWeight: 800,
               margin: '2px 0 0 0', lineHeight: 1.2,
             }}>
-              {chantierMeta.name}
+              {tConfig(chantierMeta, 'name')}
             </h2>
           </div>
           <div style={{ flexShrink: 0, textAlign: 'right' }}>
@@ -565,7 +565,7 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject,
               <button
                 key={c.id}
                 onClick={() => scrollToChantier(cfg.id)}
-                title={`${cfg.id} · ${c.name} — ${projCount} projets, ${actionCount} actions`}
+                title={`${cfg.id} · ${tConfig(c, 'name')} — ${projCount} ${t('chantiers.projets-court')}, ${actionCount} ${t('parax.actions')}`}
                 style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'stretch',
                   padding: '8px 10px', borderRadius: 8,
@@ -590,14 +590,14 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject,
                     flex: 1, minWidth: 0,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
-                    {c.name}
+                    {tConfig(c, 'name')}
                   </span>
                 </div>
                 <div style={{
                   fontSize: 10, color: cfg.color, opacity: 0.75,
                   marginBottom: 4,
                 }}>
-                  {projCount} projet{projCount > 1 ? 's' : ''} · {actionCount} action{actionCount > 1 ? 's' : ''}
+                  {projCount} {projCount > 1 ? t('chantiers.projets') : t('chantiers.projet')} · {actionCount} {actionCount > 1 ? t('parax.actions') : t('parax.action')}
                 </div>
                 {actionCount > 0 && (
                   <MiniProgressBar

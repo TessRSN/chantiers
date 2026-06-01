@@ -73,6 +73,9 @@
       'chantiers.actions': 'Actions',
       'chantiers.aucun-sous-projet': 'Aucun sous-projet',
       'chantiers.aller-vue-axe': 'Aller à la vue par axe de',
+      'chantiers.projet': 'projet',
+      'chantiers.projets': 'projets',
+      'chantiers.projets-court': 'projets',
 
       // ── Suivi ──
       'suivi.title': 'Suivi des objectifs',
@@ -108,6 +111,9 @@
       'vueglobale.search-placeholder': 'Rechercher une action…',
       'vueglobale.axes': 'axes',
       'vueglobale.chantiers': 'chantiers',
+      'vueglobale.result': 'résultat',
+      'vueglobale.results': 'résultats',
+      'vueglobale.axe-prefix': 'Axe ',
 
       // ── Partagé ──
       'shared.details': 'Détails',
@@ -167,6 +173,9 @@
       'chantiers.actions': 'Actions',
       'chantiers.aucun-sous-projet': 'No sub-project',
       'chantiers.aller-vue-axe': 'Open the axis view of',
+      'chantiers.projet': 'project',
+      'chantiers.projets': 'projects',
+      'chantiers.projets-court': 'projects',
 
       // ── Tracker ──
       'suivi.title': 'Objective tracker',
@@ -202,6 +211,9 @@
       'vueglobale.search-placeholder': 'Search an action…',
       'vueglobale.axes': 'axes',
       'vueglobale.chantiers': 'workstreams',
+      'vueglobale.result': 'result',
+      'vueglobale.results': 'results',
+      'vueglobale.axe-prefix': 'Axis ',
 
       // ── Shared ──
       'shared.details': 'Details',

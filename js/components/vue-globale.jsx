@@ -161,7 +161,7 @@ function RSNRadialGraph({ darkMode }) {
                       <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
                         <div className="flex items-center gap-1.5 mb-1.5">
                           <span className="text-sm">{chantier.icon}</span>
-                          <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                          <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{tConfig(chantier, 'name')}</span>
                           <span className={`text-xs ${theme.textLight}`}>({chantierResults.length})</span>
                         </div>
                         {chantierResults.map(action => {
@@ -188,8 +188,8 @@ function RSNRadialGraph({ darkMode }) {
                     <>
                       <span className="text-2xl">{selectedNode.icon}</span>
                       <div>
-                        <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
-                        <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color, fontSize: 10 }}>{selectedNode.verb}</span>
+                        <h3 className={`font-bold ${theme.text} text-xs`}>{tConfig(selectedNode, 'name')}</h3>
+                        <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: selectedNode.color + '30', color: selectedNode.color, fontSize: 10 }}>{tConfig(selectedNode, 'verb')}</span>
                       </div>
                     </>
                   ) : (
@@ -198,7 +198,7 @@ function RSNRadialGraph({ darkMode }) {
                         {vueGlobaleData.actions.filter(a => a.axe === selectedNode.id).length}
                       </div>
                       <div>
-                        <h3 className={`font-bold ${theme.text} text-xs`}>{selectedNode.name}</h3>
+                        <h3 className={`font-bold ${theme.text} text-xs`}>{tConfig(selectedNode, 'name')}</h3>
                         <span className={`text-xs ${theme.textLight}`} style={{ fontSize: 10 }}>
                           {selectedNode.type === 'axe' ? t('parax.entity.label.axe') : selectedNode.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                         </span>
@@ -216,7 +216,7 @@ function RSNRadialGraph({ darkMode }) {
                         <div key={axe.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: axe.color }} />
-                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{axe.name}</span>
+                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{tConfig(axe, 'name')}</span>
                             <span className={`text-xs ${theme.textLight}`}>({axeActions.length})</span>
                           </div>
                           {axeActions.map(action => (
@@ -233,7 +233,7 @@ function RSNRadialGraph({ darkMode }) {
                         <div key={chantier.id} className={`${darkMode ? 'bg-slate-800/50' : 'bg-gray-100'} rounded-lg p-2`}>
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <span className="text-sm">{chantier.icon}</span>
-                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{chantier.name}</span>
+                            <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}>{tConfig(chantier, 'name')}</span>
                             <span className={`text-xs ${theme.textLight}`}>({chantierActions.length})</span>
                           </div>
                           {chantierActions.map(action => (
@@ -322,10 +322,10 @@ function RSNRadialGraph({ darkMode }) {
                       {isSearchHighlighted ? searchCount : percentage + '%'}
                     </text>
                     <text x={chantier.x} y={chantier.y + 18} fill={theme.svgLabelSecondary} fontSize="7" textAnchor="middle">
-                      {isSearchHighlighted ? 'résultat' + (searchCount > 1 ? 's' : '') : chantier.verb}
+                      {isSearchHighlighted ? (searchCount > 1 ? t('vueglobale.results') : t('vueglobale.result')) : tConfig(chantier, 'verb')}
                     </text>
                     <text x={chantier.x} y={chantier.y + (chantier.y > centerY ? 58 : -48)}
-                      fill={theme.svgLabelPrimary} fontSize="11" fontWeight="500" textAnchor="middle">{chantier.name}</text>
+                      fill={theme.svgLabelPrimary} fontSize="11" fontWeight="500" textAnchor="middle">{tConfig(chantier, 'name')}</text>
                   </g>
                 );
               })}
@@ -353,10 +353,10 @@ function RSNRadialGraph({ darkMode }) {
                       {isSearchHighlighted ? searchCount : actionCount}
                     </text>
                     <text x={labelX} y={labelY} fill={theme.svgLabelPrimary} fontSize="10" fontWeight="500"
-                      textAnchor={labelX > centerX ? "start" : "end"} dominantBaseline="middle">{axe.name}</text>
+                      textAnchor={labelX > centerX ? "start" : "end"} dominantBaseline="middle">{tConfig(axe, 'name')}</text>
                     <text x={labelX} y={labelY + 12} fill={theme.svgLabelTertiary} fontSize="8"
                       textAnchor={labelX > centerX ? "start" : "end"}>
-                      {axe.type === 'axe' ? `Axe ${axe.id.replace('A', '')}` : axe.type === 'champ' ? "Champ d'action" : 'Principe directeur'}
+                      {axe.type === 'axe' ? `${t('vueglobale.axe-prefix')}${axe.id.replace('A', '')}` : axe.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
                     </text>
                   </g>
                 );

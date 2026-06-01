@@ -641,7 +641,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                           <code style={{ fontSize: 10, color: textTertiary, fontFamily: 'ui-monospace, monospace' }}>{a.id}</code>
-                          <span style={{ fontSize: 10, color: statusObj.color, fontWeight: 600 }}>{statusObj.label}</span>
+                          <span style={{ fontSize: 10, color: statusObj.color, fontWeight: 600 }}>{tConfig(statusObj, 'label')}</span>
                         </div>
                         <div style={{ fontSize: 12, color: textPrimary, lineHeight: 1.45, marginTop: 2 }}>
                           {a.action}
@@ -744,7 +744,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                       <code style={{ fontSize: 10, color: textTertiary, fontFamily: 'ui-monospace, monospace' }}>{a.id}</code>
                       <span style={{
                         fontSize: 10, color: statusObj.color, fontWeight: 600,
-                      }}>{statusObj.label}</span>
+                      }}>{tConfig(statusObj, 'label')}</span>
                     </div>
                     <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{a.action}</div>
                   </div>
@@ -954,7 +954,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
             <div style={{ fontSize: 16, fontWeight: 600, color: textPrimary, lineHeight: 1.3 }}>
-              {entity.fullName || entity.name}
+              {tConfig(entity, 'fullName') || tConfig(entity, 'name')}
             </div>
             <div style={{ fontSize: 11, color: textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {entity.type === 'axe' ? t('parax.entity.label.axe') : entity.type === 'champ' ? t('parax.entity.label.champ') : t('parax.entity.label.principe')}
@@ -987,13 +987,13 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
               }}
             >
               <optgroup label={t('parax.optgroup.axes')}>
-                {axes.map(a => <option key={a.id} value={a.id}>{a.fullName || a.name}</option>)}
+                {axes.map(a => <option key={a.id} value={a.id}>{tConfig(a, 'fullName') || tConfig(a, 'name')}</option>)}
               </optgroup>
               <optgroup label={t('parax.optgroup.principes')}>
-                {principes.map(p => <option key={p.id} value={p.id}>{p.fullName || p.name}</option>)}
+                {principes.map(p => <option key={p.id} value={p.id}>{tConfig(p, 'fullName') || tConfig(p, 'name')}</option>)}
               </optgroup>
               <optgroup label={t('parax.optgroup.champs')}>
-                {champs.map(c => <option key={c.id} value={c.id}>{c.fullName || c.name}</option>)}
+                {champs.map(c => <option key={c.id} value={c.id}>{tConfig(c, 'fullName') || tConfig(c, 'name')}</option>)}
               </optgroup>
             </select>
           </div>
@@ -1028,9 +1028,9 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
             const total = allEntityActions.length;
             if (total === 0) return null;
             const segments = [
-              { key: 'terminé',     label: 'terminé',     count: counts['terminé'],     color: '#22c55e' },
-              { key: 'en cours',    label: 'en cours',    count: counts['en cours'],    color: '#f59e0b' },
-              { key: 'non démarré', label: 'non démarré', count: counts['non démarré'], color: darkMode ? '#334155' : '#d1d5db' },
+              { key: 'terminé',     label: tConfig(PROGRESS['terminé'],    'label').toLowerCase(), count: counts['terminé'],     color: '#22c55e' },
+              { key: 'en cours',    label: tConfig(PROGRESS['en cours'],   'label').toLowerCase(), count: counts['en cours'],    color: '#f59e0b' },
+              { key: 'non démarré', label: tConfig(PROGRESS['non démarré'],'label').toLowerCase(), count: counts['non démarré'], color: darkMode ? '#334155' : '#d1d5db' },
             ];
             return (
               <div>
@@ -1100,7 +1100,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
                   <span style={{
                     fontSize: 14, lineHeight: 1, color: p.color, fontWeight: 700,
                   }}>{p.icon}</span>
-                  <span>{p.label.toLowerCase()}</span>
+                  <span>{tConfig(p, 'label').toLowerCase()}</span>
                 </span>
               );
             })}
