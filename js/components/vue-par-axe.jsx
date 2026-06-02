@@ -137,6 +137,7 @@ function buildEntityData(entity, allActions) {
       projet: a.projet || '—',
       chantierId: a.chantier || '',
       statut: a.statutObjectif || 'non démarré',
+      coordination: a.coordination || [],
       action: a, // référence complète pour le détail
     }))
     .sort((a, b) => {
@@ -435,6 +436,12 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
             <text x={COL3_X + 14} y={s.y + 18} fontSize={11.5} fill={textSecondary} fontFamily="ui-monospace, monospace">
               {s.id}
             </text>
+            {s.coordination && s.coordination.length > 0 && (
+              <text x={COL3_X + COL3_W - 36} y={s.y + 18} fontSize={11} textAnchor="end">
+                <title>{t('shared.coord-label')} {s.coordination.join(', ')}</title>
+                🔗
+              </text>
+            )}
             <text x={COL3_X + COL3_W - 14} y={s.y + 18} fontSize={14} fill={PROGRESS_COLOR(s.statut)} textAnchor="end">
               {PROGRESS_ICON(s.statut)}
             </text>
