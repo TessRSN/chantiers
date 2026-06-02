@@ -437,10 +437,13 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
               {s.id}
             </text>
             {s.coordination && s.coordination.length > 0 && (
-              <text x={COL3_X + COL3_W - 36} y={s.y + 18} fontSize={11} textAnchor="end">
+              <g transform={`translate(${COL3_X + COL3_W - 44}, ${s.y + 8}) scale(0.55)`}
+                 fill="none" stroke={textSecondary} strokeWidth="2.4"
+                 strokeLinecap="round" strokeLinejoin="round">
                 <title>{t('shared.coord-label')} {s.coordination.join(', ')}</title>
-                🔗
-              </text>
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </g>
             )}
             <text x={COL3_X + COL3_W - 14} y={s.y + 18} fontSize={14} fill={PROGRESS_COLOR(s.statut)} textAnchor="end">
               {PROGRESS_ICON(s.statut)}

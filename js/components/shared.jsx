@@ -1,3 +1,15 @@
+// ── Petite icône chain-link monocolor (currentColor) — pour les badges Coordination ──
+function LinkIcon({ size = 12 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+         aria-hidden="true" style={{ flexShrink: 0 }}>
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  );
+}
+
 // ── Helper : retrouver une action par son ID dans le tableau d'actions complet ──
 function findActionById(allActions, id) {
   return allActions ? allActions.find(a => a.id === id) : null;
@@ -25,7 +37,10 @@ function CoordinationBadges({ ids, allActions, darkMode }) {
       display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6,
       fontSize: 11, color: darkMode ? '#94a3b8' : '#6b7280',
     }}>
-      <span style={{ fontStyle: 'italic' }}>🔗 {t('shared.coord-label')}</span>
+      <span style={{ fontStyle: 'italic', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        <LinkIcon size={12} />
+        {t('shared.coord-label')}
+      </span>
       {ids.map(id => {
         const linkedAction = findActionById(allActions, id);
         const entityId = entityIdFromActionId(id);
