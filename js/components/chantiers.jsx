@@ -353,9 +353,9 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
   if (!chantierConfig) return null;
 
   const projects = (chantierData && chantierData.projects) || [];
-  const allActions = projects.flatMap(p => p.actions);
-  const counts = countProgressStatuses(allActions);
-  const total = allActions.length;
+  const chantierActions = projects.flatMap(p => p.actions);
+  const counts = countProgressStatuses(chantierActions);
+  const total = chantierActions.length;
 
   const subtitleColor = darkMode ? '#94a3b8' : '#6b7280';
   const innerBg = darkMode ? '#0f172a' : '#f8fafc';
@@ -561,8 +561,8 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject,
             const actionCount = data && data.projects
               ? data.projects.reduce((s, p) => s + p.actions.length, 0)
               : 0;
-            const allActions = data && data.projects ? data.projects.flatMap(p => p.actions) : [];
-            const counts = countProgressStatuses(allActions);
+            const chantierActions = data && data.projects ? data.projects.flatMap(p => p.actions) : [];
+            const counts = countProgressStatuses(chantierActions);
             return (
               <button
                 key={c.id}
