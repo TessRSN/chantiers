@@ -172,6 +172,7 @@ function csvRowsToAllData(rows) {
     descriptionProjet:    row['Description projet']    || '',
     descriptionProjet_en: row['Description projet EN'] || '',
     notesAnalyse: row['Notes analyse'] || '',
+    coordination: (row['Coordination'] || '').split(';').map(s => s.trim()).filter(Boolean),
     destination: row['Destination'] || '',
     approuve: (row['Approuvé'] || 'oui').toLowerCase(),
     statutObjectif: row['Statut objectif'] || 'non démarré',
@@ -278,6 +279,7 @@ function buildAnalyseData(allRows) {
         action_en: row.action_en,
         status: row.statusAnalyse || 'keep',
         notes: row.notesAnalyse,
+        coordination: row.coordination || [],
         statutObjectif: row.statutObjectif,
       });
     } else {

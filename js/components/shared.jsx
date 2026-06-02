@@ -1,3 +1,59 @@
+// ── Helper : retrouver une action par son ID dans le tableau d'actions complet ──
+function findActionById(allActions, id) {
+  return allActions ? allActions.find(a => a.id === id) : null;
+}
+
+// ── Helper : déduire l'entité (axe/PD/champ) à partir d'un ID action ──
+function entityIdFromActionId(actionId) {
+  if (!actionId) return null;
+  const ax = actionId.match(/^(A[1-4])-/);            if (ax) return ax[1];
+  const pd = actionId.match(/^(PD-[A-Z]+)-/);         if (pd) return pd[1];
+  const ca = actionId.match(/^(CA-[A-Z]+)-/);         if (ca) return ca[1];
+  return null;
+}
+
+// ── Pastille « Coordonné avec : … » — affiche des badges cliquables qui ouvrent la vue
+//    par axe de l'entité ciblée. n'affiche rien si la liste est vide. ──
+function CoordinationBadges({ ids, allActions, darkMode }) {
+  if (!ids || ids.length === 0) return null;
+  const accentBg = darkMode ? '#1e293b' : '#eef2ff';
+  const accentBorder = darkMode ? '#6366f1' : '#c7d2fe';
+  const accentText = darkMode ? '#a5b4fc' : '#4f46e5';
+  return (
+    <div style={{
+      marginTop: 6,
+      display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6,
+      fontSize: 11, color: darkMode ? '#94a3b8' : '#6b7280',
+    }}>
+      <span style={{ fontStyle: 'italic' }}>🔗 {t('shared.coord-label')}</span>
+      {ids.map(id => {
+        const linkedAction = findActionById(allActions, id);
+        const entityId = entityIdFromActionId(id);
+        const title = linkedAction ? tConfig(linkedAction, 'action') : id;
+        return (
+          <a
+            key={id}
+            href={entityId ? `#par-axe?entite=${entityId}${window.LANG === 'en' ? '&lang=en' : ''}` : '#'}
+            title={title}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '2px 8px', borderRadius: 10,
+              background: accentBg,
+              border: `1px solid ${accentBorder}`,
+              color: accentText,
+              fontWeight: 600, fontFamily: 'ui-monospace, monospace',
+              textDecoration: 'none', fontSize: 10.5,
+              cursor: entityId ? 'pointer' : 'default',
+            }}
+          >
+            {id}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 function ProgressBadge({ statut, darkMode, size = 'sm' }) {
   const p = PROGRESS[statut] || PROGRESS['non démarré'];
   const bg = darkMode ? p.bgDark : p.bgLight;
@@ -59,6 +115,7 @@ function ActionDetail({ action, darkMode, theme, borderColor, showAxeLabel }) {
             <ProgressBadge statut={action.statutObjectif} darkMode={darkMode} size="xs" />
           </div>
           <p className={`${darkMode ? 'text-slate-200' : 'text-gray-800'} mt-0.5 leading-relaxed`}>{tConfig(action, 'action')}</p>
+          <CoordinationBadges ids={action.coordination} allActions={vueGlobaleData.actions} darkMode={darkMode} />
         </div>
         {hasExtra && (
           <button

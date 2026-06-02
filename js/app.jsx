@@ -344,6 +344,7 @@ function MainApp() {
           chantiersMeta={chantiersMeta}
           targetProject={targetProject}
           onTargetProjectConsumed={() => setTargetProject(null)}
+          allActions={allActions}
         />
       )}
       {!csvLoading && !csvError && activeTab === 'suivi' && <SuiviObjectifs darkMode={darkMode} actions={vueGlobaleData.actions} />}

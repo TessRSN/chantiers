@@ -149,7 +149,7 @@ function EntityPill({ entity, count, darkMode, onClick }) {
 }
 
 // ── Ligne d'action (color-codée par entité) ──
-function ActionRowAnalyse({ action, darkMode }) {
+function ActionRowAnalyse({ action, darkMode, allActions }) {
   const entity = getEntityFromActionId(action.id);
   const color = entity ? entity.color : (darkMode ? '#475569' : '#9ca3af');
   const statusObj = PROGRESS[action.statutObjectif || 'non démarré'];
@@ -193,13 +193,14 @@ function ActionRowAnalyse({ action, darkMode }) {
         }}>
           {tConfig(action, 'action')}
         </div>
+        <CoordinationBadges ids={action.coordination} allActions={allActions} darkMode={darkMode} />
       </div>
     </div>
   );
 }
 
 // ── Carte de sous-projet (collapsible) ──
-function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, forceOpen }) {
+function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, forceOpen, allActions }) {
   const [open, setOpen] = useState(false);
   // Auto-ouvre + scroll quand le projet est ciblé par URL
   const rootRef = useRef(null);
@@ -336,7 +337,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
                 .slice()
                 .sort((a, b) => a.id.localeCompare(b.id))
                 .map(action => (
-                  <ActionRowAnalyse key={action.id} action={action} darkMode={darkMode} />
+                  <ActionRowAnalyse key={action.id} action={action} darkMode={darkMode} allActions={allActions} />
                 ))}
             </div>
           </div>
@@ -347,7 +348,7 @@ function ProjectCardAnalyse({ project, darkMode, chantier, onContributorClick, f
 }
 
 // ── Section d'un chantier (carte avec contour, header + projets dedans) ──
-function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorClick, targetProject }) {
+function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorClick, targetProject, allActions }) {
   const chantierConfig = CHANTIERS_CONFIG.find(c => c.id === `C${chantierMeta.id}`);
   if (!chantierConfig) return null;
 
@@ -468,6 +469,7 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
                 chantier={chantierConfig}
                 onContributorClick={onContributorClick}
                 forceOpen={targetProject === project.id}
+                allActions={allActions}
               />
             ))
         ) : (
@@ -484,7 +486,7 @@ function ChantierSection({ chantierMeta, chantierData, darkMode, onContributorCl
 }
 
 // ── Composant principal Analyse des chantiers ──
-function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject, onTargetProjectConsumed }) {
+function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject, onTargetProjectConsumed, allActions }) {
   // Quand un projet est ciblé via URL, on consomme le paramètre après le scroll
   useEffect(() => {
     if (targetProject && onTargetProjectConsumed) {
@@ -633,6 +635,7 @@ function AnalyseChantiers({ darkMode, analyseData, chantiersMeta, targetProject,
                 darkMode={darkMode}
                 onContributorClick={handleContributorClick}
                 targetProject={targetProject}
+                allActions={allActions}
               />
             </div>
           ))}

@@ -121,6 +121,7 @@
       'shared.details': 'Détails',
       'shared.original-action': 'Action originale :',
       'shared.os-label': 'Objectif stratégique :',
+      'shared.coord-label': 'Coordonné avec :',
     },
     en: {
       // ── App / header / tabs ──
@@ -225,6 +226,7 @@
       'shared.details': 'Details',
       'shared.original-action': 'Original action:',
       'shared.os-label': 'Strategic objective:',
+      'shared.coord-label': 'Coordinated with:',
     },
   };
 

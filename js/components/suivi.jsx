@@ -27,6 +27,7 @@ function SuiviObjectifs({ darkMode, actions }) {
         os: extractOSLocal(a.id),
         texte:    a.action,
         texte_en: a.action_en,
+        coordination: a.coordination || [],
         objectif: a.objectif,
         statut: a.statutObjectif || 'non démarré',
         axeId: axeConfig?.id || a.axe,
@@ -184,6 +185,7 @@ function SuiviObjectifs({ darkMode, actions }) {
                         {obj.objectif}
                       </div>
                     )}
+                    <CoordinationBadges ids={obj.coordination} allActions={actions} darkMode={darkMode} />
                     {/* Pastilles : entité (axe/PD/CA), projet (avec chantier) */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 'auto' }}>
                       {/* Entité */}

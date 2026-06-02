@@ -527,7 +527,7 @@ function SankeyDiagram({ entity, data, darkMode, onNodeClick, hoveredKey, setHov
 
 // ── Panneau « Tout le chantier » : montre toutes les actions d'un projet, groupées par axe,
 //    avec les actions de l'entité courante surlignées ──
-function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
+function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose, allActions }) {
   if (!projectId || !data) return null;
   const project = data.projectList.find(p => p.id === projectId);
   if (!project) return null;
@@ -652,6 +652,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
                         <div style={{ fontSize: 12, color: textPrimary, lineHeight: 1.45, marginTop: 2 }}>
                           {tConfig(a, 'action')}
                         </div>
+                        <CoordinationBadges ids={a.coordination} allActions={allActions} darkMode={darkMode} />
                       </div>
                     </div>
                   );
@@ -666,7 +667,7 @@ function ChantierDetailPanel({ projectId, entityId, data, darkMode, onClose }) {
 }
 
 // ── Liste des actions groupée par OS ──
-function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, onProjectClick }) {
+function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, onProjectClick, allActions }) {
   const listRef = useRef(null);
 
   useEffect(() => {
@@ -753,6 +754,7 @@ function ActionsParOS({ entity, data, darkMode, highlightedKey, scrollTargetId, 
                       }}>{tConfig(statusObj, 'label')}</span>
                     </div>
                     <div style={{ fontSize: 12.5, color: textPrimary, lineHeight: 1.45 }}>{tConfig(a, 'action')}</div>
+                    <CoordinationBadges ids={a.coordination} allActions={allActions} darkMode={darkMode} />
                   </div>
                   {chantier && projectInfo && (
                     <button
@@ -1119,6 +1121,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
               data={data}
               darkMode={darkMode}
               onClose={() => setExpandedProjectId(null)}
+              allActions={allActions}
             />
           )}
         </div>
@@ -1138,6 +1141,7 @@ function VueParAxe({ darkMode, allActions, gouvernanceData, selectedEntityId, on
             highlightedKey={hoveredKey}
             scrollTargetId={scrollTargetId}
             onProjectClick={handleProjectClickFromList}
+            allActions={allActions}
           />
         </div>
 
