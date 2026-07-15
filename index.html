@@ -12,7 +12,7 @@
 <body>
   <div id="root"></div>
   <script>
-    var VERSION = '7.7';
+    var VERSION = '7.8';
     var modules = [
       'js/config.js',
       'js/i18n.js',
@@ -32,7 +32,7 @@
       });
     }))
     .then(function(sources) {
-      var result = Babel.transform(sources.join('\n;\n'), { presets: ['env', 'react'] });
+      var result = Babel.transform(sources.join('\n;\n'), { presets: ['react'] });
       (0, eval)(result.code);
     })
     .catch(function(err) {
